@@ -19,7 +19,7 @@ Future<void> initializeService() async {
       isForegroundMode: true,
       // 前景通知的設定
       // notificationChannelId: 'my_foreground',
-      initialNotificationTitle: '背景計時器',
+      initialNotificationTitle: '背景碼錶',
       initialNotificationContent: '正在初始化...',
       foregroundServiceNotificationId: 888,
     ),
@@ -65,24 +65,23 @@ void onStart(ServiceInstance service) async {
     service.stopSelf();
   });
 
-  // 計時器變數
+  // 碼錶變數
   int seconds = 0;
   Timer? timer;
 
-  // 啟動計時器
+  // 啟動碼錶
   timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
     seconds++;
-
     // 更新前景通知內容
     if (service is AndroidServiceInstance) {
-      // 如果你想在通知中顯示計時器，可以在這裡更新
+      // 如果你想在通知中顯示碼錶，可以在這裡更新
       service.setForegroundNotificationInfo(
-        title: "背景計時器執行中",
+        title: "背景碼錶執行中",
         content: "已過時間：$seconds 秒",
       );
     }
 
-    // 將計時器更新發送到前景 UI
+    // 將碼錶更新發送到前景 UI
     service.invoke(
       'update',
       {
@@ -110,7 +109,6 @@ class StopWatch extends StatefulWidget {
 class _StopWatchState extends State<StopWatch> {
   TextToSpeech tts = TextToSpeech();
   final FlutterBackgroundService _service = FlutterBackgroundService();
-  String _text = "點擊按鈕啟動計時器";
   int _secondsElapsed = 0;
   bool _isRunning = false;
 
@@ -127,13 +125,20 @@ class _StopWatchState extends State<StopWatch> {
       if (event != null && event.containsKey("seconds")) {
         setState(() {
           _secondsElapsed = event["seconds"];
-          _text = "計時器執行中：$_secondsElapsed 秒";
-          if(_secondsElapsed > 0 && _secondsElapsed % 10 == 0) {
-            tts.speak("已過 $_secondsElapsed 秒");
+          if(_secondsElapsed > 0 && _secondsElapsed % 60 == 0) {
+            var str = formatTime(_secondsElapsed);
+            tts.speak("時間 $str");
           }
         });
       }
     });
+  }
+
+ @override
+  void dispose() async {
+    super.dispose();
+    bool isRunning = await _service.isRunning();
+    if (isRunning) _toggleService();
   }
 
   // 檢查服務狀態並更新 UI
@@ -142,11 +147,11 @@ class _StopWatchState extends State<StopWatch> {
     setState(() {
       _isRunning = isRunning;
       if (isRunning) {
-        _text = "計時器執行中... (從背景恢復)";
+        // _text = "碼錶執行中... (從背景恢復)";
         // 如果服務正在運行，可以請求一次當前時間
         // 注意：這需要你在 onStart 中處理一個 'requestCurrentTime' 之類的事件
       } else {
-        _text = "點擊按鈕啟動計時器";
+        // _text = "";
         _secondsElapsed = 0;
       }
     });
@@ -159,42 +164,67 @@ class _StopWatchState extends State<StopWatch> {
       // 如果正在運行，則停止服務
       _service.invoke("stopService");
       setState(() {
-        _text = "計時器已停止";
+        // _text = "";
         _isRunning = false;
-        // _secondsElapsed = 0; // 根據需求決定是否重置
+        _secondsElapsed = 0; // 根據需求決定是否重置
+        tts.speak("停止碼錶");
       });
     } else {
-      // 如果未運行，則啟動服務
-      // 注意：由於 autoStart 為 false，我們需要手動啟動
-      // 這裡我們假設 onStart 會自動開始計時
-      // 如果你想在服務啟動後才開始計時，你需要在 onStart 中添加一個 'startTimer' 事件
-      // 並在這裡 invoke('startTimer')
       await _service.startService();
       setState(() {
-        _text = "計時器已啟動";
+        // _text = "碼錶已啟動";
         _isRunning = true;
+        tts.speak("啟動碼錶");
       });
     }
   }
 
+  // 格式化時間，將秒數轉換為 HH:mm:ss 格式
+  String formatDuration(int sec) {
+    final hours = (sec ~/ 3600); // .toString().padLeft(2, '0');
+    final minutes = ((sec % 3600) ~/ 60).toString().padLeft(2, '0');
+    final seconds = (sec % 60).toString().padLeft(2, '0');
+    return "${hours == 0 ? "" : "$hours.toString().padLeft(2, '0'):"}$minutes:$seconds";
+  }
+
+  String formatTime(int sec) {
+    var str = "";
+    final hours = (sec ~/ 3600); // .toString().padLeft(2, '0');
+    if(hours > 0) {
+      str += "$hours 小時";
+    }
+    final minutes = ((sec % 3600) ~/ 60);
+    if(minutes > 0) {
+      str += "$minutes 分鐘";
+    }
+    return str;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return  Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          const Center(child: Text('StopWatch 頁，中文')),
-          IconButton(
-            icon: Icon(Icons.email),
-            onPressed: () {
-              tts.speak("Hello World, 你好，今天天氣晴朗");
-            },
+    return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.blue, //  Theme.of(context).colorScheme.inversePrimary,
+          title: Text("報時碼錶",
+              style: TextStyle(
+              // fontSize: 40,
+              color: Colors.white,
+            ),
           ),
-          const SizedBox(height: 60),
-          Text(
-              _text,
-              style: Theme.of(context).textTheme.headlineMedium,
+        ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            const Center(),
+            // const SizedBox(height: 60),
+            Text(
+              formatDuration(_secondsElapsed),
+              style: TextStyle(
+                fontSize: 80,
+              ),
               textAlign: TextAlign.center,
+              
             ),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -203,10 +233,11 @@ class _StopWatchState extends State<StopWatch> {
                 padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                 textStyle: const TextStyle(fontSize: 18),
               ),
-              child: Text(_isRunning ? '停止計時器' : '啟動計時器'),
+              child: Text(_isRunning ? '停止碼錶' : '啟動碼錶'),
             ),
 
-        ],
+          ],
+      )
     );
   }
 }
