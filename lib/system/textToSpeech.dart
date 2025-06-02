@@ -12,11 +12,11 @@ class TextToSpeech {
     _getDefaultVoice();
 
     flutterTts.setStartHandler(() {
-        print("Playing");
+      // print("Playing");
     });
 
     flutterTts.setCompletionHandler(() {
-        print("Complete");
+      // print("Complete");
     });
 
     flutterTts.setCancelHandler(() {
@@ -24,7 +24,7 @@ class TextToSpeech {
     });
 
     flutterTts.setPauseHandler(() {
-      print("Paused");
+      // print("Paused");
     });
 
     flutterTts.setContinueHandler(() {
@@ -32,7 +32,7 @@ class TextToSpeech {
     });
 
     flutterTts.setErrorHandler((msg) {
-        print("error: $msg");
+      print("TTS error: $msg");
     });
     // flutterTts.setLanguage("");
     // await flutterTts.getLanguages
@@ -40,22 +40,22 @@ class TextToSpeech {
 
   setup() async {
     try {
-      dynamic languages = await flutterTts.getLanguages;
+      // dynamic languages = await flutterTts.getLanguages;
       // print("languages: $languages");
       // if (languages != null) {
-        await flutterTts.setLanguage(ttsLanguage);
-        await flutterTts.setSpeechRate(0.5);
-        await flutterTts.setVolume(1.0);
-        await flutterTts.setPitch(1.0);
+      await flutterTts.setLanguage(ttsLanguage);
+      await flutterTts.setSpeechRate(0.5);
+      await flutterTts.setVolume(1.0);
+      await flutterTts.setPitch(1.0);
     } catch (e) {
-        print("設定 TTS 語言失敗: $e");
-        // 可以設定一個備用語言或讓 TTS 使用系統預設
+      print("設定 TTS 語言失敗: $e");
+      // 可以設定一個備用語言或讓 TTS 使用系統預設
     }
   }
 
-  Future<void> speak(String text) async{
+  Future<void> speak(String text) async {
     var result = await flutterTts.speak(text);
-    print('$text: $result');
+    // print('$text: $result');
     // if (result == 1) setState(() => ttsState = TtsState.playing);
   }
 

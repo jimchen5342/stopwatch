@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:myapp/textToSpeech.dart';
+import 'package:myapp/system/textToSpeech.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 
@@ -56,9 +56,7 @@ void onStart(ServiceInstance service) async {
       service.setAsBackgroundService();
     });
   }
-  service.on("start").listen((event) {
-
-  });
+  service.on("start").listen((event) {});
 
   // 監聽 'stopService' 事件，停止服務
   service.on('stopService').listen((event) {
@@ -82,21 +80,11 @@ void onStart(ServiceInstance service) async {
     }
 
     // 將碼錶更新發送到前景 UI
-    service.invoke(
-      'update',
-      {
-        "seconds": seconds,
-      },
-    );
+    service.invoke('update', {"seconds": seconds});
   });
 
   // 初始通知（可以根據需要自訂）
-  service.invoke(
-    'update',
-    {
-      "seconds": 0,
-    },
-  );
+  service.invoke('update', {"seconds": 0});
 }
 
 class StopWatch extends StatefulWidget {
@@ -125,7 +113,7 @@ class _StopWatchState extends State<StopWatch> {
       if (event != null && event.containsKey("seconds")) {
         setState(() {
           _secondsElapsed = event["seconds"];
-          if(_secondsElapsed > 0 && _secondsElapsed % 60 == 0) {
+          if (_secondsElapsed > 0 && _secondsElapsed % 60 == 0) {
             var str = formatTime(_secondsElapsed);
             tts.speak("時間 $str");
           }
@@ -134,11 +122,12 @@ class _StopWatchState extends State<StopWatch> {
     });
   }
 
- @override
+  @override
   void dispose() async {
+    _service.invoke("stopService");
+    tts.speak("關閉碼錶");
+    // tts = null;
     super.dispose();
-    bool isRunning = await _service.isRunning();
-    if (isRunning) _toggleService();
   }
 
   // 檢查服務狀態並更新 UI
@@ -184,17 +173,21 @@ class _StopWatchState extends State<StopWatch> {
     final hours = (sec ~/ 3600); // .toString().padLeft(2, '0');
     final minutes = ((sec % 3600) ~/ 60).toString().padLeft(2, '0');
     final seconds = (sec % 60).toString().padLeft(2, '0');
-    return "${hours == 0 ? "" : "$hours.toString().padLeft(2, '0'):"}$minutes:$seconds";
+    var h = "";
+    if (hours > 0) {
+      h = "${hours.toString().padLeft(2, '0')}:";
+    }
+    return "$h$minutes:$seconds";
   }
 
   String formatTime(int sec) {
     var str = "";
     final hours = (sec ~/ 3600); // .toString().padLeft(2, '0');
-    if(hours > 0) {
+    if (hours > 0) {
       str += "$hours 小時";
     }
     final minutes = ((sec % 3600) ~/ 60);
-    if(minutes > 0) {
+    if (minutes > 0) {
       str += "$minutes 分鐘";
     }
     return str;
@@ -203,41 +196,39 @@ class _StopWatchState extends State<StopWatch> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.blue, //  Theme.of(context).colorScheme.inversePrimary,
-          title: Text("報時碼錶",
-              style: TextStyle(
-              // fontSize: 40,
-              color: Colors.white,
-            ),
+      appBar: AppBar(
+        backgroundColor:
+            Colors.blue, //  Theme.of(context).colorScheme.inversePrimary,
+        title: Text(
+          "報時碼錶",
+          style: TextStyle(
+            // fontSize: 40,
+            color: Colors.white,
           ),
         ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            const Center(),
-            // const SizedBox(height: 60),
-            Text(
-              formatDuration(_secondsElapsed),
-              style: TextStyle(
-                fontSize: 80,
-              ),
-              textAlign: TextAlign.center,
-              
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          const Center(),
+          // const SizedBox(height: 60),
+          Text(
+            formatDuration(_secondsElapsed),
+            style: TextStyle(fontSize: 80),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: _toggleService,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+              textStyle: const TextStyle(fontSize: 18),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _toggleService,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                textStyle: const TextStyle(fontSize: 18),
-              ),
-              child: Text(_isRunning ? '停止碼錶' : '啟動碼錶'),
-            ),
-
-          ],
-      )
+            child: Text(_isRunning ? '停止碼錶' : '啟動碼錶'),
+          ),
+        ],
+      ),
     );
   }
 }
