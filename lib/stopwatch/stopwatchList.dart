@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:myapp/system/storage.dart';
 import 'package:myapp/stopwatch/stopwatch.dart';
+import 'package:myapp/stopwatch/stopwatchEdit.dart';
 
 class StopWatchList extends StatefulWidget {
   const StopWatchList({super.key});
@@ -13,6 +14,7 @@ class StopWatchList extends StatefulWidget {
 class _StopWatchListState extends State<StopWatchList> {
   StorageManager storage = StorageManager();
   List<dynamic> _stopwatchList = [];
+  int active = -1;
 
   @override
   initState() {
@@ -22,7 +24,7 @@ class _StopWatchListState extends State<StopWatchList> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await storage.initStorage();
       _stopwatchList = await storage.readJsonArray("stopwatch");
-      print(_stopwatchList);
+      // print(_stopwatchList);
       if (_stopwatchList.isEmpty) {
         _stopwatchList = [
           {"title": "預設", "interval": 1},
@@ -42,7 +44,12 @@ class _StopWatchListState extends State<StopWatchList> {
 
   String descrip(dynamic json) {
     String s1 = "";
-    // json["interval"];
+
+    if (json is Map && json.containsKey('interval')) {
+      s1 = '間隔 ${json['interval']} 分鐘報時';
+    } else {
+      print('myData 不包含 key "age" 或 myData 不是一個 Map');
+    }
 
     return s1;
   }
@@ -70,11 +77,28 @@ class _StopWatchListState extends State<StopWatchList> {
             title: Text(_stopwatchList[index]["title"]),
             subtitle: Text(descrip(_stopwatchList[index])),
             onTap: () async {
+              active = index;
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const StopWatch()),
+                MaterialPageRoute(
+                  builder: (context) => const StopWatch(),
+                  settings: RouteSettings(arguments: _stopwatchList[index]),
+                ),
               );
             },
+            onLongPress: () {
+              active = index;
+              print("onLongPress: $index");
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const StopWatchEdit(),
+                  settings: RouteSettings(arguments: _stopwatchList[index]),
+                ),
+              );
+            },
+            trailing: Icon(Icons.keyboard_arrow_right),
+            selected: active == index,
           );
         },
       ),

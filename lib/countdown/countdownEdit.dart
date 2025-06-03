@@ -1,14 +1,14 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-class CountDown extends StatefulWidget {
-  const CountDown({super.key});
+class CountDownEdit extends StatefulWidget {
+  const CountDownEdit({super.key});
 
   @override
-  State<CountDown> createState() => _CountDownState();
+  State<CountDownEdit> createState() => _CountDownEditState();
 }
 
-class _CountDownState extends State<CountDown> {
+class _CountDownEditState extends State<CountDownEdit> {
   @override
   initState() {
     super.initState();

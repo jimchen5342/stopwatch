@@ -103,6 +103,9 @@ class _StopWatchState extends State<StopWatch> {
   @override
   initState() {
     super.initState();
+
+    // print(ModalRoute.of(context)?.settings.arguments);
+
     tts.setup();
     initializeService();
 
@@ -119,6 +122,11 @@ class _StopWatchState extends State<StopWatch> {
           }
         });
       }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      var args = ModalRoute.of(context)?.settings.arguments;
+      print(args);
     });
   }
 
