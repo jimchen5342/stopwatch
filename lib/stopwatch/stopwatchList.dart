@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:myapp/system/storage.dart';
 import 'package:myapp/stopwatch/stopwatch.dart';
@@ -23,6 +22,7 @@ class _StopWatchListState extends State<StopWatchList> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await storage.initStorage();
+
       _stopwatchList = await storage.readJsonArray("stopwatch");
       // print(_stopwatchList);
       if (_stopwatchList.isEmpty) {
@@ -42,6 +42,24 @@ class _StopWatchListState extends State<StopWatchList> {
     super.dispose();
   }
 
+  @override
+  void reassemble() async {
+    super.reassemble();
+
+    // defaultPage();
+  }
+
+  defaultPage() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const StopWatchEdit(),
+        settings: RouteSettings(arguments: _stopwatchList[0]),
+      ),
+    );
+    print(result);
+  }
+
   String descrip(dynamic json) {
     String s1 = "";
 
@@ -50,7 +68,6 @@ class _StopWatchListState extends State<StopWatchList> {
     } else {
       print('myData 不包含 key "age" 或 myData 不是一個 Map');
     }
-
     return s1;
   }
 
@@ -58,8 +75,11 @@ class _StopWatchListState extends State<StopWatchList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor:
-            Colors.blue, //  Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Colors.blue,
+        // leading: IconButton(
+        //   icon: Icon(Icons.arrow_back, color: Colors.white),
+        //   onPressed: () => print('按下選單'),
+        // ),
         title: Text(
           "報時碼錶清單",
           style: TextStyle(
@@ -67,6 +87,21 @@ class _StopWatchListState extends State<StopWatchList> {
             color: Colors.white,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add, color: Colors.white),
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const StopWatchEdit()),
+              );
+            },
+          ),
+          // IconButton(
+          //   icon: Icon(Icons.search, color: Colors.white),
+          //   onPressed: () => print('按下搜尋'),
+          // ),
+        ],
       ),
       body: ListView.builder(
         shrinkWrap: true,
@@ -86,16 +121,21 @@ class _StopWatchListState extends State<StopWatchList> {
                 ),
               );
             },
-            onLongPress: () {
+            onLongPress: () async {
               active = index;
-              print("onLongPress: $index");
-              Navigator.push(
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const StopWatchEdit(),
                   settings: RouteSettings(arguments: _stopwatchList[index]),
                 ),
               );
+              if (result != null) {
+                setState(() {
+                  _stopwatchList.add(result);
+                });
+              }
+              // print(_stopwatchList)
             },
             trailing: Icon(Icons.keyboard_arrow_right),
             selected: active == index,

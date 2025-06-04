@@ -43,10 +43,7 @@ class _HomeState extends State<Home> {
             icon: Icon(Icons.access_time_sharp),
             label: '碼錶',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.access_alarms_sharp),
-            label: '計時器',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.alarm), label: '計時器'),
         ],
         currentIndex: _selectedIndex, // 目前選中的項目索引
         selectedItemColor: Colors.amber[800], // 選中項目的顏色

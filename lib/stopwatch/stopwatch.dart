@@ -203,10 +203,27 @@ class _StopWatchState extends State<StopWatch> {
 
   @override
   Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+
+        // if (await _isExitDesired() && context.mounted) {
+        _exitSetup();
+        // }
+      },
+      child: scaffold(),
+    );
+  }
+
+  Widget scaffold() {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor:
-            Colors.blue, //  Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Colors.blue,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => _exitSetup(),
+        ),
         title: Text(
           "報時碼錶",
           style: TextStyle(
@@ -215,28 +232,36 @@ class _StopWatchState extends State<StopWatch> {
           ),
         ),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          const Center(),
-          // const SizedBox(height: 60),
-          Text(
-            formatDuration(_secondsElapsed),
-            style: TextStyle(fontSize: 80),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: _toggleService,
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-              textStyle: const TextStyle(fontSize: 18),
-            ),
-            child: Text(_isRunning ? '停止碼錶' : '啟動碼錶'),
-          ),
-        ],
-      ),
+      body: body(),
     );
+  }
+
+  Widget body() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        const Center(),
+        Text(
+          formatDuration(_secondsElapsed),
+          style: TextStyle(fontSize: 80),
+          textAlign: TextAlign.center,
+        ),
+        Container(height: 20),
+        ElevatedButton(
+          onPressed: _toggleService,
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+            textStyle: const TextStyle(fontSize: 18),
+          ),
+          child: Text(_isRunning ? '停止碼錶' : '啟動碼錶'),
+        ),
+      ],
+    );
+  }
+
+  void _exitSetup() {
+    Navigator.of(context).pop();
+    print("stopWatch.pop");
   }
 }

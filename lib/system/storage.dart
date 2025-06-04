@@ -12,7 +12,7 @@ class StorageManager {
 
   Future<void> initStorage() async {
     await initLocalStorage();
-    // localStorage.clear();
+    localStorage.clear();
   }
 
   getItem(String key) {
@@ -30,13 +30,13 @@ class StorageManager {
   }
 
   Future<List<String>> readStringArray(String key) async {
-     var s = localStorage.getItem(key) ?? "[]";
-      List<String> dataList = jsonDecode(s);
+    var s = localStorage.getItem(key) ?? "[]";
+    List<String> dataList = jsonDecode(s);
     return dataList;
   }
 
   Future<List<num>> readNumberArray(String key) async {
-     var s = localStorage.getItem(key) ?? "[]";
+    var s = localStorage.getItem(key) ?? "[]";
     List<num> dataList = jsonDecode(s);
     return dataList;
   }
