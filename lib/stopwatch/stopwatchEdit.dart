@@ -70,6 +70,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
 
   Widget scaffold() {
     return Scaffold(
+      // resizeToAvoidBottomInset: false,
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
@@ -85,7 +86,17 @@ class _StopWatchEditState extends State<StopWatchEdit> {
           ),
         ),
       ),
-      body: body(),
+      body: SingleChildScrollView(
+        physics: NeverScrollableScrollPhysics(),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minWidth: MediaQuery.of(context).size.width,
+            minHeight: MediaQuery.of(context).size.height - 100,
+          ),
+          child: IntrinsicHeight(child: body()),
+        ),
+      ),
+      //body(),
     );
   }
 
@@ -101,7 +112,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
     );
     return Column(
       children: [
-        SizedBox(height: 20), // 第一列，標題
+        SizedBox(height: 10), // 第一列，標題
         Row(
           children: [
             SizedBox(width: 20),
@@ -116,6 +127,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
               child: TextField(
                 controller: ctrlTitle,
                 decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(5.0),
                   border: OutlineInputBorder(),
                   // labelText: "whatever you want",
                   // hintText: "whatever you want",
@@ -129,7 +141,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
             SizedBox(width: 20),
           ],
         ),
-        SizedBox(height: 20), // 第二列
+        SizedBox(height: 10), // 第二列
         Row(
           children: [
             SizedBox(width: 20),
@@ -140,6 +152,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
                 controller: ctrlInterval,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(5.0),
                   border: OutlineInputBorder(),
                   // labelText: "whatever you want",
                   // icon: Icon(Icons.phone_iphone),
@@ -159,7 +172,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
             SizedBox(width: 20),
           ],
         ),
-        SizedBox(height: 20), // 第三列
+        SizedBox(height: 10), // 第三列
         Row(
           children: [
             SizedBox(width: 20),
@@ -176,6 +189,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
                 controller: ctrlInterval1,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(5.0),
                   border: OutlineInputBorder(),
                   // hintText: '',
                 ),
@@ -195,6 +209,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
               child: TextField(
                 controller: ctrlInterval1Txt,
                 decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(5.0),
                   border: OutlineInputBorder(),
                   hintText: "開始休息",
                 ),
@@ -206,7 +221,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
             SizedBox(width: 20),
           ],
         ),
-        SizedBox(height: 20), // 第四列
+        SizedBox(height: 10), // 第四列
         Row(
           children: [
             SizedBox(width: 20),
@@ -223,6 +238,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
                 controller: ctrlInterval2,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(5.0),
                   border: OutlineInputBorder(),
                   // hintText: '',
                 ),
@@ -242,6 +258,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
               child: TextField(
                 controller: ctrlInterval2Txt,
                 decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(5.0),
                   border: OutlineInputBorder(),
                   hintText: "開始運動",
                 ),

@@ -99,11 +99,11 @@ class _StopWatchState extends State<StopWatch> {
   final FlutterBackgroundService _service = FlutterBackgroundService();
   int _secondsElapsed = 0;
   bool _isRunning = false;
+  dynamic setting;
 
   @override
   initState() {
     super.initState();
-
     // print(ModalRoute.of(context)?.settings.arguments);
 
     tts.setup();
@@ -125,8 +125,8 @@ class _StopWatchState extends State<StopWatch> {
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      var args = ModalRoute.of(context)?.settings.arguments;
-      print(args);
+      setting = ModalRoute.of(context)?.settings.arguments;
+      setState(() {});
     });
   }
 
@@ -225,7 +225,7 @@ class _StopWatchState extends State<StopWatch> {
           onPressed: () => _exitSetup(),
         ),
         title: Text(
-          "報時碼錶",
+          "報時碼錶${setting != null ? '[' + setting['title'] + ']' : ''}",
           style: TextStyle(
             // fontSize: 40,
             color: Colors.white,

@@ -28,8 +28,9 @@ class _StopWatchListState extends State<StopWatchList> {
       print(_stopwatchList);
       if (_stopwatchList.isEmpty) {
         _stopwatchList = [
-          {"title": "預設", "interval": 1},
+          {"key": 1, "title": "預設", "interval": 1},
           {
+            "key": 2,
             "title": "超慢跑",
             "interval": 1,
             "interval1": 4,
