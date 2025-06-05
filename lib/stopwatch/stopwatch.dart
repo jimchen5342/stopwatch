@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/system/textToSpeech.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
+import 'package:myapp/system/module.dart';
 
 // 初始化背景服務的函數
 Future<void> initializeService() async {
@@ -100,6 +101,7 @@ class _StopWatchState extends State<StopWatch> {
   int _secondsElapsed = 0;
   bool _isRunning = false;
   dynamic setting;
+  List<String> recoders = [];
 
   @override
   initState() {
@@ -108,7 +110,6 @@ class _StopWatchState extends State<StopWatch> {
 
     tts.setup();
     initializeService();
-
     _checkServiceStatus();
 
     // 監聽來自背景服務的 'update' 事件
@@ -118,7 +119,7 @@ class _StopWatchState extends State<StopWatch> {
           _secondsElapsed = event["seconds"];
           if (_secondsElapsed > 0 && _secondsElapsed % 60 == 0) {
             var str = formatTime(_secondsElapsed);
-            tts.speak("時間 $str");
+            speak("時間 $str");
           }
         });
       }
@@ -133,9 +134,16 @@ class _StopWatchState extends State<StopWatch> {
   @override
   void dispose() async {
     _service.invoke("stopService");
-    tts.speak("關閉碼錶");
+    speak("關閉碼錶");
     // tts = null;
     super.dispose();
+  }
+
+  @override
+  void reassemble() async {
+    super.reassemble();
+
+    // print("tts.time: " + DateTime.now().format(pattern: "HH:mm:ss:ms"));
   }
 
   // 檢查服務狀態並更新 UI
@@ -164,14 +172,14 @@ class _StopWatchState extends State<StopWatch> {
         // _text = "";
         _isRunning = false;
         _secondsElapsed = 0; // 根據需求決定是否重置
-        tts.speak("停止碼錶");
+        speak("停止碼錶");
       });
     } else {
       await _service.startService();
       setState(() {
         // _text = "碼錶已啟動";
         _isRunning = true;
-        tts.speak("啟動碼錶");
+        speak("啟動碼錶");
       });
     }
   }
@@ -199,6 +207,17 @@ class _StopWatchState extends State<StopWatch> {
       str += "$minutes 分鐘";
     }
     return str;
+  }
+
+  void speak(String txt) async {
+    var result = await tts.speak(txt);
+    print("tts.speak: $result, $txt");
+    if (result == "1") {
+      recoders.insert(
+        0,
+        "${DateTime.now().format(pattern: "HH:mm:ss:ms")}: $txt",
+      );
+    }
   }
 
   @override
@@ -256,7 +275,19 @@ class _StopWatchState extends State<StopWatch> {
           ),
           child: Text(_isRunning ? '停止碼錶' : '啟動碼錶'),
         ),
+        _widget(),
       ],
+    );
+  }
+
+  Widget _widget() {
+    return Expanded(
+      child: ListView.builder(
+        itemCount: recoders.length,
+        itemBuilder: (context, index) {
+          return ListTile(title: Text(recoders[index]));
+        },
+      ),
     );
   }
 

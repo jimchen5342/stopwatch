@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/system/storage.dart';
+import 'package:myapp/system/module.dart';
 
 class StopWatchEdit extends StatefulWidget {
   const StopWatchEdit({super.key});
@@ -271,27 +271,28 @@ class _StopWatchEditState extends State<StopWatchEdit> {
           ],
         ),
         Expanded(flex: 1, child: Container()),
-        ElevatedButton(
-          style: raisedButtonStyle,
-          onPressed: () {},
-          child: Text('存檔'),
-        ),
+        if (isEdit == true)
+          ElevatedButton(
+            style: raisedButtonStyle,
+            onPressed: () {},
+            child: Text('存檔'),
+          ),
       ],
     );
   }
 
   onChange(TextEditingController ctrl) {
     String text = ctrl.text;
-    print('First text field: $text (${text.characters.length})');
+    isEdit = true;
   }
 
   void _exitSetup() {
     Navigator.of(context).pop();
-    print("stopWatchEdit.pop");
   }
 
   save() async {
     StorageManager storage = StorageManager();
     List<dynamic> _stopwatchList = await storage.readJsonArray("stopwatch");
+
   }
 }

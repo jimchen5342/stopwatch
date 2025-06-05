@@ -53,10 +53,9 @@ class TextToSpeech {
     }
   }
 
-  Future<void> speak(String text) async {
+  Future<String> speak(String text) async {
     var result = await flutterTts.speak(text);
-    // print('$text: $result');
-    // if (result == 1) setState(() => ttsState = TtsState.playing);
+    return '$result';
   }
 
   Future<void> _getDefaultEngine() async {
