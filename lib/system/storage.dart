@@ -12,6 +12,10 @@ class StorageManager {
 
   Future<void> initStorage() async {
     await initLocalStorage();
+    // localStorage.clear();
+  }
+
+  clear() {
     localStorage.clear();
   }
 

@@ -90,6 +90,15 @@ class _StopWatchEditState extends State<StopWatchEdit> {
   }
 
   Widget body() {
+    final ButtonStyle raisedButtonStyle = ElevatedButton.styleFrom(
+      foregroundColor: Colors.white,
+      backgroundColor: Colors.blue,
+      minimumSize: Size(88, 36),
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(2)),
+      ),
+    );
     return Column(
       children: [
         SizedBox(height: 20), // 第一列，標題
@@ -136,7 +145,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
                   // icon: Icon(Icons.phone_iphone),
                 ),
                 onChanged: (text) {
-                  print('First text field: $text (${text.characters.length})');
+                  onChange(ctrlInterval);
                 },
               ),
             ),
@@ -170,6 +179,9 @@ class _StopWatchEditState extends State<StopWatchEdit> {
                   border: OutlineInputBorder(),
                   // hintText: '',
                 ),
+                onChanged: (text) {
+                  onChange(ctrlInterval1);
+                },
               ),
             ),
             Text(
@@ -182,11 +194,13 @@ class _StopWatchEditState extends State<StopWatchEdit> {
             Expanded(
               child: TextField(
                 controller: ctrlInterval1Txt,
-                keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: "開始休息",
                 ),
+                onChanged: (text) {
+                  onChange(ctrlInterval1Txt);
+                },
               ),
             ),
             SizedBox(width: 20),
@@ -212,6 +226,9 @@ class _StopWatchEditState extends State<StopWatchEdit> {
                   border: OutlineInputBorder(),
                   // hintText: '',
                 ),
+                onChanged: (text) {
+                  onChange(ctrlInterval2);
+                },
               ),
             ),
             Text(
@@ -224,15 +241,23 @@ class _StopWatchEditState extends State<StopWatchEdit> {
             Expanded(
               child: TextField(
                 controller: ctrlInterval2Txt,
-                keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: "開始運動",
                 ),
+                onChanged: (text) {
+                  onChange(ctrlInterval2Txt);
+                },
               ),
             ),
             SizedBox(width: 20),
           ],
+        ),
+        Expanded(flex: 1, child: Container()),
+        ElevatedButton(
+          style: raisedButtonStyle,
+          onPressed: () {},
+          child: Text('存檔'),
         ),
       ],
     );
