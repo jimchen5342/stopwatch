@@ -57,11 +57,16 @@ void onStart(ServiceInstance service) async {
       service.setAsBackgroundService();
     });
   }
-  service.on("start").listen((event) {});
+  service.on("start").listen((event) {
+    print("stopWatch: startService");
+    service.invoke('start');
+  });
 
   // 監聽 'stopService' 事件，停止服務
   service.on('stopService').listen((event) {
+    print("stopWatch: stopService");
     service.stopSelf();
+    service.invoke('stop');
   });
 
   // 碼錶變數
@@ -99,22 +104,20 @@ class _StopWatchState extends State<StopWatch> {
   TextToSpeech tts = TextToSpeech();
   final FlutterBackgroundService _service = FlutterBackgroundService();
   int _secondsElapsed = 0;
-  bool _isRunning = false;
+  bool _isRunning = false, begin = false;
   dynamic setting;
   List<String> recoders = [];
 
   @override
   initState() {
     super.initState();
-    // print(ModalRoute.of(context)?.settings.arguments);
-
     tts.setup();
     initializeService();
     _checkServiceStatus();
 
     // 監聽來自背景服務的 'update' 事件
     _service.on('update').listen((event) {
-      if (event != null && event.containsKey("seconds")) {
+      if (begin && event != null && event.containsKey("seconds")) {
         setState(() {
           _secondsElapsed = event["seconds"];
           if (_secondsElapsed > 0 && _secondsElapsed % 60 == 0) {
@@ -125,6 +128,13 @@ class _StopWatchState extends State<StopWatch> {
       }
     });
 
+    _service.on('start').listen((event) {
+      print("stopWatch: start");
+    });
+    _service.on('stop').listen((event) {
+      print("stopWatch: stop");
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       setting = ModalRoute.of(context)?.settings.arguments;
       setState(() {});
@@ -133,8 +143,10 @@ class _StopWatchState extends State<StopWatch> {
 
   @override
   void dispose() async {
-    _service.invoke("stopService");
-    speak("關閉碼錶");
+    if (_isRunning) {
+      _service.invoke("stopService");
+      speak("關閉碼錶");
+    }
     // tts = null;
     super.dispose();
   }
@@ -142,8 +154,6 @@ class _StopWatchState extends State<StopWatch> {
   @override
   void reassemble() async {
     super.reassemble();
-
-    // print("tts.time: " + DateTime.now().format(pattern: "HH:mm:ss:ms"));
   }
 
   // 檢查服務狀態並更新 UI
@@ -152,6 +162,9 @@ class _StopWatchState extends State<StopWatch> {
     setState(() {
       _isRunning = isRunning;
       if (isRunning) {
+        _isRunning = false;
+        _service.invoke("stopService");
+        _secondsElapsed = 0;
         // _text = "碼錶執行中... (從背景恢復)";
         // 如果服務正在運行，可以請求一次當前時間
         // 注意：這需要你在 onStart 中處理一個 'requestCurrentTime' 之類的事件
@@ -159,25 +172,26 @@ class _StopWatchState extends State<StopWatch> {
         // _text = "";
         _secondsElapsed = 0;
       }
+      setState(() {});
     });
   }
 
   // 啟動或停止服務的函數
   void _toggleService() async {
+    begin = true;
     bool isRunning = await _service.isRunning();
     if (isRunning) {
       // 如果正在運行，則停止服務
       _service.invoke("stopService");
       setState(() {
-        // _text = "";
         _isRunning = false;
         _secondsElapsed = 0; // 根據需求決定是否重置
         speak("停止碼錶");
       });
     } else {
       await _service.startService();
+      recoders = [];
       setState(() {
-        // _text = "碼錶已啟動";
         _isRunning = true;
         speak("啟動碼錶");
       });
@@ -211,12 +225,10 @@ class _StopWatchState extends State<StopWatch> {
 
   void speak(String txt) async {
     var result = await tts.speak(txt);
-    print("tts.speak: $result, $txt");
+    var s = "${DateTime.now().format(pattern: "HH:mm:ss:ms")} => $txt";
+    print("stopWatch: $s");
     if (result == "1") {
-      recoders.insert(
-        0,
-        "${DateTime.now().format(pattern: "HH:mm:ss:ms")}: $txt",
-      );
+      recoders.insert(0, s);
     }
   }
 
@@ -226,10 +238,7 @@ class _StopWatchState extends State<StopWatch> {
       canPop: false,
       onPopInvokedWithResult: (didPop, _) async {
         if (didPop) return;
-
-        // if (await _isExitDesired() && context.mounted) {
         _exitSetup();
-        // }
       },
       child: scaffold(),
     );
@@ -293,6 +302,5 @@ class _StopWatchState extends State<StopWatch> {
 
   void _exitSetup() {
     Navigator.of(context).pop();
-    print("stopWatch.pop");
   }
 }

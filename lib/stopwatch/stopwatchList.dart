@@ -25,7 +25,7 @@ class _StopWatchListState extends State<StopWatchList> {
       // storage.clear();
 
       _stopwatchList = await storage.readJsonArray("stopwatch");
-      print(_stopwatchList);
+      // print(_stopwatchList);
       if (_stopwatchList.isEmpty) {
         _stopwatchList = [
           {"key": 1, "title": "預設", "interval": 1},
@@ -67,7 +67,7 @@ class _StopWatchListState extends State<StopWatchList> {
         settings: RouteSettings(arguments: _stopwatchList[0]),
       ),
     );
-    print(result);
+    // print(result);
   }
 
   String descrip(dynamic json) {
