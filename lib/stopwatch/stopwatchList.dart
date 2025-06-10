@@ -18,7 +18,7 @@ class _StopWatchListState extends State<StopWatchList> {
   @override
   initState() {
     super.initState();
-    WidgetsFlutterBinding.ensureInitialized();
+    
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await storage.initStorage();
