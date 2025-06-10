@@ -100,13 +100,15 @@ class StopWatch extends StatefulWidget {
   State<StopWatch> createState() => _StopWatchState();
 }
 
-class _StopWatchState extends State<StopWatch> {
+class _StopWatchState extends State<StopWatch> with WidgetsBindingObserver {
   TextToSpeech tts = TextToSpeech();
   final FlutterBackgroundService _service = FlutterBackgroundService();
-  int _secondsElapsed = 0;
-  bool _isRunning = false, begin = false;
+  int _secondsElapsed = 0, frequency = 60, _nextTime = -1;
+  bool _isRunning = false, begin = false, showButton = true;
   dynamic setting;
   List<String> recoders = [];
+  var millSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+  String index = "-1";
 
   @override
   initState() {
@@ -118,13 +120,7 @@ class _StopWatchState extends State<StopWatch> {
     // 監聽來自背景服務的 'update' 事件
     _service.on('update').listen((event) {
       if (begin && event != null && event.containsKey("seconds")) {
-        setState(() {
-          _secondsElapsed = event["seconds"];
-          if (_secondsElapsed > 0 && _secondsElapsed % 60 == 0) {
-            var str = formatTime(_secondsElapsed);
-            speak("時間 $str");
-          }
-        });
+        listenToService(event["seconds"]);
       }
     });
 
@@ -138,6 +134,57 @@ class _StopWatchState extends State<StopWatch> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       setting = ModalRoute.of(context)?.settings.arguments;
       setState(() {});
+      // {key: 2, title: 超慢跑, interval: 1, interval1: 4, interval1Txt: 休息, interval2: 5, interval2Txt: 開始跑步}
+      // print(setting);
+
+      // setting = {
+      //   "key": 2,
+      //   "title": "超慢跑",
+      //   "interval": 1,
+      //   "interval1": 2,
+      //   "interval1Txt": "休息",
+      //   "interval2": 1,
+      //   "interval2Txt": "開始跑步",
+      // };
+
+      if (setting is Map && setting.containsKey('interval')) {
+        frequency = setting["interval"] * 60;
+      }
+      if (setting is Map &&
+          setting.containsKey('interval1') &&
+          setting.containsKey('interval2')) {
+        if (setting["interval1"] is num &&
+            setting["interval2"] is num &&
+            setting["interval1"] > 0 &&
+            setting["interval2"] > 0) {
+          _nextTime = setting["interval1"] * 60;
+          index = "1";
+        }
+      }
+    });
+  }
+
+  void listenToService(int second) {
+    setState(() {
+      if (second == 0) {
+        millSec = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+      }
+      int sec = (DateTime.now().millisecondsSinceEpoch ~/ 1000) - millSec;
+      _secondsElapsed = sec;
+      // event["seconds"];
+
+      // print("stopWatch: $sec / $_secondsElapsed; $second; ${DateTime.now()}");
+
+      if (_secondsElapsed > 0 && _secondsElapsed % frequency == 0) {
+        var s1 = "";
+        if (_secondsElapsed >= _nextTime && _nextTime > -1) {
+          s1 = ", ${setting['interval${index}Txt']}";
+          index = index == "1" ? "2" : "1";
+          _nextTime = (setting["interval$index"] * 60) + _secondsElapsed;
+        }
+        var str = formatTime(_secondsElapsed);
+        speak("時間 $str$s1");
+      }
     });
   }
 
@@ -149,6 +196,18 @@ class _StopWatchState extends State<StopWatch> {
     }
     // tts = null;
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    print("didChangeAppLifecycleState: $state");
+    if (AppLifecycleState.detached == state) {
+      // APP 被銷毀、釋放
+      if (_isRunning) {
+        _service.invoke("stopService");
+        speak("關閉碼錶");
+      }
+    } else if (AppLifecycleState.paused == state) {}
   }
 
   @override
@@ -178,6 +237,9 @@ class _StopWatchState extends State<StopWatch> {
 
   // 啟動或停止服務的函數
   void _toggleService() async {
+    setState(() {
+      showButton = false;
+    });
     begin = true;
     bool isRunning = await _service.isRunning();
     if (isRunning) {
@@ -194,8 +256,14 @@ class _StopWatchState extends State<StopWatch> {
       setState(() {
         _isRunning = true;
         speak("啟動碼錶");
+        // millSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
       });
     }
+    Timer(Duration(seconds: 2), () {
+      setState(() {
+        showButton = !showButton;
+      });
+    });
   }
 
   // 格式化時間，將秒數轉換為 HH:mm:ss 格式
@@ -275,14 +343,28 @@ class _StopWatchState extends State<StopWatch> {
           style: TextStyle(fontSize: 80),
           textAlign: TextAlign.center,
         ),
-        Container(height: 20),
-        ElevatedButton(
-          onPressed: _toggleService,
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-            textStyle: const TextStyle(fontSize: 18),
-          ),
-          child: Text(_isRunning ? '停止碼錶' : '啟動碼錶'),
+        // Container(height: 20),
+        SizedBox(
+          height: 40,
+          child:
+              showButton == false
+                  ? null
+                  : OutlinedButton(
+                    onPressed: _toggleService,
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 0,
+                      ),
+                      // textStyle: const TextStyle(fontSize: 16, color: Colors.white),
+                      foregroundColor: Colors.white,
+                      backgroundColor: _isRunning ? Colors.red : Colors.blue,
+                    ),
+                    child: Text(
+                      _isRunning ? '停止碼錶' : '啟動碼錶',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
+                  ),
         ),
         _widget(),
       ],
@@ -294,7 +376,10 @@ class _StopWatchState extends State<StopWatch> {
       child: ListView.builder(
         itemCount: recoders.length,
         itemBuilder: (context, index) {
-          return ListTile(title: Text(recoders[index]));
+          return ListTile(
+            title: Text(recoders[index]),
+            // contentPadding: EdgeInsets.all(0.0),
+          );
         },
       ),
     );
