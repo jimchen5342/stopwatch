@@ -35,7 +35,7 @@ class _StopWatchListState extends State<StopWatchList> {
             "interval": 1,
             "interval1": 4,
             "interval1Txt": "休息",
-            "interval2": 5,
+            "interval2": 1,
             "interval2Txt": "開始跑步",
           },
         ];
@@ -119,8 +119,20 @@ class _StopWatchListState extends State<StopWatchList> {
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
             // leading: Icon(Icons.event_seat),
-            title: Text(_stopwatchList[index]["title"]),
-            subtitle: Text(descrip(_stopwatchList[index])),
+            title: Text(
+              _stopwatchList[index]["title"],
+              style: TextStyle(
+                fontSize: 20,
+                // color: Colors.white,
+              ),
+            ),
+            subtitle: Text(
+              descrip(_stopwatchList[index]),
+              style: TextStyle(
+                fontSize: 14,
+                // color: Colors.white,
+              ),
+            ),
             onTap: () async {
               active = index;
               Navigator.push(

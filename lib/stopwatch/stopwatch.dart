@@ -57,16 +57,14 @@ void onStart(ServiceInstance service) async {
       service.setAsBackgroundService();
     });
   }
-  service.on("start").listen((event) {
-    print("stopWatch: startService");
-    service.invoke('start');
-  });
+  // service.on("start").listen((event) {
+  //   service.invoke('start');
+  // });
 
   // 監聽 'stopService' 事件，停止服務
   service.on('stopService').listen((event) {
-    print("stopWatch: stopService");
     service.stopSelf();
-    service.invoke('stop');
+    // service.invoke('stop');
   });
 
   // 碼錶變數
@@ -135,7 +133,7 @@ class _StopWatchState extends State<StopWatch> with WidgetsBindingObserver {
       setting = ModalRoute.of(context)?.settings.arguments;
       setState(() {});
       // {key: 2, title: 超慢跑, interval: 1, interval1: 4, interval1Txt: 休息, interval2: 5, interval2Txt: 開始跑步}
-      // print(setting);
+      print(setting);
 
       // setting = {
       //   "key": 2,
@@ -340,12 +338,17 @@ class _StopWatchState extends State<StopWatch> with WidgetsBindingObserver {
         const Center(),
         Text(
           formatDuration(_secondsElapsed),
-          style: TextStyle(fontSize: 80),
+          style: TextStyle(fontSize: 90),
           textAlign: TextAlign.center,
         ),
         // Container(height: 20),
-        SizedBox(
-          height: 40,
+        Container(
+          // margin: const EdgeInsets.all(15.0),
+          // padding: const EdgeInsets.all(3.0),
+          // decoration: BoxDecoration(
+          //   border: Border.all(color: Colors.blueAccent),
+          // ),
+          height: 60,
           child:
               showButton == false
                   ? null
@@ -353,7 +356,7 @@ class _StopWatchState extends State<StopWatch> with WidgetsBindingObserver {
                     onPressed: _toggleService,
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 30,
+                        horizontal: 80,
                         vertical: 0,
                       ),
                       // textStyle: const TextStyle(fontSize: 16, color: Colors.white),
@@ -362,7 +365,7 @@ class _StopWatchState extends State<StopWatch> with WidgetsBindingObserver {
                     ),
                     child: Text(
                       _isRunning ? '停止碼錶' : '啟動碼錶',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      style: TextStyle(fontSize: 30, color: Colors.white),
                     ),
                   ),
         ),

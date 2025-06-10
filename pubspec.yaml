@@ -38,6 +38,7 @@ dependencies:
   flutter_background_service: ^5.1.0 # 請使用最新版本
   flutter_background_service_android: ^6.3.0 # 請使用最新版本
   localstorage: ^6.0.0
+  package_info_plus: ^8.3.0
   
 
 dev_dependencies:

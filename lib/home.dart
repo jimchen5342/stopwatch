@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/stopwatch/stopwatchList.dart';
 import 'package:myapp/countdown/countdownList.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:myapp/system/module.dart';
+import 'dart:async';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -11,10 +14,26 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _selectedIndex = 0; // 用於追蹤目前選中的索引
+  String version = " ";
 
   @override
   initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      version = packageInfo.version;
+      setState(() {
+        Timer(Duration(seconds: 2), () {
+          setState(() {});
+          version = "";
+        });
+      });
+      // String appName = packageInfo.appName;
+      // String packageName = packageInfo.packageName;
+      // String version = packageInfo.version;
+      // String buildNumber = packageInfo.buildNumber;
+      // // print("buildNumber: $buildNumber");
+    });
   }
 
   // 準備要顯示在不同分頁的 Widget 列表
@@ -34,23 +53,39 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _widgetOptions.elementAt(_selectedIndex),
-      bottomNavigationBar: BottomNavigationBar(
-        // type: BottomNavigationBarType.fixed, // Fixed
-        // backgroundColor: Colors.blue, // <-- This works for fixed
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.access_time_sharp),
-            label: '碼錶',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.alarm), label: '計時器'),
-        ],
-        currentIndex: _selectedIndex, // 目前選中的項目索引
-        selectedItemColor: Colors.amber[800], // 選中項目的顏色
-        unselectedItemColor: Colors.grey, // 未選中項目的顏色
-        onTap: _onItemTapped, // 點擊項目時的回調函數
-        // type: BottomNavigationBarType.fixed, // 當項目多於3個時，可以設為 shifting 或 fixed
+      body:
+          version.isNotEmpty
+              ? _versiion()
+              : _widgetOptions.elementAt(_selectedIndex),
+      bottomNavigationBar: version.isNotEmpty ? null : bottom(),
+    );
+  }
+
+  Widget _versiion() {
+    return Center(
+      child: Text(
+        version,
+        style: TextStyle(fontSize: 30, color: HexColor.fromHex('#C01921')),
       ),
     );
+  }
+
+  Widget bottom() {
+    return (BottomNavigationBar(
+      // type: BottomNavigationBarType.fixed, // Fixed
+      // backgroundColor: Colors.blue, // <-- This works for fixed
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.access_time_sharp),
+          label: '碼錶',
+        ),
+        BottomNavigationBarItem(icon: Icon(Icons.alarm), label: '計時器'),
+      ],
+      currentIndex: _selectedIndex, // 目前選中的項目索引
+      selectedItemColor: Colors.amber[800], // 選中項目的顏色
+      unselectedItemColor: Colors.grey, // 未選中項目的顏色
+      onTap: _onItemTapped, // 點擊項目時的回調函數
+      // type: BottomNavigationBarType.fixed, // 當項目多於3個時，可以設為 shifting 或 fixed
+    ));
   }
 }
