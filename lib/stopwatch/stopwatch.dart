@@ -12,7 +12,7 @@ class StopWatch extends StatefulWidget {
   State<StopWatch> createState() => _StopWatchState();
 }
 
-class _StopWatchState extends State<StopWatch> with WidgetsBindingObserver {
+class _StopWatchState extends State<StopWatch> {
   TextToSpeech tts = TextToSpeech();
   final FlutterBackgroundService _service = FlutterBackgroundService();
   int _secondsElapsed = 0, frequency = 60, _nextTime = -1;
@@ -110,18 +110,6 @@ class _StopWatchState extends State<StopWatch> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    print("didChangeAppLifecycleState: $state");
-    if (AppLifecycleState.detached == state) {
-      // APP 被銷毀、釋放
-      if (_isRunning) {
-        _service.invoke("stopService");
-        speak("關閉碼錶");
-      }
-    } else if (AppLifecycleState.paused == state) {}
-  }
-
-  @override
   void reassemble() async {
     super.reassemble();
   }
@@ -170,7 +158,7 @@ class _StopWatchState extends State<StopWatch> with WidgetsBindingObserver {
         // millSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
       });
     }
-    Timer(Duration(seconds: 2), () {
+    Timer(Duration(seconds: 1), () {
       setState(() {
         showButton = !showButton;
       });
@@ -232,14 +220,15 @@ class _StopWatchState extends State<StopWatch> with WidgetsBindingObserver {
           onPressed: () => _exitSetup(),
         ),
         title: Text(
-          "報時碼錶${setting != null ? '[' + setting['title'] + ']' : ''}",
+          // ignore: prefer_interpolation_to_compose_strings
+          "報時碼錶${setting != null ? ' [ ' + setting['title'] + ' ]' : ''}",
           style: TextStyle(
             // fontSize: 40,
             color: Colors.white,
           ),
         ),
       ),
-      body: body(),
+      body: Center(child: body()),
     );
   }
 
@@ -248,7 +237,6 @@ class _StopWatchState extends State<StopWatch> with WidgetsBindingObserver {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        const Center(),
         Text(
           formatDuration(_secondsElapsed),
           style: TextStyle(fontSize: 90),
@@ -278,16 +266,16 @@ class _StopWatchState extends State<StopWatch> with WidgetsBindingObserver {
                     ),
                     child: Text(
                       _isRunning ? '停止碼錶' : '啟動碼錶',
-                      style: TextStyle(fontSize: 30, color: Colors.white),
+                      style: TextStyle(fontSize: 25, color: Colors.white),
                     ),
                   ),
         ),
-        _widget(),
+        _list(),
       ],
     );
   }
 
-  Widget _widget() {
+  Widget _list() {
     return Expanded(
       child: ListView.builder(
         itemCount: recoders.length,

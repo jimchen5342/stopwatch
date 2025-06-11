@@ -141,7 +141,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
             SizedBox(width: 20),
           ],
         ),
-        SizedBox(height: 10), // 第二列
+        SizedBox(height: 10), // 第二列，報時頻率
         Row(
           children: [
             SizedBox(width: 20),
@@ -270,11 +270,14 @@ class _StopWatchEditState extends State<StopWatchEdit> {
             SizedBox(width: 20),
           ],
         ),
-        Expanded(flex: 1, child: Container()),
+        // Expanded(flex: 1, child: Container()),
+        SizedBox(height: 20),
         if (isEdit == true)
           ElevatedButton(
             style: raisedButtonStyle,
-            onPressed: () {},
+            onPressed: () {
+              save();
+            },
             child: Text('存檔'),
           ),
       ],
@@ -291,8 +294,92 @@ class _StopWatchEditState extends State<StopWatchEdit> {
   }
 
   save() async {
-    StorageManager storage = StorageManager();
-    List<dynamic> _stopwatchList = await storage.readJsonArray("stopwatch");
+    var msg = "";
+    int interval =
+        int.tryParse(ctrlInterval.text) == null
+            ? 0
+            : int.parse(ctrlInterval.text);
 
+    int interval1 =
+        int.tryParse(ctrlInterval1.text) == null
+            ? 0
+            : int.parse(ctrlInterval1.text);
+    int interval2 =
+        int.tryParse(ctrlInterval2.text) == null
+            ? 0
+            : int.parse(ctrlInterval2.text);
+    if (ctrlTitle.text.isEmpty) {
+      msg = "請輸入標題";
+    } else if (interval == 0) {
+      msg = "請輸入報時頻率";
+    } else if (interval1 == 0 && interval2 == 0) {
+    } else if (interval1 == 0 && ctrlInterval1Txt.text.isNotEmpty) {
+      msg = "請輸入第 1 個間隔時間";
+    } else if (interval2 == 0 && ctrlInterval1Txt.text.isNotEmpty) {
+      msg = "請輸入第 2 個間隔時間";
+    } else if (interval1 > 0 && ctrlInterval1Txt.text.isEmpty) {
+      msg = "請輸入第 1 通知";
+    } else if (interval2 > 0 && ctrlInterval2Txt.text.isEmpty) {
+      msg = "請輸入第2通知";
+    } else {}
+
+    if (msg.isNotEmpty) {
+      _showMyDialog(msg);
+    } else {
+      StorageManager storage = StorageManager();
+      List<dynamic> stopwatchList = await storage.readJsonArray("stopwatch");
+      if (json == null) {
+        json = {};
+        var key = 1;
+        for (var el in stopwatchList) {
+          if (el["key"] > key) {
+            key = el["key"] + 1;
+          }
+        }
+        json["key"] = key;
+        stopwatchList.add(json);
+      }
+      json["title"] = ctrlTitle.text;
+      json["interval"] = interval;
+      if (!(interval1 == 0 && interval2 == 0)) {
+        json["interval1"] = interval1;
+        json["interval2"] = interval2;
+        json["interval1Txt"] = ctrlInterval1Txt.text;
+        json["interval2Txt"] = ctrlInterval2Txt.text;
+      }
+      int index = stopwatchList.indexWhere((el) => el["key"] == json["key"]);
+      stopwatchList[index] = json;
+      await storage.writeJsonArray("stopwatch", stopwatchList);
+      _exitSetup();
+      isEdit = true;
+    }
+  }
+
+  Future<void> _showMyDialog(String msg) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('StopWatch'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(msg),
+                //
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('確定'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

@@ -4,6 +4,49 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'dart:async';
 import 'dart:ui';
+import 'package:myapp/system/module.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget with WidgetsBindingObserver {
+  final StorageManager storage = StorageManager();
+  final FlutterBackgroundService _service = FlutterBackgroundService();
+
+  MyApp({super.key}) {
+    WidgetsFlutterBinding.ensureInitialized();
+    initializeService();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await storage.initStorage();
+      // storage.clear();
+    });
+  }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    print("stopWatch: didChangeAppLifecycleState: $state");
+    if (AppLifecycleState.detached == state) {
+      // APP 被銷毀、釋放
+      bool isRunning = await _service.isRunning();
+      if (isRunning) {
+        _service.invoke("stopService");
+      }
+    } else if (AppLifecycleState.paused == state) {}
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      // title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+      ),
+      home: const Home(),
+    );
+  }
+}
 
 // 初始化背景服務的函數
 Future<void> initializeService() async {
@@ -88,27 +131,4 @@ void onStart(ServiceInstance service) async {
 
   // 初始通知（可以根據需要自訂）
   service.invoke('update', {"seconds": 0});
-}
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  MyApp({super.key}) {
-    WidgetsFlutterBinding.ensureInitialized();
-    initializeService();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      // title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-      ),
-      home: const Home(),
-    );
-  }
 }

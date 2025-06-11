@@ -18,14 +18,10 @@ class _StopWatchListState extends State<StopWatchList> {
   @override
   initState() {
     super.initState();
-    
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await storage.initStorage();
       // storage.clear();
-
       _stopwatchList = await storage.readJsonArray("stopwatch");
-      // print(_stopwatchList);
       if (_stopwatchList.isEmpty) {
         _stopwatchList = [
           {"key": 1, "title": "預設", "interval": 1},
@@ -41,8 +37,6 @@ class _StopWatchListState extends State<StopWatchList> {
         ];
         storage.writeJsonArray("stopwatch", _stopwatchList);
       }
-      // print(_stopwatchList);
-
       setState(() {});
     });
   }
@@ -67,14 +61,22 @@ class _StopWatchListState extends State<StopWatchList> {
         settings: RouteSettings(arguments: _stopwatchList[0]),
       ),
     );
-    // print(result);
+    // print(result); //
   }
 
   String descrip(dynamic json) {
     String s1 = "";
 
-    if (json is Map && json.containsKey('interval')) {
-      s1 = '間隔 ${json['interval']} 分鐘報時';
+    if (json is Map) {
+      if (json.containsKey('interval')) {
+        s1 = '間隔 ${json['interval']} 分鐘報時';
+      }
+      if (json["interval1"] is num && json["interval1"] > 0) {
+        s1 += "；${json["interval1"]}分鐘"; // ，${json["interval1Txt"]}
+      }
+      if (json["interval2"] is num && json["interval2"] > 0) {
+        s1 += "、${json["interval2"]}分鐘"; // ，${json["interval2Txt"]}
+      }
     } else {
       print('myData 不包含 key "age" 或 myData 不是一個 Map');
     }
