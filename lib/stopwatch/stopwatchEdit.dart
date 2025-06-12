@@ -85,6 +85,15 @@ class _StopWatchEditState extends State<StopWatchEdit> {
             color: Colors.white,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete, color: Colors.white),
+            onPressed: () async {
+              json = null;
+              _exitSetup();
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         physics: NeverScrollableScrollPhysics(),
@@ -163,7 +172,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
               ),
             ),
             Text(
-              " 分鐘",
+              " 分鐘報時",
               style: TextStyle(
                 fontSize: 20,
                 // color: Colors.white,
@@ -177,7 +186,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
           children: [
             SizedBox(width: 20),
             Text(
-              "第 ",
+              "運動 ",
               style: TextStyle(
                 fontSize: 20,
                 // color: Colors.white,
@@ -226,7 +235,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
           children: [
             SizedBox(width: 20),
             Text(
-              "第 ",
+              "休息 ",
               style: TextStyle(
                 fontSize: 20,
                 // color: Colors.white,
@@ -290,7 +299,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
   }
 
   void _exitSetup() {
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(json);
   }
 
   save() async {
@@ -363,12 +372,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
         return AlertDialog(
           title: const Text('StopWatch'),
           content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(msg),
-                //
-              ],
-            ),
+            child: ListBody(children: <Widget>[Text(msg)]),
           ),
           actions: <Widget>[
             TextButton(

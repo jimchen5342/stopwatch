@@ -17,7 +17,7 @@ class _StopWatchState extends State<StopWatch> {
   final FlutterBackgroundService _service = FlutterBackgroundService();
   int _secondsElapsed = 0, frequency = 60, _nextTime = -1;
   bool _isRunning = false, begin = false, showButton = true;
-  dynamic setting;
+  dynamic json;
   List<String> recoders = [];
   var millSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   String index = "-1";
@@ -43,35 +43,13 @@ class _StopWatchState extends State<StopWatch> {
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      setting = ModalRoute.of(context)?.settings.arguments;
+      json = ModalRoute.of(context)?.settings.arguments;
       setState(() {});
-      // {key: 2, title: 超慢跑, interval: 1, interval1: 4, interval1Txt: 休息, interval2: 5, interval2Txt: 開始跑步}
-      print(setting);
 
-      // setting = {
-      //   "key": 2,
-      //   "title": "超慢跑",
-      //   "interval": 1,
-      //   "interval1": 2,
-      //   "interval1Txt": "休息",
-      //   "interval2": 1,
-      //   "interval2Txt": "開始跑步",
-      // };
-
-      if (setting is Map && setting.containsKey('interval')) {
-        frequency = setting["interval"] * 60;
+      if (json is Map && json.containsKey('interval')) {
+        frequency = json["interval"] * 60;
       }
-      if (setting is Map &&
-          setting.containsKey('interval1') &&
-          setting.containsKey('interval2')) {
-        if (setting["interval1"] is num &&
-            setting["interval2"] is num &&
-            setting["interval1"] > 0 &&
-            setting["interval2"] > 0) {
-          _nextTime = setting["interval1"] * 60;
-          index = "1";
-        }
-      }
+      calcNextTime();
     });
   }
 
@@ -89,9 +67,9 @@ class _StopWatchState extends State<StopWatch> {
       if (_secondsElapsed > 0 && _secondsElapsed % frequency == 0) {
         var s1 = "";
         if (_secondsElapsed >= _nextTime && _nextTime > -1) {
-          s1 = ", ${setting['interval${index}Txt']}";
+          s1 = ", ${json['interval${index}Txt']}";
           index = index == "1" ? "2" : "1";
-          _nextTime = (setting["interval$index"] * 60) + _secondsElapsed;
+          _nextTime = (json["interval$index"] * 60) + _secondsElapsed;
         }
         var str = formatTime(_secondsElapsed);
         speak("時間 $str$s1");
@@ -134,6 +112,19 @@ class _StopWatchState extends State<StopWatch> {
     });
   }
 
+  void calcNextTime() {
+    if (json is Map) {
+      if (json.containsKey('interval1') && json.containsKey('interval2')) {
+        if (json["interval1"] is num && json["interval2"] is num) {
+          if (json["interval1"] > 0 && json["interval2"] > 0) {
+            _nextTime = json["interval1"] * 60;
+            index = "1";
+          }
+        }
+      }
+    }
+  }
+
   // 啟動或停止服務的函數
   void _toggleService() async {
     setState(() {
@@ -147,6 +138,7 @@ class _StopWatchState extends State<StopWatch> {
       setState(() {
         _isRunning = false;
         _secondsElapsed = 0; // 根據需求決定是否重置
+        _nextTime = -1;
         speak("停止碼錶");
       });
     } else {
@@ -154,6 +146,7 @@ class _StopWatchState extends State<StopWatch> {
       recoders = [];
       setState(() {
         _isRunning = true;
+        calcNextTime();
         speak("啟動碼錶");
         // millSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
       });
@@ -221,7 +214,7 @@ class _StopWatchState extends State<StopWatch> {
         ),
         title: Text(
           // ignore: prefer_interpolation_to_compose_strings
-          "報時碼錶${setting != null ? ' [ ' + setting['title'] + ' ]' : ''}",
+          "報時碼錶${json != null ? ' [ ' + json['title'] + ' ]' : ''}",
           style: TextStyle(
             // fontSize: 40,
             color: Colors.white,
@@ -249,29 +242,68 @@ class _StopWatchState extends State<StopWatch> {
           // decoration: BoxDecoration(
           //   border: Border.all(color: Colors.blueAccent),
           // ),
-          height: 60,
-          child:
-              showButton == false
-                  ? null
-                  : OutlinedButton(
-                    onPressed: _toggleService,
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 80,
-                        vertical: 0,
-                      ),
-                      // textStyle: const TextStyle(fontSize: 16, color: Colors.white),
-                      foregroundColor: Colors.white,
-                      backgroundColor: _isRunning ? Colors.red : Colors.blue,
-                    ),
-                    child: Text(
-                      _isRunning ? '停止碼錶' : '啟動碼錶',
-                      style: TextStyle(fontSize: 25, color: Colors.white),
-                    ),
-                  ),
+          height: 45,
+          child: showButton == false ? null : _btn(),
         ),
-        _list(),
+        if (_isRunning && _nextTime > -1)
+          Container(
+            margin: const EdgeInsets.all(5.0),
+            child: Text(
+              "第 ${_nextTime ~/ 60} 分鐘，${json["interval${index}Txt"]}",
+              style: TextStyle(fontSize: 20, color: Colors.blue),
+            ),
+          ),
+        if (_isRunning) _list(),
+        if (!_isRunning) _content(),
       ],
+    );
+  }
+
+  Widget _btn() {
+    return OutlinedButton(
+      onPressed: _toggleService,
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 0),
+        // textStyle: const TextStyle(fontSize: 16, color: Colors.white),
+        foregroundColor: Colors.white,
+        backgroundColor: _isRunning ? Colors.red : Colors.blue,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        // side: BorderSide(width: 5, color: Colors.green),
+      ),
+      child: Text(
+        _isRunning ? '停止碼錶' : '啟動碼錶',
+        style: TextStyle(fontSize: 20, color: Colors.white),
+      ),
+    );
+  }
+
+  Widget _content() {
+    String s1 = "";
+
+    if (json is Map) {
+      if (json.containsKey('interval')) {
+        s1 = '間隔 ${json['interval']} 分鐘報時';
+      }
+      if (json["interval1"] is num && json["interval1"] > 0) {
+        s1 += "\n運動 ${json["interval1"]} 分鐘"; // ，${json["interval1Txt"]}
+      }
+      if (json["interval2"] is num && json["interval2"] > 0) {
+        s1 += "\n休息 ${json["interval2"]} 分鐘"; // ，${json["interval2Txt"]}
+      }
+    }
+
+    return Expanded(
+      child: Center(
+        child: Text(
+          s1,
+          style: TextStyle(
+            fontSize: 20,
+            // color: Colors.white,
+          ),
+        ),
+      ),
     );
   }
 

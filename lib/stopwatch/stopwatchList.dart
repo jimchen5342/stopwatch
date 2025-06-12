@@ -49,19 +49,6 @@ class _StopWatchListState extends State<StopWatchList> {
   @override
   void reassemble() async {
     super.reassemble();
-
-    // defaultPage();
-  }
-
-  defaultPage() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const StopWatchEdit(),
-        settings: RouteSettings(arguments: _stopwatchList[0]),
-      ),
-    );
-    // print(result); //
   }
 
   String descrip(dynamic json) {
@@ -72,10 +59,10 @@ class _StopWatchListState extends State<StopWatchList> {
         s1 = '間隔 ${json['interval']} 分鐘報時';
       }
       if (json["interval1"] is num && json["interval1"] > 0) {
-        s1 += "；${json["interval1"]}分鐘"; // ，${json["interval1Txt"]}
+        s1 += "；運動${json["interval1"]}分鐘"; // ，${json["interval1Txt"]}
       }
       if (json["interval2"] is num && json["interval2"] > 0) {
-        s1 += "、${json["interval2"]}分鐘"; // ，${json["interval2Txt"]}
+        s1 += "，休息${json["interval2"]}分鐘"; // ，${json["interval2Txt"]}
       }
     } else {
       print('myData 不包含 key "age" 或 myData 不是一個 Map');
@@ -100,6 +87,7 @@ class _StopWatchListState extends State<StopWatchList> {
           ),
         ),
         actions: [
+          // 新增
           IconButton(
             icon: Icon(Icons.add, color: Colors.white),
             onPressed: () async {
@@ -107,12 +95,13 @@ class _StopWatchListState extends State<StopWatchList> {
                 context,
                 MaterialPageRoute(builder: (context) => const StopWatchEdit()),
               );
+              if (result != null) {
+                setState(() {
+                  _stopwatchList.add(result);
+                });
+              }
             },
           ),
-          // IconButton(
-          //   icon: Icon(Icons.search, color: Colors.white),
-          //   onPressed: () => print('按下搜尋'),
-          // ),
         ],
       ),
       body: ListView.builder(
@@ -154,11 +143,19 @@ class _StopWatchListState extends State<StopWatchList> {
                   settings: RouteSettings(arguments: _stopwatchList[index]),
                 ),
               );
-              if (result != null) {
-                setState(() {
-                  _stopwatchList.add(result);
-                });
-              }
+              setState(() {
+                if (result != null) {
+                  for (var el in _stopwatchList) {
+                    if (el["key"] == result["key"]) {
+                      el = result;
+                      break;
+                    }
+                  }
+                } else {
+                  _stopwatchList.removeAt(index);
+                }
+              });
+              
               // print(_stopwatchList)
             },
             trailing: Icon(Icons.keyboard_arrow_right),
