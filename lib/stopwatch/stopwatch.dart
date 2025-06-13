@@ -64,10 +64,10 @@ class _StopWatchState extends State<StopWatch> {
 
       // print("stopWatch: $sec / $_secondsElapsed; $second; ${DateTime.now()}");
 
-      if (_secondsElapsed > 0 && _secondsElapsed % frequency == 0) {
+      if (_secondsElapsed > 0) {
         var s1 = "";
         if (_secondsElapsed >= _nextTime && _nextTime > -1) {
-          s1 = ", ${json['interval${index}Txt']}";
+          s1 = "；${json['interval${index}Txt']}";
           index = index == "1" ? "2" : "1";
           var sec =
               json["interval${index}Unit"] is String &&
@@ -76,8 +76,10 @@ class _StopWatchState extends State<StopWatch> {
                   : 60;
           _nextTime = (json["interval$index"] * sec) + _secondsElapsed;
         }
-        var str = formatTime(_secondsElapsed);
-        speak("時間 $str$s1");
+        if (_secondsElapsed % frequency == 0 || s1.isNotEmpty) {
+          var str = formatTime(_secondsElapsed);
+          speak("時間 $str$s1");
+        }
       }
     });
   }
@@ -181,13 +183,20 @@ class _StopWatchState extends State<StopWatch> {
 
   String formatTime(int sec) {
     var str = "";
-    final hours = (sec ~/ 3600); // .toString().padLeft(2, '0');
+    final hours = (sec ~/ 3600);
+    final minutes = ((sec % 3600) ~/ 60);
+    final seconds = (sec % 60);
     if (hours > 0) {
       str += "$hours 小時";
     }
-    final minutes = ((sec % 3600) ~/ 60);
+
     if (minutes > 0) {
-      str += "$minutes 分鐘";
+      str +=
+          "${str.isEmpty ? '' : ', '}$minutes 分${hours == 0 && seconds == 0 ? '鐘' : ''}";
+    }
+    if (seconds > 0) {
+      str +=
+          "${str.isEmpty ? '' : ', '}$seconds 秒${hours == 0 && minutes == 0 ? '鐘' : ''}";
     }
     return str;
   }
@@ -258,7 +267,7 @@ class _StopWatchState extends State<StopWatch> {
           Container(
             margin: const EdgeInsets.all(5.0),
             child: Text(
-              "第 ${_nextTime ~/ 60} 分鐘，${json["interval${index}Txt"]}",
+              _nextTimeText(index),
               style: TextStyle(fontSize: 20, color: Colors.blue),
             ),
           ),
@@ -336,6 +345,20 @@ class _StopWatchState extends State<StopWatch> {
         },
       ),
     );
+  }
+
+  String _nextTimeText(String index) {
+    String unit =
+        json["interval${index}Unit"] is String &&
+                json["interval${index}Unit"] == "S"
+            ? "秒"
+            : "分";
+    int sec =
+        json["interval${index}Unit"] is String &&
+                json["interval${index}Unit"] == "S"
+            ? 1
+            : 60;
+    return "第 ${formatTime(_nextTime ~/ sec)}，${json["interval${index}Txt"]}";
   }
 
   void _exitSetup() {
