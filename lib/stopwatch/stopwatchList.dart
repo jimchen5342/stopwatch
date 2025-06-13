@@ -65,7 +65,7 @@ class _StopWatchListState extends State<StopWatchList> {
     String s1 = "";
 
     if (json is Map) {
-      if (json.containsKey('interval')) {
+      if (json.containsKey('interval') && json["interval"] > 0) {
         s1 = '間隔 ${json['interval']} 分鐘報時';
       }
       if (json["interval1"] is num && json["interval1"] > 0) {
@@ -73,7 +73,8 @@ class _StopWatchListState extends State<StopWatchList> {
             json["interval1Unit"] is String && json["interval1Unit"] == "S"
                 ? "秒"
                 : "分";
-        s1 += "；${json["interval1"]}${unit}鐘後${json["interval1Txt"]}";
+        s1 +=
+            "${s1.isNotEmpty ? '；' : ''}${json["interval1"]}${unit}鐘後${json["interval1Txt"]}";
       }
       if (json["interval2"] is num && json["interval2"] > 0) {
         String unit =

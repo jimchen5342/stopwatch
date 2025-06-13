@@ -240,8 +240,8 @@ class _StopWatchEditState extends State<StopWatchEdit> {
           style: ElevatedButton.styleFrom(
             foregroundColor: Colors.white,
             backgroundColor: Colors.blue,
-            minimumSize: Size(30, 30),
-            padding: EdgeInsets.symmetric(horizontal: 10),
+            minimumSize: Size(30, 40),
+            padding: EdgeInsets.symmetric(horizontal: 15),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(2)),
             ),
@@ -255,7 +255,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
           },
           child: Text(
             "${unit["interval$index"] == "S" ? "秒" : "分"}鐘",
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 18),
           ),
         ),
         SizedBox(width: 5),
@@ -310,9 +310,10 @@ class _StopWatchEditState extends State<StopWatchEdit> {
             : int.parse(ctrlInterval2.text);
     if (ctrlTitle.text.isEmpty) {
       msg = "請輸入標題";
-    } else if (interval == 0) {
-      msg = "請輸入報時頻率";
     } else if (interval1 == 0 && interval2 == 0) {
+      if (interval == 0) {
+        msg = "請輸入報時頻率";
+      }
     } else if (interval1 == 0 && ctrlInterval1Txt.text.isNotEmpty) {
       msg = "請輸入第 1 個間隔時間";
     } else if (interval2 == 0 && ctrlInterval1Txt.text.isNotEmpty) {
@@ -320,7 +321,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
     } else if (interval1 > 0 && ctrlInterval1Txt.text.isEmpty) {
       msg = "請輸入第 1 通知";
     } else if (interval2 > 0 && ctrlInterval2Txt.text.isEmpty) {
-      msg = "請輸入第2通知";
+      msg = "請輸入第 2 通知";
     } else {}
 
     if (msg.isNotEmpty) {
@@ -332,9 +333,11 @@ class _StopWatchEditState extends State<StopWatchEdit> {
         json = {};
         var key = 1;
         for (var el in stopwatchList) {
-          if (el["key"] > key) {
+          print('${el["key"]} / ${key}; ${el["key"] == key}');
+          if (el["key"] >= key) {
             key = el["key"] + 1;
           }
+          print("key: $key");
         }
         json["key"] = key;
         stopwatchList.add(json);
@@ -355,8 +358,11 @@ class _StopWatchEditState extends State<StopWatchEdit> {
           json["interval2Unit"] = unit["interval2"];
         }
       }
-      print(json);
-      int index = stopwatchList.indexWhere((el) => el["key"] == json["key"]);
+      // print(json);
+      int index = stopwatchList.indexWhere((el) {
+        print("${el['key']} / ${json['key']}; ${el['key'] == json['key']}");
+        return el["key"] == json["key"];
+      });
       stopwatchList[index] = json;
       await storage.writeJsonArray("stopwatch", stopwatchList);
       _exitSetup();

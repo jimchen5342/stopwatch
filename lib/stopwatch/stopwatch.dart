@@ -62,7 +62,7 @@ class _StopWatchState extends State<StopWatch> {
       _secondsElapsed = sec;
       // event["seconds"];
 
-      // print("stopWatch: $sec / $_secondsElapsed; $second; ${DateTime.now()}");
+      print("stopWatch: $sec / $_secondsElapsed; $second; ${DateTime.now()}");
 
       if (_secondsElapsed > 0) {
         var s1 = "";
@@ -125,7 +125,7 @@ class _StopWatchState extends State<StopWatch> {
         if (json["interval1"] is num && json["interval2"] is num) {
           if (json["interval1"] > 0 && json["interval2"] > 0) {
             var sec =
-                json["interval1Unit"] is String && json["interval2Unit"] == "S"
+                json["interval1Unit"] is String && json["interval1Unit"] == "S"
                     ? 1
                     : 60;
             _nextTime = json["interval1"] * sec;
@@ -301,7 +301,7 @@ class _StopWatchState extends State<StopWatch> {
     String s1 = "";
 
     if (json is Map) {
-      if (json.containsKey('interval')) {
+      if (json.containsKey('interval') && json["interval"] > 0) {
         s1 = '間隔 ${json['interval']} 分鐘報時';
       }
       if (json["interval1"] is num && json["interval1"] > 0) {
@@ -348,17 +348,12 @@ class _StopWatchState extends State<StopWatch> {
   }
 
   String _nextTimeText(String index) {
-    String unit =
-        json["interval${index}Unit"] is String &&
-                json["interval${index}Unit"] == "S"
-            ? "秒"
-            : "分";
     int sec =
         json["interval${index}Unit"] is String &&
                 json["interval${index}Unit"] == "S"
             ? 1
             : 60;
-    return "第 ${formatTime(_nextTime ~/ sec)}，${json["interval${index}Txt"]}";
+    return "在 ${formatDuration(_nextTime)}，${json["interval${index}Txt"]}";
   }
 
   void _exitSetup() {

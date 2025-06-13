@@ -111,10 +111,7 @@ void onStart(ServiceInstance service) async {
 
   // 碼錶變數
   int seconds = 0;
-  Timer? timer;
-
-  // 啟動碼錶
-  timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+  Timer.periodic(const Duration(seconds: 1), (timer) async {
     seconds++;
     // 更新前景通知內容
     if (service is AndroidServiceInstance) {
