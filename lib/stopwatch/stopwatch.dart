@@ -58,25 +58,25 @@ class _StopWatchState extends State<StopWatch> {
       if (second == 0) {
         millSec = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
       }
-      int sec = (DateTime.now().millisecondsSinceEpoch ~/ 1000) - millSec;
-      _secondsElapsed = sec;
-      // event["seconds"];
+      int sec1 = (DateTime.now().millisecondsSinceEpoch ~/ 1000) - millSec;
+      _secondsElapsed = sec1;
 
-      print("stopWatch: $sec / $_secondsElapsed; $second; ${DateTime.now()}");
+      // print("stopWatch: $sec1 / $_secondsElapsed; $second; ${DateTime.now()}");
 
       if (_secondsElapsed > 0) {
         var s1 = "";
         if (_secondsElapsed >= _nextTime && _nextTime > -1) {
           s1 = "；${json['interval${index}Txt']}";
           index = index == "1" ? "2" : "1";
-          var sec =
+          var sec2 =
               json["interval${index}Unit"] is String &&
                       json["interval${index}Unit"] == "S"
                   ? 1
                   : 60;
-          _nextTime = (json["interval$index"] * sec) + _secondsElapsed;
+          _nextTime = (json["interval$index"] * sec2) + _secondsElapsed;
         }
-        if (_secondsElapsed % frequency == 0 || s1.isNotEmpty) {
+        if ((frequency > 0 && _secondsElapsed % frequency == 0) ||
+            s1.isNotEmpty) {
           var str = formatTime(_secondsElapsed);
           speak("時間 $str$s1");
         }
