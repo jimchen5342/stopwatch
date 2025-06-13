@@ -32,7 +32,17 @@ class _StopWatchListState extends State<StopWatchList> {
             "interval1": 4,
             "interval1Txt": "休息",
             "interval2": 1,
-            "interval2Txt": "開始跑步",
+            "interval2Txt": "運動",
+          },
+          {
+            "key": 3,
+            "title": "健走",
+            "interval": 1,
+            "interval1": 1,
+            "interval1Txt": "跑步",
+            "interval2": 20,
+            "interval2Unit": "S",
+            "interval2Txt": "慢走",
           },
         ];
         storage.writeJsonArray("stopwatch", _stopwatchList);
@@ -59,10 +69,18 @@ class _StopWatchListState extends State<StopWatchList> {
         s1 = '間隔 ${json['interval']} 分鐘報時';
       }
       if (json["interval1"] is num && json["interval1"] > 0) {
-        s1 += "；運動${json["interval1"]}分鐘"; // ，${json["interval1Txt"]}
+        String unit =
+            json["interval1Unit"] is String && json["interval1Unit"] == "S"
+                ? "秒"
+                : "分";
+        s1 += "；${json["interval1"]}${unit}鐘後${json["interval1Txt"]}";
       }
       if (json["interval2"] is num && json["interval2"] > 0) {
-        s1 += "，休息${json["interval2"]}分鐘"; // ，${json["interval2Txt"]}
+        String unit =
+            json["interval2Unit"] is String && json["interval2Unit"] == "S"
+                ? "秒"
+                : "分";
+        s1 += "，${json["interval2"]}${unit}鐘後${json["interval2Txt"]}";
       }
     } else {
       print('myData 不包含 key "age" 或 myData 不是一個 Map');
@@ -123,6 +141,9 @@ class _StopWatchListState extends State<StopWatchList> {
                 fontSize: 14,
                 // color: Colors.white,
               ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              softWrap: false,
             ),
             onTap: () async {
               active = index;
@@ -155,7 +176,7 @@ class _StopWatchListState extends State<StopWatchList> {
                   _stopwatchList.removeAt(index);
                 }
               });
-              
+
               // print(_stopwatchList)
             },
             trailing: Icon(Icons.keyboard_arrow_right),

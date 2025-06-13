@@ -49,7 +49,7 @@ class _StopWatchState extends State<StopWatch> {
       if (json is Map && json.containsKey('interval')) {
         frequency = json["interval"] * 60;
       }
-      calcNextTime();
+      resetNextTime();
     });
   }
 
@@ -69,7 +69,12 @@ class _StopWatchState extends State<StopWatch> {
         if (_secondsElapsed >= _nextTime && _nextTime > -1) {
           s1 = ", ${json['interval${index}Txt']}";
           index = index == "1" ? "2" : "1";
-          _nextTime = (json["interval$index"] * 60) + _secondsElapsed;
+          var sec =
+              json["interval${index}Unit"] is String &&
+                      json["interval${index}Unit"] == "S"
+                  ? 1
+                  : 60;
+          _nextTime = (json["interval$index"] * sec) + _secondsElapsed;
         }
         var str = formatTime(_secondsElapsed);
         speak("時間 $str$s1");
@@ -112,12 +117,16 @@ class _StopWatchState extends State<StopWatch> {
     });
   }
 
-  void calcNextTime() {
+  void resetNextTime() {
     if (json is Map) {
       if (json.containsKey('interval1') && json.containsKey('interval2')) {
         if (json["interval1"] is num && json["interval2"] is num) {
           if (json["interval1"] > 0 && json["interval2"] > 0) {
-            _nextTime = json["interval1"] * 60;
+            var sec =
+                json["interval1Unit"] is String && json["interval2Unit"] == "S"
+                    ? 1
+                    : 60;
+            _nextTime = json["interval1"] * sec;
             index = "1";
           }
         }
@@ -146,7 +155,7 @@ class _StopWatchState extends State<StopWatch> {
       recoders = [];
       setState(() {
         _isRunning = true;
-        calcNextTime();
+        resetNextTime();
         speak("啟動碼錶");
         // millSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
       });
@@ -287,10 +296,18 @@ class _StopWatchState extends State<StopWatch> {
         s1 = '間隔 ${json['interval']} 分鐘報時';
       }
       if (json["interval1"] is num && json["interval1"] > 0) {
-        s1 += "\n運動 ${json["interval1"]} 分鐘"; // ，${json["interval1Txt"]}
+        String unit =
+            json["interval1Unit"] is String && json["interval1Unit"] == "S"
+                ? "秒"
+                : "分";
+        s1 += "\n${json["interval1"]} $unit鐘後，${json["interval1Txt"]}";
       }
       if (json["interval2"] is num && json["interval2"] > 0) {
-        s1 += "\n休息 ${json["interval2"]} 分鐘"; // ，${json["interval2Txt"]}
+        String unit =
+            json["interval2Unit"] is String && json["interval2Unit"] == "S"
+                ? "秒"
+                : "分";
+        s1 += "\n${json["interval2"]}  $unit鐘後，${json["interval2Txt"]}";
       }
     }
 
@@ -299,7 +316,7 @@ class _StopWatchState extends State<StopWatch> {
         child: Text(
           s1,
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 25,
             // color: Colors.white,
           ),
         ),

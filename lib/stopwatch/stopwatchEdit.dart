@@ -18,6 +18,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
       ctrlInterval1Txt = TextEditingController(),
       ctrlInterval2Txt = TextEditingController();
   bool isEdit = false;
+  dynamic unit = {"interval1": "M", "interval2": "M"};
 
   @override
   initState() {
@@ -26,20 +27,31 @@ class _StopWatchEditState extends State<StopWatchEdit> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       json = ModalRoute.of(context)?.settings.arguments;
       if (json != null) {
+        setState(() {});
         title = "編輯";
         ctrlTitle.text = json["title"];
         ctrlInterval.text = json["interval"].toString();
-        if (json is Map && json.containsKey('interval1')) {
-          ctrlInterval1.text = json["interval1"].toString();
-        }
-        if (json is Map && json.containsKey('interval2')) {
-          ctrlInterval2.text = json["interval2"].toString();
-        }
-        if (json is Map && json.containsKey('interval1Txt')) {
-          ctrlInterval1Txt.text = json["interval1Txt"];
-        }
-        if (json is Map && json.containsKey('interval2Txt')) {
-          ctrlInterval2Txt.text = json["interval2Txt"];
+        if (json is Map) {
+          if (json.containsKey('interval1')) {
+            ctrlInterval1.text = json["interval1"].toString();
+          }
+          if (json.containsKey('interval2')) {
+            ctrlInterval2.text = json["interval2"].toString();
+          }
+          if (json.containsKey('interval1Txt')) {
+            ctrlInterval1Txt.text = json["interval1Txt"];
+          }
+          if (json.containsKey('interval2Txt')) {
+            ctrlInterval2Txt.text = json["interval2Txt"];
+          }
+          if (json.containsKey('interval1Unit') &&
+              json["interval1Unit"] is String) {
+            unit["interval1"] = json["interval1Unit"];
+          }
+          if (json.containsKey('interval2Unit') &&
+              json["interval2Unit"] is String) {
+            unit["interval2"] = json["interval2Unit"];
+          }
         }
       }
     });
@@ -110,15 +122,6 @@ class _StopWatchEditState extends State<StopWatchEdit> {
   }
 
   Widget body() {
-    final ButtonStyle raisedButtonStyle = ElevatedButton.styleFrom(
-      foregroundColor: Colors.white,
-      backgroundColor: Colors.blue,
-      minimumSize: Size(88, 36),
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(2)),
-      ),
-    );
     return Column(
       children: [
         SizedBox(height: 10), // 第一列，標題
@@ -182,119 +185,107 @@ class _StopWatchEditState extends State<StopWatchEdit> {
           ],
         ),
         SizedBox(height: 10), // 第三列
-        Row(
-          children: [
-            SizedBox(width: 20),
-            Text(
-              "運動 ",
-              style: TextStyle(
-                fontSize: 20,
-                // color: Colors.white,
-              ),
-            ),
-            SizedBox(
-              width: 50,
-              child: TextField(
-                controller: ctrlInterval1,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.all(5.0),
-                  border: OutlineInputBorder(),
-                  // hintText: '',
-                ),
-                onChanged: (text) {
-                  onChange(ctrlInterval1);
-                },
-              ),
-            ),
-            Text(
-              " 分鐘，通知 ",
-              style: TextStyle(
-                fontSize: 20,
-                // color: Colors.white,
-              ),
-            ),
-            Expanded(
-              child: TextField(
-                controller: ctrlInterval1Txt,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.all(5.0),
-                  border: OutlineInputBorder(),
-                  hintText: "開始休息",
-                ),
-                onChanged: (text) {
-                  onChange(ctrlInterval1Txt);
-                },
-              ),
-            ),
-            SizedBox(width: 20),
-          ],
-        ),
+        _row("1"),
         SizedBox(height: 10), // 第四列
-        Row(
-          children: [
-            SizedBox(width: 20),
-            Text(
-              "休息 ",
-              style: TextStyle(
-                fontSize: 20,
-                // color: Colors.white,
-              ),
-            ),
-            SizedBox(
-              width: 50,
-              child: TextField(
-                controller: ctrlInterval2,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.all(5.0),
-                  border: OutlineInputBorder(),
-                  // hintText: '',
-                ),
-                onChanged: (text) {
-                  onChange(ctrlInterval2);
-                },
-              ),
-            ),
-            Text(
-              " 分鐘，通知 ",
-              style: TextStyle(
-                fontSize: 20,
-                // color: Colors.white,
-              ),
-            ),
-            Expanded(
-              child: TextField(
-                controller: ctrlInterval2Txt,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.all(5.0),
-                  border: OutlineInputBorder(),
-                  hintText: "開始運動",
-                ),
-                onChanged: (text) {
-                  onChange(ctrlInterval2Txt);
-                },
-              ),
-            ),
-            SizedBox(width: 20),
-          ],
-        ),
+        _row("2"),
         // Expanded(flex: 1, child: Container()),
-        SizedBox(height: 20),
+        SizedBox(height: 10),
         if (isEdit == true)
           ElevatedButton(
-            style: raisedButtonStyle,
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.blue,
+              minimumSize: Size(120, 40),
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(2)),
+              ),
+            ),
             onPressed: () {
               save();
             },
-            child: Text('存檔'),
+            child: Text(
+              '存檔',
+              style: TextStyle(
+                fontSize: 20,
+                // color: Colors.white,
+              ),
+            ),
           ),
       ],
     );
   }
 
+  Widget _row(String index) {
+    return Row(
+      children: [
+        SizedBox(width: 20),
+        SizedBox(
+          width: 50,
+          child: TextField(
+            controller: index == "1" ? ctrlInterval1 : ctrlInterval2,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.all(5.0),
+              border: OutlineInputBorder(),
+              // hintText: '',
+            ),
+            onChanged: (text) {
+              onChange(index == "1" ? ctrlInterval1 : ctrlInterval2);
+            },
+          ),
+        ),
+        SizedBox(width: 5),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.blue,
+            minimumSize: Size(30, 30),
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(2)),
+            ),
+          ),
+          onPressed: () {
+            setState(() {
+              unit["interval$index"] =
+                  unit["interval$index"] == "S" ? "M" : "S";
+              isEdit = true;
+            });
+          },
+          child: Text(
+            "${unit["interval$index"] == "S" ? "秒" : "分"}鐘",
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
+        SizedBox(width: 5),
+        Text(
+          "後，通知 ",
+          style: TextStyle(
+            fontSize: 20,
+            // color: Colors.white,
+          ),
+        ),
+        Expanded(
+          child: TextField(
+            controller: index == "1" ? ctrlInterval1Txt : ctrlInterval2Txt,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.all(5.0),
+              border: OutlineInputBorder(),
+              hintText: index == "1" ? "休息" : "運動",
+            ),
+            onChanged: (text) {
+              onChange(index == "1" ? ctrlInterval1Txt : ctrlInterval2Txt);
+            },
+          ),
+        ),
+        SizedBox(width: 20),
+      ],
+    );
+  }
+
   onChange(TextEditingController ctrl) {
-    String text = ctrl.text;
+    // String text = ctrl.text;
     isEdit = true;
   }
 
@@ -355,7 +346,16 @@ class _StopWatchEditState extends State<StopWatchEdit> {
         json["interval2"] = interval2;
         json["interval1Txt"] = ctrlInterval1Txt.text;
         json["interval2Txt"] = ctrlInterval2Txt.text;
+        if (json["interval1Unit"] == "S" ||
+            (json["interval1Unit"] != unit["interval1"])) {
+          json["interval1Unit"] = unit["interval1"];
+        }
+        if (json["interval2Unit"] == "S" ||
+            (json["interval2Unit"] != unit["interval2"])) {
+          json["interval2Unit"] = unit["interval2"];
+        }
       }
+      print(json);
       int index = stopwatchList.indexWhere((el) => el["key"] == json["key"]);
       stopwatchList[index] = json;
       await storage.writeJsonArray("stopwatch", stopwatchList);

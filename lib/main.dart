@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget with WidgetsBindingObserver {
   }
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    print("stopWatch: didChangeAppLifecycleState: $state");
+    // print("stopWatch: didChangeAppLifecycleState: $state");
     if (AppLifecycleState.detached == state) {
       // APP 被銷毀、釋放
       bool isRunning = await _service.isRunning();
