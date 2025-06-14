@@ -325,7 +325,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
     } else {}
 
     if (msg.isNotEmpty) {
-      _showMyDialog(msg);
+      alert(context, msg);
     } else {
       StorageManager storage = StorageManager();
       List<dynamic> stopwatchList = await storage.readJsonArray("stopwatch");
@@ -368,28 +368,5 @@ class _StopWatchEditState extends State<StopWatchEdit> {
       _exitSetup();
       isEdit = true;
     }
-  }
-
-  Future<void> _showMyDialog(String msg) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('StopWatch'),
-          content: SingleChildScrollView(
-            child: ListBody(children: <Widget>[Text(msg)]),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('確定'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 }

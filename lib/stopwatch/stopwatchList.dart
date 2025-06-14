@@ -121,6 +121,14 @@ class _StopWatchListState extends State<StopWatchList> {
               }
             },
           ),
+          // 測試用
+          // IconButton(
+          //   icon: Icon(Icons.delete, color: Colors.white),
+          //   onPressed: () async {
+          //     String? s = await alert(context, "測試", ok: "yes", no: "no");
+          //     print("sretuurn: $s");
+          //   },
+          // ),
         ],
       ),
       body: ListView.builder(
