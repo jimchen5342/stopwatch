@@ -225,7 +225,7 @@ class _StopWatchState extends State<StopWatch> {
   Widget scaffold() {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: SysColor.primary,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => _exitSetup(),
@@ -268,7 +268,7 @@ class _StopWatchState extends State<StopWatch> {
             margin: const EdgeInsets.all(5.0),
             child: Text(
               _nextTimeText(index),
-              style: TextStyle(fontSize: 20, color: Colors.blue),
+              style: TextStyle(fontSize: 20, color: SysColor.primary),
             ),
           ),
         if (_isRunning) _list(),
@@ -284,7 +284,7 @@ class _StopWatchState extends State<StopWatch> {
         padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 0),
         // textStyle: const TextStyle(fontSize: 16, color: Colors.white),
         foregroundColor: Colors.white,
-        backgroundColor: _isRunning ? Colors.red : Colors.blue,
+        backgroundColor: _isRunning ? Colors.red : SysColor.primary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),

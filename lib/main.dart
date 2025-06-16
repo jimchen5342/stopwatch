@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget with WidgetsBindingObserver {
       // title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        colorScheme: ColorScheme.fromSeed(seedColor: SysColor.primary),
       ),
       home: const Home(),
     );

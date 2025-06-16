@@ -55,9 +55,16 @@ extension HexColor on Color {
   }
 
   /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
-  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
+  String toHex({bool leadingHashSign = true}) =>
+      '${leadingHashSign ? '#' : ''}'
       '${(255 * a).toInt().toRadixString(16).padLeft(2, '0')}'
       '${(255 * r).toInt().toRadixString(16).padLeft(2, '0')}'
       '${(255 * g).toInt().toRadixString(16).padLeft(2, '0')}'
       '${(255 * b).toInt().toRadixString(16).padLeft(2, '0')}';
+}
+
+extension SysColor on Color {
+  static Color get primary => HexColor.fromHex("#3891D8");
+  static Color get second => HexColor.fromHex("#cce2f3");
+  static Color get gray => HexColor.fromHex("#eeeeee");
 }

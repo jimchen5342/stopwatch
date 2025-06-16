@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/system/module.dart';
 
 class CountDownList extends StatefulWidget {
   const CountDownList({super.key});
@@ -22,8 +23,7 @@ class _CountDownListState extends State<CountDownList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor:
-            Colors.blue, //  Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: SysColor.primary,
         title: Text(
           "倒數計時清單",
           style: TextStyle(

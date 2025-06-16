@@ -88,8 +88,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: _exitSetup,
         ),
-        backgroundColor:
-            Colors.blue, //  Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: SysColor.primary,
         title: Text(
           "報時碼錶[$title]",
           style: TextStyle(
@@ -98,13 +97,22 @@ class _StopWatchEditState extends State<StopWatchEdit> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.delete, color: Colors.white),
-            onPressed: () async {
-              json = null;
-              _exitSetup();
-            },
-          ),
+          if (title == "編輯")
+            IconButton(
+              icon: Icon(Icons.delete, color: Colors.white),
+              onPressed: () async {
+                var result = await alert(
+                  context,
+                  "確定要刪除嗎？",
+                  ok: "確定",
+                  cancel: "取消",
+                );
+                if (result == "確定") {
+                  json = null;
+                  _exitSetup();
+                }
+              },
+            ),
         ],
       ),
       body: SingleChildScrollView(
@@ -128,13 +136,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
         Row(
           children: [
             SizedBox(width: 20),
-            Text(
-              "標題 ",
-              style: TextStyle(
-                fontSize: 20,
-                // color: Colors.white,
-              ),
-            ),
+            Text("標題 ", style: TextStyle(fontSize: 20)),
             Expanded(
               child: TextField(
                 controller: ctrlTitle,
@@ -174,13 +176,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
                 },
               ),
             ),
-            Text(
-              " 分鐘報時",
-              style: TextStyle(
-                fontSize: 20,
-                // color: Colors.white,
-              ),
-            ),
+            Text(" 分鐘報時", style: TextStyle(fontSize: 20)),
             SizedBox(width: 20),
           ],
         ),
@@ -194,7 +190,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               foregroundColor: Colors.white,
-              backgroundColor: Colors.blue,
+              backgroundColor: SysColor.primary,
               minimumSize: Size(120, 40),
               padding: EdgeInsets.symmetric(horizontal: 16),
               shape: const RoundedRectangleBorder(
@@ -204,13 +200,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
             onPressed: () {
               save();
             },
-            child: Text(
-              '存檔',
-              style: TextStyle(
-                fontSize: 20,
-                // color: Colors.white,
-              ),
-            ),
+            child: Text('存檔', style: TextStyle(fontSize: 20)),
           ),
       ],
     );
@@ -239,7 +229,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             foregroundColor: Colors.white,
-            backgroundColor: Colors.blue,
+            backgroundColor: SysColor.primary,
             minimumSize: Size(30, 40),
             padding: EdgeInsets.symmetric(horizontal: 15),
             shape: const RoundedRectangleBorder(
@@ -259,13 +249,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
           ),
         ),
         SizedBox(width: 5),
-        Text(
-          "後，通知 ",
-          style: TextStyle(
-            fontSize: 20,
-            // color: Colors.white,
-          ),
-        ),
+        Text("後，通知 ", style: TextStyle(fontSize: 20)),
         Expanded(
           child: TextField(
             controller: index == "1" ? ctrlInterval1Txt : ctrlInterval2Txt,

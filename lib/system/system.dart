@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/system/module.dart';
 
 Future<String?> alert(
   BuildContext context,
@@ -56,7 +57,7 @@ Future<String?> alert(
           Navigator.of(context).pop(ok ?? "確定");
         },
         style: TextButton.styleFrom(
-          backgroundColor: Colors.blue,
+          backgroundColor: SysColor.primary,
           foregroundColor: Colors.white,
           textStyle: TextStyle(fontSize: 16.0),
           shape: RoundedRectangleBorder(
@@ -74,12 +75,15 @@ Future<String?> alert(
     builder: (BuildContext context) {
       return AlertDialog(
         title: const Text('StopWatch'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+        ),
         titlePadding: const EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 0.0),
         // titleTextStyle: const TextStyle(
         //   fontSize: 20.0,
         //   fontWeight: FontWeight.bold,
         // ),
-        contentPadding: const EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 10.0),
+        contentPadding: const EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 35.0),
         content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[

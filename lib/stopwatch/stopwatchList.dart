@@ -93,7 +93,7 @@ class _StopWatchListState extends State<StopWatchList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
+        backgroundColor: SysColor.primary,
         // leading: IconButton(
         //   icon: Icon(Icons.arrow_back, color: Colors.white),
         //   onPressed: () => print('按下選單'),
@@ -125,7 +125,7 @@ class _StopWatchListState extends State<StopWatchList> {
           // IconButton(
           //   icon: Icon(Icons.delete, color: Colors.white),
           //   onPressed: () async {
-          //     String? s = await alert(context, "測試", ok: "yes", no: "no");
+          //     String? s = await alert(context, "alert 測試", ok: "yes", no: "no");
           //     print("sretuurn: $s");
           //   },
           // ),
@@ -139,17 +139,11 @@ class _StopWatchListState extends State<StopWatchList> {
             // leading: Icon(Icons.event_seat),
             title: Text(
               _stopwatchList[index]["title"],
-              style: TextStyle(
-                fontSize: 20,
-                // color: Colors.white,
-              ),
+              style: TextStyle(fontSize: 20),
             ),
             subtitle: Text(
               descrip(_stopwatchList[index]),
-              style: TextStyle(
-                fontSize: 14,
-                // color: Colors.white,
-              ),
+              style: TextStyle(fontSize: 14),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
               softWrap: false,
