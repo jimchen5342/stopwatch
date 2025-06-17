@@ -125,55 +125,66 @@ class _StopWatchListState extends State<StopWatchList> {
         shrinkWrap: true,
         itemCount: _stopwatchList.length,
         itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            // leading: Icon(Icons.event_seat),
-            title: Text(
-              _stopwatchList[index]["title"],
-              style: TextStyle(fontSize: 20),
+          return Container(
+            decoration: BoxDecoration(
+              border: Border(
+                top:
+                    index == 0
+                        ? BorderSide(color: SysColor.second, width: 2)
+                        : BorderSide.none,
+                bottom: BorderSide(color: SysColor.second, width: 2),
+              ),
             ),
-            subtitle: Text(
-              descrip(_stopwatchList[index]),
-              style: TextStyle(fontSize: 14),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-              softWrap: false,
-            ),
-            onTap: () async {
-              active = index;
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const StopWatch(),
-                  settings: RouteSettings(arguments: _stopwatchList[index]),
-                ),
-              );
-            },
-            onLongPress: () async {
-              active = index;
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const StopWatchEdit(),
-                  settings: RouteSettings(arguments: _stopwatchList[index]),
-                ),
-              );
-              setState(() {
-                if (result != null) {
-                  for (var el in _stopwatchList) {
-                    if (el["key"] == result["key"]) {
-                      el = result;
-                      break;
+            child: ListTile(
+              // leading: Icon(Icons.event_seat),
+              title: Text(
+                _stopwatchList[index]["title"],
+                style: TextStyle(fontSize: 20),
+              ),
+              subtitle: Text(
+                descrip(_stopwatchList[index]),
+                style: TextStyle(fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                softWrap: false,
+              ),
+              onTap: () async {
+                active = index;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const StopWatch(),
+                    settings: RouteSettings(arguments: _stopwatchList[index]),
+                  ),
+                );
+              },
+              onLongPress: () async {
+                active = index;
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const StopWatchEdit(),
+                    settings: RouteSettings(arguments: _stopwatchList[index]),
+                  ),
+                );
+                setState(() {
+                  if (result != null) {
+                    for (var el in _stopwatchList) {
+                      if (el["key"] == result["key"]) {
+                        el = result;
+                        break;
+                      }
                     }
+                  } else {
+                    _stopwatchList.removeAt(index);
                   }
-                } else {
-                  _stopwatchList.removeAt(index);
-                }
-              });
+                });
 
-              // print(_stopwatchList)
-            },
-            trailing: Icon(Icons.keyboard_arrow_right),
-            selected: active == index,
+                // print(_stopwatchList)
+              },
+              trailing: Icon(Icons.keyboard_arrow_right),
+              selected: active == index,
+            ),
           );
         },
       ),

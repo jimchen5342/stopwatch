@@ -155,8 +155,9 @@ class _StopWatchState extends State<StopWatch> {
       });
     } else {
       await _service.startService();
-      recoders = [];
       setState(() {
+        recoders = [];
+        resetHistory = [];
         _isRunning = true;
         resetNextTime();
         speak("啟動碼錶");
@@ -275,7 +276,7 @@ class _StopWatchState extends State<StopWatch> {
           // decoration: BoxDecoration(
           //   border: Border.all(color: Colors.blueAccent),
           // ),
-          height: 45,
+          height: 60,
           child: showButton == false ? null : _btn(),
         ),
         if (_isRunning && _nextTime > -1)
@@ -286,8 +287,9 @@ class _StopWatchState extends State<StopWatch> {
               style: TextStyle(fontSize: 20, color: SysColor.primary),
             ),
           ),
-        if (_isRunning) _list(),
-        if (!_isRunning) _content(),
+        if (recoders.isNotEmpty) SizedBox(height: 10),
+        if (recoders.isNotEmpty) _recorders(),
+        if (recoders.isEmpty) _content(),
       ],
     );
   }
@@ -329,7 +331,7 @@ class _StopWatchState extends State<StopWatch> {
         OutlinedButton(
           onPressed: _toggleService,
           style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 0),
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
             // textStyle: const TextStyle(fontSize: 16, color: Colors.white),
             foregroundColor: Colors.white,
             backgroundColor: _isRunning ? SysColor.red : SysColor.primary,
@@ -346,12 +348,12 @@ class _StopWatchState extends State<StopWatch> {
             style: TextStyle(fontSize: 20, color: Colors.white),
           ),
         ),
-        if (_isRunning && _secondsElapsed > 10)
-          // 重置碼錶
+        if (_isRunning && _secondsElapsed > 60)
+          // 重新計時
           OutlinedButton(
             onPressed: _reset,
             style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 0),
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
               // textStyle: const TextStyle(fontSize: 16, color: Colors.white),
               foregroundColor: Colors.white,
               backgroundColor: SysColor.primary,
@@ -396,22 +398,28 @@ class _StopWatchState extends State<StopWatch> {
       child: Center(
         child: Text(
           s1,
-          style: TextStyle(
-            fontSize: 25,
-            // color: Colors.white,
-          ),
+          style: TextStyle(fontSize: 25, color: SysColor.primary),
         ),
       ),
     );
   }
 
-  Widget _list() {
+  Widget _recorders() {
     return Expanded(
       child: ListView.builder(
         itemCount: recoders.length,
         itemBuilder: (context, index) {
           return ListTile(
-            title: Text(recoders[index]),
+            contentPadding: EdgeInsets.only(left: 10, right: 10),
+            isThreeLine: false,
+            minTileHeight: 10,
+            title: Text(
+              recoders[index],
+              style: TextStyle(
+                // fontSize: 25,
+                color: recoders[index].contains("重新") ? SysColor.red : null,
+              ),
+            ),
             // contentPadding: EdgeInsets.all(0.0),
           );
         },
