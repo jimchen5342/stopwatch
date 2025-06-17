@@ -21,6 +21,7 @@ class _StopWatchState extends State<StopWatch> {
   List<String> recoders = [];
   var millSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   String index = "-1";
+  List<String> resetHistory = [];
 
   @override
   initState() {
@@ -169,6 +170,19 @@ class _StopWatchState extends State<StopWatch> {
     });
   }
 
+  void _reset() {
+    setState(() {
+      resetHistory.add(formatDuration(_secondsElapsed));
+      var str = formatTime(_secondsElapsed);
+      speak("時間 $str；重新計時");
+
+      millSec = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+      _secondsElapsed = 0;
+      _nextTime = -1;
+      resetNextTime();
+    });
+  }
+
   // 格式化時間，將秒數轉換為 HH:mm:ss 格式
   String formatDuration(int sec) {
     final hours = (sec ~/ 3600); // .toString().padLeft(2, '0');
@@ -248,6 +262,7 @@ class _StopWatchState extends State<StopWatch> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
+        _history(),
         Text(
           formatDuration(_secondsElapsed),
           style: TextStyle(fontSize: 90),
@@ -277,23 +292,80 @@ class _StopWatchState extends State<StopWatch> {
     );
   }
 
-  Widget _btn() {
-    return OutlinedButton(
-      onPressed: _toggleService,
-      style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 0),
-        // textStyle: const TextStyle(fontSize: 16, color: Colors.white),
-        foregroundColor: Colors.white,
-        backgroundColor: _isRunning ? Colors.red : SysColor.primary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
+  Widget _history() {
+    List<Widget> arr = [];
+    for (var (index, item) in resetHistory.indexed) {
+      arr.add(
+        Container(
+          margin: EdgeInsets.only(left: index == 0 ? 0 : 10.0),
+          // padding: const EdgeInsets.only(left: 3.0, right: 3.0),
+          // decoration: BoxDecoration(
+          //   border: Border.all(color: Colors.blueAccent),
+          // ),
+          child: Text(
+            item,
+            style: TextStyle(
+              fontSize: 26,
+              color: index % 2 == 0 ? SysColor.primary : null,
+            ),
+          ),
         ),
-        // side: BorderSide(width: 5, color: Colors.green),
-      ),
-      child: Text(
-        _isRunning ? '停止碼錶' : '啟動碼錶',
-        style: TextStyle(fontSize: 20, color: Colors.white),
-      ),
+      );
+    }
+    return Container(
+      // margin: const EdgeInsets.all(15.0),
+      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+      // decoration: BoxDecoration(border: Border.all(color: Colors.blueAccent)),
+      height: 45,
+      child: Row(mainAxisAlignment: MainAxisAlignment.start, children: arr),
+    );
+  }
+
+  Widget _btn() {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        OutlinedButton(
+          onPressed: _toggleService,
+          style: OutlinedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 0),
+            // textStyle: const TextStyle(fontSize: 16, color: Colors.white),
+            foregroundColor: Colors.white,
+            backgroundColor: _isRunning ? SysColor.red : SysColor.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            side: BorderSide(
+              width: 5,
+              color: _isRunning ? SysColor.red : SysColor.primary,
+            ),
+          ),
+          child: Text(
+            _isRunning ? '停止碼錶' : '啟動碼錶',
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
+        ),
+        if (_isRunning && _secondsElapsed > 10)
+          // 重置碼錶
+          OutlinedButton(
+            onPressed: _reset,
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 0),
+              // textStyle: const TextStyle(fontSize: 16, color: Colors.white),
+              foregroundColor: Colors.white,
+              backgroundColor: SysColor.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              // side: BorderSide(width: 5, color: Colors.green),
+            ),
+            child: Text(
+              "重新計時",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+          ),
+      ],
     );
   }
 

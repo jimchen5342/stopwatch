@@ -109,17 +109,7 @@ class _StopWatchListState extends State<StopWatchList> {
           // 新增
           IconButton(
             icon: Icon(Icons.add, color: Colors.white),
-            onPressed: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const StopWatchEdit()),
-              );
-              if (result != null) {
-                setState(() {
-                  _stopwatchList.add(result);
-                });
-              }
-            },
+            onPressed: _onAdd,
           ),
           // 測試用
           // IconButton(
@@ -187,6 +177,27 @@ class _StopWatchListState extends State<StopWatchList> {
           );
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: SysColor.primary,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(40.0),
+        ),
+        onPressed: _onAdd,
+        child: Icon(Icons.add, size: 30.0),
+      ),
     );
+  }
+
+  void _onAdd() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const StopWatchEdit()),
+    );
+    if (result != null) {
+      setState(() {
+        _stopwatchList.add(result);
+      });
+    }
   }
 }

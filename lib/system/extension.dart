@@ -67,4 +67,6 @@ extension SysColor on Color {
   static Color get primary => HexColor.fromHex("#3891D8");
   static Color get second => HexColor.fromHex("#cce2f3");
   static Color get gray => HexColor.fromHex("#eeeeee");
+  static Color get white => HexColor.fromHex("#ffffff");
+  static Color get red => HexColor.fromHex("#C01921");
 }
