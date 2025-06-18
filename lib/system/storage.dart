@@ -19,41 +19,51 @@ class StorageManager {
     localStorage.clear();
   }
 
-  getItem(String key) {
-    return localStorage.getItem(key);
+  getString(String key) {
+    var s = localStorage.getItem(key) ?? "[]";
+    return s;
   }
 
-  setItem(String key, dynamic value) {
+  setString(String key, dynamic value) {
     localStorage.setItem(key, value);
   }
 
-  Future<List<dynamic>> readJsonArray(String key) async {
+  getInt(String key) {
+    var s = localStorage.getItem(key) ?? "0";
+    return int.parse(s);
+  }
+
+  setInt(String key, int value) {
+    localStorage.setItem(key, value.toString());
+  }
+
+  List<dynamic> getJsonArray(String key) {
     var s = localStorage.getItem(key) ?? "[]";
     List<dynamic> dataList = jsonDecode(s);
     return dataList;
   }
 
-  Future<List<String>> readStringArray(String key) async {
+  List<String> readStringArray(String key) {
     var s = localStorage.getItem(key) ?? "[]";
     List<String> dataList = jsonDecode(s);
     return dataList;
   }
 
-  Future<List<num>> readNumberArray(String key) async {
+  List<num> readNumberArray(String key) {
     var s = localStorage.getItem(key) ?? "[]";
     List<num> dataList = jsonDecode(s);
     return dataList;
   }
 
-  Future<void> writeJsonArray(String key, List<dynamic> array) async {
+  void setJsonArray(String key, List<dynamic> array) {
     localStorage.setItem(key, jsonEncode(array));
   }
 
-  Future<void> writeStringArray(String key, List<String> array) async {
+  void writeStringArray(String key, List<String> array) {
     localStorage.setItem(key, jsonEncode(array));
   }
 
-  Future<void> writeNumberArray(String key, List<num> array) async {
+  void writeNumberArray(String key, List<num> array) {
     localStorage.setItem(key, jsonEncode(array));
   }
 }

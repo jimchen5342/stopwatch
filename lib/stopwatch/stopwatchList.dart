@@ -21,7 +21,7 @@ class _StopWatchListState extends State<StopWatchList> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // storage.clear();
-      _list = await storage.readJsonArray("stopwatch");
+      _list = storage.getJsonArray("stopwatch");
       if (_list.isEmpty) {
         _list = [
           {"key": 1, "title": "預設", "interval": 1},
@@ -45,7 +45,7 @@ class _StopWatchListState extends State<StopWatchList> {
             "interval2Txt": "慢走",
           },
         ];
-        storage.writeJsonArray("stopwatch", _list);
+        storage.setJsonArray("stopwatch", _list);
       }
       setState(() {});
     });

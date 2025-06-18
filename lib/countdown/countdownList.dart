@@ -21,14 +21,14 @@ class _CountDownListState extends State<CountDownList> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // storage.clear();
-      _list = await storage.readJsonArray("countdown");
+      _list = storage.getJsonArray("countdown");
       if (_list.isEmpty) {
         _list = [
           {"key": 1, "title": "預設 1", "minutes": 5},
           {"key": 2, "title": "預設 2", "minutes": 10},
           {"key": 3, "title": "預設 3", "minutes": 30},
         ];
-        storage.writeJsonArray("countdown", _list);
+        storage.setJsonArray("countdown", _list);
       }
       setState(() {});
     });

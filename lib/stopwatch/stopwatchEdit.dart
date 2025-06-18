@@ -312,7 +312,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
       alert(context, msg);
     } else {
       StorageManager storage = StorageManager();
-      List<dynamic> stopwatchList = await storage.readJsonArray("stopwatch");
+      List<dynamic> stopwatchList = storage.getJsonArray("stopwatch");
       if (json == null) {
         json = {};
         var key = 1;
@@ -348,7 +348,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
         return el["key"] == json["key"];
       });
       stopwatchList[index] = json;
-      await storage.writeJsonArray("stopwatch", stopwatchList);
+      storage.setJsonArray("stopwatch", stopwatchList);
       _exitSetup();
       isEdit = true;
     }

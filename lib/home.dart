@@ -24,7 +24,7 @@ class _HomeState extends State<Home> {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       version = packageInfo.version;
 
-      var index = storage.getItem("bottomNavigationIndex");
+      var index = storage.getInt("bottomNavigationIndex");
       if (index is int) {
         _selectedIndex = index;
       }
@@ -54,7 +54,7 @@ class _HomeState extends State<Home> {
 
   // 當點擊 BottomNavigationBarItem 時調用的函數
   void _onItemTapped(int index) {
-    storage.setItem("bottomNavigationIndex", index);
+    storage.setInt("bottomNavigationIndex", index);
     setState(() {
       _selectedIndex = index; // 更新選中的索引，觸發 UI 重建
     });
