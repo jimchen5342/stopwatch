@@ -12,7 +12,7 @@ class StopWatchList extends StatefulWidget {
 
 class _StopWatchListState extends State<StopWatchList> {
   StorageManager storage = StorageManager();
-  List<dynamic> _stopwatchList = [];
+  List<dynamic> _list = [];
   int active = -1;
 
   @override
@@ -21,9 +21,9 @@ class _StopWatchListState extends State<StopWatchList> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // storage.clear();
-      _stopwatchList = await storage.readJsonArray("stopwatch");
-      if (_stopwatchList.isEmpty) {
-        _stopwatchList = [
+      _list = await storage.readJsonArray("stopwatch");
+      if (_list.isEmpty) {
+        _list = [
           {"key": 1, "title": "預設", "interval": 1},
           {
             "key": 2,
@@ -45,7 +45,7 @@ class _StopWatchListState extends State<StopWatchList> {
             "interval2Txt": "慢走",
           },
         ];
-        storage.writeJsonArray("stopwatch", _stopwatchList);
+        storage.writeJsonArray("stopwatch", _list);
       }
       setState(() {});
     });
@@ -123,7 +123,7 @@ class _StopWatchListState extends State<StopWatchList> {
       ),
       body: ListView.builder(
         shrinkWrap: true,
-        itemCount: _stopwatchList.length,
+        itemCount: _list.length,
         itemBuilder: (BuildContext context, int index) {
           return Container(
             decoration: BoxDecoration(
@@ -138,11 +138,11 @@ class _StopWatchListState extends State<StopWatchList> {
             child: ListTile(
               // leading: Icon(Icons.event_seat),
               title: Text(
-                _stopwatchList[index]["title"],
+                _list[index]["title"],
                 style: TextStyle(fontSize: 20),
               ),
               subtitle: Text(
-                descrip(_stopwatchList[index]),
+                descrip(_list[index]),
                 style: TextStyle(fontSize: 14),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
@@ -154,7 +154,7 @@ class _StopWatchListState extends State<StopWatchList> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const StopWatch(),
-                    settings: RouteSettings(arguments: _stopwatchList[index]),
+                    settings: RouteSettings(arguments: _list[index]),
                   ),
                 );
               },
@@ -164,23 +164,23 @@ class _StopWatchListState extends State<StopWatchList> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const StopWatchEdit(),
-                    settings: RouteSettings(arguments: _stopwatchList[index]),
+                    settings: RouteSettings(arguments: _list[index]),
                   ),
                 );
                 setState(() {
                   if (result != null) {
-                    for (var el in _stopwatchList) {
+                    for (var el in _list) {
                       if (el["key"] == result["key"]) {
                         el = result;
                         break;
                       }
                     }
                   } else {
-                    _stopwatchList.removeAt(index);
+                    _list.removeAt(index);
                   }
                 });
 
-                // print(_stopwatchList)
+                // print(_list)
               },
               trailing: Icon(Icons.keyboard_arrow_right),
               selected: active == index,
@@ -207,7 +207,7 @@ class _StopWatchListState extends State<StopWatchList> {
     );
     if (result != null) {
       setState(() {
-        _stopwatchList.add(result);
+        _list.add(result);
       });
     }
   }

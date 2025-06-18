@@ -15,6 +15,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _selectedIndex = 0; // 用於追蹤目前選中的索引
   String version = " ";
+  StorageManager storage = StorageManager();
 
   @override
   initState() {
@@ -22,12 +23,20 @@ class _HomeState extends State<Home> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       version = packageInfo.version;
+
+      var index = storage.getItem("bottomNavigationIndex");
+      if (index is int) {
+        _selectedIndex = index;
+      }
+      print("index: $index");
       setState(() {
         Timer(Duration(seconds: 2), () {
           setState(() {});
           version = "";
         });
       });
+
+      // getItem
       // String appName = packageInfo.appName;
       // String packageName = packageInfo.packageName;
       // String version = packageInfo.version;
@@ -45,6 +54,7 @@ class _HomeState extends State<Home> {
 
   // 當點擊 BottomNavigationBarItem 時調用的函數
   void _onItemTapped(int index) {
+    storage.setItem("bottomNavigationIndex", index);
     setState(() {
       _selectedIndex = index; // 更新選中的索引，觸發 UI 重建
     });
