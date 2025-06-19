@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/system/textToSpeech.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:myapp/system/module.dart';
+import 'package:myapp/widgets/module.dart';
 
 class StopWatch extends StatefulWidget {
   const StopWatch({super.key});
@@ -239,19 +240,11 @@ class _StopWatchState extends State<StopWatch> {
 
   Widget scaffold() {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: SysColor.primary,
+      appBar: appBar(
+        "碼錶${json != null ? ' [ ' + json['title'] + ' ]' : ''}",
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => _exitSetup(),
-        ),
-        title: Text(
-          // ignore: prefer_interpolation_to_compose_strings
-          "報時碼錶${json != null ? ' [ ' + json['title'] + ' ]' : ''}",
-          style: TextStyle(
-            // fontSize: 40,
-            color: Colors.white,
-          ),
         ),
       ),
       body: Center(child: body()),
@@ -328,8 +321,18 @@ class _StopWatchState extends State<StopWatch> {
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
+        // 長按，停止碼錶
         OutlinedButton(
-          onPressed: _toggleService,
+          onPressed: () {
+            if (!_isRunning) {
+              _toggleService();
+            }
+          },
+          onLongPress: () {
+            if (_isRunning) {
+              _toggleService();
+            }
+          },
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
             // textStyle: const TextStyle(fontSize: 16, color: Colors.white),
@@ -349,12 +352,12 @@ class _StopWatchState extends State<StopWatch> {
           ),
         ),
         if (_isRunning && _secondsElapsed > 60)
-          // 重新計時
+          // 重新計時, 要長按
           OutlinedButton(
-            onPressed: _reset,
+            onPressed: null,
+            onLongPress: _reset,
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-              // textStyle: const TextStyle(fontSize: 16, color: Colors.white),
               foregroundColor: Colors.white,
               backgroundColor: SysColor.primary,
               shape: RoundedRectangleBorder(

@@ -28,7 +28,6 @@ class _HomeState extends State<Home> {
       if (index is int) {
         _selectedIndex = index;
       }
-      print("index: $index");
       setState(() {
         Timer(Duration(seconds: 2), () {
           setState(() {});

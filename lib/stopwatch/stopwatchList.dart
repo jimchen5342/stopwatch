@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/system/module.dart';
+import 'package:myapp/widgets/module.dart';
 import 'package:myapp/stopwatch/stopwatch.dart';
 import 'package:myapp/stopwatch/stopwatchEdit.dart';
 
@@ -92,19 +93,8 @@ class _StopWatchListState extends State<StopWatchList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: SysColor.primary,
-        // leading: IconButton(
-        //   icon: Icon(Icons.arrow_back, color: Colors.white),
-        //   onPressed: () => print('按下選單'),
-        // ),
-        title: Text(
-          "報時碼錶清單",
-          style: TextStyle(
-            // fontSize: 40,
-            color: Colors.white,
-          ),
-        ),
+      appBar: appBar(
+        "碼錶清單",
         actions: [
           // 新增
           IconButton(

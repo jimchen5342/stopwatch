@@ -21,10 +21,24 @@ class _CountDownEditState extends State<CountDownEdit> {
 
   @override
   Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        _exitSetup();
+      },
+      child: scaffold(),
+    );
+  }
+
+  Widget scaffold() {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor:
-            SysColor.primary, //  Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: SysColor.primary,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => _exitSetup(),
+        ),
         title: Text(
           "倒數計時",
           style: TextStyle(
@@ -35,5 +49,9 @@ class _CountDownEditState extends State<CountDownEdit> {
       ),
       body: Container(),
     );
+  }
+
+  void _exitSetup() {
+    Navigator.of(context).pop();
   }
 }

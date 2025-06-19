@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/system/module.dart';
+import 'package:myapp/widgets/module.dart';
 
 class StopWatchEdit extends StatefulWidget {
   const StopWatchEdit({super.key});
@@ -83,18 +84,11 @@ class _StopWatchEditState extends State<StopWatchEdit> {
   Widget scaffold() {
     return Scaffold(
       // resizeToAvoidBottomInset: false,
-      appBar: AppBar(
+      appBar: appBar(
+        "碼錶[$title]",
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: _exitSetup,
-        ),
-        backgroundColor: SysColor.primary,
-        title: Text(
-          "報時碼錶[$title]",
-          style: TextStyle(
-            // fontSize: 40,
-            color: Colors.white,
-          ),
         ),
         actions: [
           if (title == "編輯")

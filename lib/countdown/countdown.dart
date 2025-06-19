@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/system/module.dart';
+import 'package:myapp/system/textToSpeech.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 
 class CountDown extends StatefulWidget {
   const CountDown({super.key});
@@ -9,9 +11,35 @@ class CountDown extends StatefulWidget {
 }
 
 class _CountDownState extends State<CountDown> {
+  TextToSpeech tts = TextToSpeech();
+  final FlutterBackgroundService _service = FlutterBackgroundService();
+  dynamic json;
+  bool _isRunning = false, begin = false, showButton = true;
+
   @override
   initState() {
     super.initState();
+    tts.setup();
+    // _checkServiceStatus();
+
+    // 監聽來自背景服務的 'update' 事件
+    _service.on('update').listen((event) {
+      if (begin && event != null && event.containsKey("seconds")) {
+        // listenToService(event["seconds"]);
+      }
+    });
+
+    _service.on('start').listen((event) {
+      print("stopWatch: start");
+    });
+    _service.on('stop').listen((event) {
+      print("stopWatch: stop");
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      json = ModalRoute.of(context)?.settings.arguments;
+      setState(() {});
+    });
   }
 
   @override
@@ -21,12 +49,27 @@ class _CountDownState extends State<CountDown> {
 
   @override
   Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        _exitSetup();
+      },
+      child: scaffold(),
+    );
+  }
+
+  Widget scaffold() {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor:
-            SysColor.primary, //  Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: SysColor.primary,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => _exitSetup(),
+        ),
         title: Text(
-          "倒數計時",
+          // ignore: prefer_interpolation_to_compose_strings
+          "倒數計時${json != null ? ' [ ' + json['title'] + ' ]' : ''}",
           style: TextStyle(
             // fontSize: 40,
             color: Colors.white,
@@ -35,5 +78,9 @@ class _CountDownState extends State<CountDown> {
       ),
       body: Container(),
     );
+  }
+
+  void _exitSetup() {
+    Navigator.of(context).pop();
   }
 }

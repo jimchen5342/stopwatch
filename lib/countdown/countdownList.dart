@@ -62,14 +62,6 @@ class _CountDownListState extends State<CountDownList> {
             icon: Icon(Icons.add, color: Colors.white),
             onPressed: _onAdd,
           ),
-          // 測試用
-          // IconButton(
-          //   icon: Icon(Icons.delete, color: Colors.white),
-          //   onPressed: () async {
-          //     String? s = await alert(context, "alert 測試", ok: "yes", no: "no");
-          //     print("sretuurn: $s");
-          //   },
-          // ),
         ],
       ),
       body: ListView.builder(
