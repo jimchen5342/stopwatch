@@ -33,7 +33,16 @@ class _CountDownEditState extends State<CountDownEdit> {
   }
 
   Widget scaffold() {
-    return Scaffold(appBar: appBar("倒數計時"), body: Container());
+    return Scaffold(
+      appBar: appBar(
+        "倒數計時",
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => _exitSetup(),
+        ),
+      ),
+      body: Container(),
+    );
   }
 
   void _exitSetup() {
