@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/system/module.dart';
+import 'package:myapp/widgets/module.dart';
 import 'package:myapp/countdown/countdown.dart';
 import 'package:myapp/countdown/countdownEdit.dart';
 
@@ -47,15 +48,8 @@ class _CountDownListState extends State<CountDownList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: SysColor.primary,
-        title: Text(
-          "倒數計時清單",
-          style: TextStyle(
-            // fontSize: 40,
-            color: Colors.white,
-          ),
-        ),
+      appBar: appBar(
+        "倒數計時清單",
         actions: [
           // 新增
           IconButton(

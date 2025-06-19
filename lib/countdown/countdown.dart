@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/system/module.dart';
-import 'package:myapp/system/textToSpeech.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:myapp/system/textToSpeech.dart';
+import 'package:myapp/system/module.dart';
+import 'package:myapp/widgets/module.dart';
 
 class CountDown extends StatefulWidget {
   const CountDown({super.key});
@@ -61,21 +62,7 @@ class _CountDownState extends State<CountDown> {
 
   Widget scaffold() {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: SysColor.primary,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => _exitSetup(),
-        ),
-        title: Text(
-          // ignore: prefer_interpolation_to_compose_strings
-          "倒數計時${json != null ? ' [ ' + json['title'] + ' ]' : ''}",
-          style: TextStyle(
-            // fontSize: 40,
-            color: Colors.white,
-          ),
-        ),
-      ),
+      appBar: appBar("倒數計時${json != null ? ' [ ' + json['title'] + ' ]' : ''}"),
       body: Container(),
     );
   }
