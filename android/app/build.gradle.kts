@@ -27,7 +27,7 @@ android {
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = 1 // flutter.versionCode
-        versionName = "2025-06-17 17:30" // flutter.versionName
+        versionName = "2025-06-19 17:00" // flutter.versionName
         setProperty("archivesBaseName", "stopwatch")
     }
 
