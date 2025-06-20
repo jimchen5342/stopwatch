@@ -40,7 +40,7 @@ Future<String?> alert(
           style: TextButton.styleFrom(
             backgroundColor: Colors.orange,
             foregroundColor: Colors.white,
-            textStyle: TextStyle(fontSize: 16.0),
+            textStyle: TextStyle(fontSize: 18.0),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
             ),
@@ -89,7 +89,7 @@ Future<String?> alert(
             children: <Widget>[
               Divider(),
               SizedBox(height: 10),
-              Text(msg, style: TextStyle(fontSize: 18.0)),
+              Text(msg, style: TextStyle(fontSize: 20.0)),
             ],
           ),
         ),

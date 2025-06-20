@@ -49,7 +49,11 @@ class _StopWatchState extends State<StopWatch> {
       setState(() {});
 
       if (json is Map && json.containsKey('interval')) {
-        frequency = json["interval"] * 60;
+        var sec =
+            (json["intervalUnit"] is String && json["intervalUnit"] == "S"
+                ? 1
+                : 60);
+        frequency = json["interval"] * sec;
       }
       resetNextTime();
     });
@@ -176,7 +180,7 @@ class _StopWatchState extends State<StopWatch> {
     setState(() {
       resetHistory.add(formatDuration(_secondsElapsed));
       var str = formatTime(_secondsElapsed);
-      speak("時間 $str；重新計時");
+      speak("時間 $str；碼錶歸零");
 
       millSec = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
       _secondsElapsed = 0;
@@ -323,13 +327,16 @@ class _StopWatchState extends State<StopWatch> {
       children: [
         // 長按，停止碼錶
         OutlinedButton(
+          // 啟動碼錶
           onPressed: () {
             if (!_isRunning) {
               _toggleService();
             }
           },
+          // 停止碼錶
           onLongPress: () {
             if (_isRunning) {
+              
               _toggleService();
             }
           },
@@ -352,7 +359,7 @@ class _StopWatchState extends State<StopWatch> {
           ),
         ),
         if (_isRunning && _secondsElapsed > 60)
-          // 重新計時, 要長按
+          // 碼錶歸零, 要長按
           OutlinedButton(
             onPressed: null,
             onLongPress: _reset,
@@ -366,7 +373,7 @@ class _StopWatchState extends State<StopWatch> {
               // side: BorderSide(width: 5, color: Colors.green),
             ),
             child: Text(
-              "重新計時",
+              "碼錶歸零",
               style: TextStyle(fontSize: 20, color: Colors.white),
             ),
           ),
@@ -379,7 +386,11 @@ class _StopWatchState extends State<StopWatch> {
 
     if (json is Map) {
       if (json.containsKey('interval') && json["interval"] > 0) {
-        s1 = '間隔 ${json['interval']} 分鐘報時';
+        String unit =
+            json["intervalUnit"] is String && json["intervalUnit"] == "S"
+                ? "秒"
+                : "分";
+        s1 = '間隔 ${json['interval']} $unit鐘報時';
       }
       if (json["interval1"] is num && json["interval1"] > 0) {
         String unit =

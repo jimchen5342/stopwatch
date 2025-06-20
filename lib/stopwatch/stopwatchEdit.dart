@@ -19,7 +19,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
       ctrlInterval1Txt = TextEditingController(),
       ctrlInterval2Txt = TextEditingController();
   bool isEdit = false;
-  dynamic unit = {"interval1": "M", "interval2": "M"};
+  dynamic unit = {"interval": "M", "interval1": "M", "interval2": "M"};
 
   @override
   initState() {
@@ -45,6 +45,11 @@ class _StopWatchEditState extends State<StopWatchEdit> {
           if (json.containsKey('interval2Txt')) {
             ctrlInterval2Txt.text = json["interval2Txt"];
           }
+          if (json.containsKey('intervalUnit') &&
+              json["intervalUnit"] is String) {
+            unit["interval"] = json["intervalUnit"];
+          }
+
           if (json.containsKey('interval1Unit') &&
               json["interval1Unit"] is String) {
             unit["interval1"] = json["interval1Unit"];
@@ -134,6 +139,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
             Expanded(
               child: TextField(
                 controller: ctrlTitle,
+                // style: TextStyle(fontSize: 20),
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.all(5.0),
                   border: OutlineInputBorder(),
@@ -170,7 +176,29 @@ class _StopWatchEditState extends State<StopWatchEdit> {
                 },
               ),
             ),
-            Text(" 分鐘報時", style: TextStyle(fontSize: 20)),
+            SizedBox(width: 5),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: SysColor.primary,
+                minimumSize: Size(30, 40),
+                padding: EdgeInsets.symmetric(horizontal: 15),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(2)),
+                ),
+              ),
+              onPressed: () {
+                unit["interval"] = unit["interval"] == "S" ? "M" : "S";
+                isEdit = true;
+                setState(() {});
+              },
+              child: Text(
+                "${unit["interval"] == "S" ? "秒" : "分"}鐘",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+            SizedBox(width: 5),
+            Text("報時", style: TextStyle(fontSize: 20)),
             SizedBox(width: 20),
           ],
         ),
@@ -322,6 +350,10 @@ class _StopWatchEditState extends State<StopWatchEdit> {
       }
       json["title"] = ctrlTitle.text;
       json["interval"] = interval;
+      if (unit["interval"] == "S" ||
+          (json["intervalUnit"] != unit["interval"])) {
+        json["intervalUnit"] = unit["interval"];
+      }
       if (!(interval1 == 0 && interval2 == 0)) {
         json["interval1"] = interval1;
         json["interval2"] = interval2;
