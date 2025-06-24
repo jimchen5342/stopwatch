@@ -153,17 +153,18 @@ class _StopWatchState extends State<StopWatch> {
       // 如果正在運行，則停止服務
       _service.invoke("stopService");
       setState(() {
+        var str = formatTime(_secondsElapsed);
+        speak("時間 $str；停止碼錶");
         _isRunning = false;
         _secondsElapsed = 0; // 根據需求決定是否重置
         _nextTime = -1;
-        speak("停止碼錶");
       });
     } else {
       await _service.startService();
       setState(() {
+        _isRunning = true;
         recoders = [];
         resetHistory = [];
-        _isRunning = true;
         resetNextTime();
         speak("啟動碼錶");
         // millSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
@@ -336,7 +337,6 @@ class _StopWatchState extends State<StopWatch> {
           // 停止碼錶
           onLongPress: () {
             if (_isRunning) {
-              
               _toggleService();
             }
           },

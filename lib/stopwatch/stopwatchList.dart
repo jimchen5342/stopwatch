@@ -264,4 +264,10 @@ class _StopWatchListState extends State<StopWatchList> {
       });
     }
   }
+
+  void showSnackBar() { // 可以用的，
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Hello, Snackbar!')));
+  }
 }

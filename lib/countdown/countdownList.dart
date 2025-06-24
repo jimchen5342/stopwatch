@@ -15,6 +15,7 @@ class _CountDownListState extends State<CountDownList> {
   StorageManager storage = StorageManager();
   List<dynamic> _list = [];
   int active = -1;
+  bool _sort = false;
 
   @override
   initState() {
@@ -49,82 +50,29 @@ class _CountDownListState extends State<CountDownList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar(
-        "倒數計時清單",
+        "計時清單",
         actions: [
-          // 新增
-          IconButton(
-            icon: Icon(Icons.add, color: Colors.white),
-            onPressed: _onAdd,
-          ),
+          if (_sort == false)
+            IconButton(
+              icon: Icon(Icons.add, color: Colors.white),
+              onPressed: _onAdd,
+            ),
+
+          if (_list.length > 2)
+            IconButton(
+              icon: Icon(
+                Icons.reorder_sharp,
+                color: _sort ? Colors.red : Colors.white,
+              ),
+              onPressed: () async {
+                setState(() {
+                  _sort = !_sort;
+                });
+              },
+            ),
         ],
       ),
-      body: ListView.builder(
-        shrinkWrap: true,
-        itemCount: _list.length,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            decoration: BoxDecoration(
-              border: Border(
-                top:
-                    index == 0
-                        ? BorderSide(color: SysColor.second, width: 2)
-                        : BorderSide.none,
-                bottom: BorderSide(color: SysColor.second, width: 2),
-              ),
-            ),
-            child: ListTile(
-              // leading: Icon(Icons.event_seat),
-              title: Text(
-                _list[index]["title"],
-                style: TextStyle(fontSize: 20),
-              ),
-              subtitle: Text(
-                descrip(_list[index]),
-                style: TextStyle(fontSize: 14),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                softWrap: false,
-              ),
-              onTap: () async {
-                active = index;
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CountDown(),
-                    settings: RouteSettings(arguments: _list[index]),
-                  ),
-                );
-              },
-              onLongPress: () async {
-                active = index;
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CountDownEdit(),
-                    settings: RouteSettings(arguments: _list[index]),
-                  ),
-                );
-                setState(() {
-                  if (result != null) {
-                    for (var el in _list) {
-                      if (el["key"] == result["key"]) {
-                        el = result;
-                        break;
-                      }
-                    }
-                  } else {
-                    _list.removeAt(index);
-                  }
-                });
-
-                // print(_list)
-              },
-              trailing: Icon(Icons.keyboard_arrow_right),
-              selected: active == index,
-            ),
-          );
-        },
-      ),
+      body: _sort ? reorderable() : listview(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: SysColor.primary,
         foregroundColor: Colors.white,
@@ -134,6 +82,112 @@ class _CountDownListState extends State<CountDownList> {
         onPressed: _onAdd,
         child: Icon(Icons.add, size: 30.0),
       ),
+    );
+  }
+
+  Widget reorderable() {
+    return ReorderableListView(
+      padding: const EdgeInsets.symmetric(horizontal: 0),
+      children: <Widget>[
+        for (int index = 0; index < _list.length; index += 1)
+          listTile(index, Icons.drag_handle),
+      ],
+      onReorder: (int oldIndex, int newIndex) {
+        setState(() {
+          if (oldIndex < newIndex) {
+            newIndex -= 1;
+          }
+          final dynamic item = _list.removeAt(oldIndex);
+          _list.insert(newIndex, item);
+          storage.setJsonArray("countdown", _list);
+        });
+      },
+    );
+  }
+
+  Widget listview() {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: _list.length,
+      itemBuilder: (BuildContext context, int index) {
+        return listTile(
+          index,
+          Icons.keyboard_arrow_right,
+          onTap: () async {
+            active = index;
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CountDown(),
+                settings: RouteSettings(arguments: _list[index]),
+              ),
+            );
+          },
+          onLongPress: () async {
+            active = index;
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CountDownEdit(),
+                settings: RouteSettings(arguments: _list[index]),
+              ),
+            );
+            setState(() {
+              if (result != null) {
+                for (var el in _list) {
+                  if (el["key"] == result["key"]) {
+                    el = result;
+                    break;
+                  }
+                }
+              } else {
+                _list.removeAt(index);
+              }
+            });
+          },
+        );
+      },
+    );
+  }
+
+  ListTile listTile(
+    int index,
+    IconData trailing, {
+    Function()? onTap,
+    Function()? onLongPress,
+  }) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final Color oddItemColor = colorScheme.primary.withValues(alpha: 0.05);
+    final Color evenItemColor = colorScheme.primary.withValues(alpha: 0.15);
+
+    return ListTile(
+      key: Key('$index'),
+      tileColor: index % 2 == 0 ? oddItemColor : evenItemColor,
+      title: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(_list[index]["title"], style: TextStyle(fontSize: 22)),
+          // Text(
+          //   "key: ${_list[index]["key"]}",
+          //   style: TextStyle(fontSize: 16, color: Colors.red),
+          // ),
+        ],
+      ),
+      subtitle: Text(
+        descrip(_list[index]),
+        style: TextStyle(fontSize: 14),
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+        softWrap: false,
+      ),
+      trailing: Icon(
+        trailing,
+        color: trailing == Icons.keyboard_arrow_right ? null : Colors.red,
+      ),
+      selected: active == index,
+      onTap: onTap,
+      onLongPress: onLongPress,
     );
   }
 
