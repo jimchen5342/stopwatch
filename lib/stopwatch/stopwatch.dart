@@ -83,7 +83,8 @@ class _StopWatchState extends State<StopWatch> {
         }
         if ((frequency > 0 && _secondsElapsed % frequency == 0) ||
             s1.isNotEmpty) {
-          var str = formatTime(_secondsElapsed);
+          var str = _secondsElapsed.secondToChinese();
+          // str = formatTime(_secondsElapsed);
           speak("時間 $str$s1");
         }
       }
@@ -153,7 +154,7 @@ class _StopWatchState extends State<StopWatch> {
       // 如果正在運行，則停止服務
       _service.invoke("stopService");
       setState(() {
-        var str = formatTime(_secondsElapsed);
+        var str = _secondsElapsed.secondToChinese();
         speak("時間 $str；停止碼錶");
         _isRunning = false;
         _secondsElapsed = 0; // 根據需求決定是否重置
@@ -179,8 +180,8 @@ class _StopWatchState extends State<StopWatch> {
 
   void _reset() {
     setState(() {
-      resetHistory.add(formatDuration(_secondsElapsed));
-      var str = formatTime(_secondsElapsed);
+      resetHistory.add(_secondsElapsed.secondToFormat());
+      var str = _secondsElapsed.secondToChinese();
       speak("時間 $str；碼錶歸零");
 
       millSec = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
@@ -188,38 +189,6 @@ class _StopWatchState extends State<StopWatch> {
       _nextTime = -1;
       resetNextTime();
     });
-  }
-
-  // 格式化時間，將秒數轉換為 HH:mm:ss 格式
-  String formatDuration(int sec) {
-    final hours = (sec ~/ 3600); // .toString().padLeft(2, '0');
-    final minutes = ((sec % 3600) ~/ 60).toString().padLeft(2, '0');
-    final seconds = (sec % 60).toString().padLeft(2, '0');
-    var h = "";
-    if (hours > 0) {
-      h = "${hours.toString().padLeft(2, '0')}:";
-    }
-    return "$h$minutes:$seconds";
-  }
-
-  String formatTime(int sec) {
-    var str = "";
-    final hours = (sec ~/ 3600);
-    final minutes = ((sec % 3600) ~/ 60);
-    final seconds = (sec % 60);
-    if (hours > 0) {
-      str += "$hours 小時";
-    }
-
-    if (minutes > 0) {
-      str +=
-          "${str.isEmpty ? '' : ', '}$minutes 分${hours == 0 && seconds == 0 ? '鐘' : ''}";
-    }
-    if (seconds > 0) {
-      str +=
-          "${str.isEmpty ? '' : ', '}$seconds 秒${hours == 0 && minutes == 0 ? '鐘' : ''}";
-    }
-    return str;
   }
 
   void speak(String txt) async {
@@ -263,7 +232,7 @@ class _StopWatchState extends State<StopWatch> {
       children: <Widget>[
         _history(),
         Text(
-          formatDuration(_secondsElapsed),
+          _secondsElapsed.secondToFormat(),
           style: TextStyle(fontSize: 90),
           textAlign: TextAlign.center,
         ),
@@ -447,7 +416,7 @@ class _StopWatchState extends State<StopWatch> {
                 json["interval${index}Unit"] == "S"
             ? 1
             : 60;
-    return "在 ${formatDuration(_nextTime)}，${json["interval${index}Txt"]}";
+    return "在 ${_nextTime.secondToFormat()}，${json["interval${index}Txt"]}";
   }
 
   void _exitSetup() {

@@ -50,6 +50,8 @@ class _StopWatchListState extends State<StopWatchList> {
         storage.setJsonArray("stopwatch", _list);
       }
       setState(() {});
+      // print(DruationToString(12).secondToTime());
+      print(15.secondToChinese());
     });
   }
 
@@ -265,7 +267,8 @@ class _StopWatchListState extends State<StopWatchList> {
     }
   }
 
-  void showSnackBar() { // 可以用的，
+  void showSnackBar() {
+    // 可以用的，
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text('Hello, Snackbar!')));

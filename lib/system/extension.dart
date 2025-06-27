@@ -15,6 +15,37 @@ extension StringnExtension on String {
     RegExp numeric = RegExp(r'^-?[0-9]+$');
     return numeric.hasMatch(this);
   }
+
+  String formatDuration(int sec) {
+    final hours = (sec ~/ 3600); // .toString().padLeft(2, '0');
+    final minutes = ((sec % 3600) ~/ 60).toString().padLeft(2, '0');
+    final seconds = (sec % 60).toString().padLeft(2, '0');
+    var h = "";
+    if (hours > 0) {
+      h = "${hours.toString().padLeft(2, '0')}:";
+    }
+    return "$h$minutes:$seconds";
+  }
+
+  String formatTime(int sec) {
+    var str = "";
+    final hours = (sec ~/ 3600);
+    final minutes = ((sec % 3600) ~/ 60);
+    final seconds = (sec % 60);
+    if (hours > 0) {
+      str += "$hours 小時";
+    }
+
+    if (minutes > 0) {
+      str +=
+          "${str.isEmpty ? '' : ', '}$minutes 分${hours == 0 && seconds == 0 ? '鐘' : ''}";
+    }
+    if (seconds > 0) {
+      str +=
+          "${str.isEmpty ? '' : ', '}$seconds 秒${hours == 0 && minutes == 0 ? '鐘' : ''}";
+    }
+    return str;
+  }
 }
 
 extension DateTimeFormatting on DateTime {

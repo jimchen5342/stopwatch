@@ -63,14 +63,19 @@ class _CountDownState extends State<CountDown> {
   Widget scaffold() {
     return Scaffold(
       appBar: appBar(
+        // ignore: prefer_interpolation_to_compose_strings
         "計時${json != null ? ' [ ' + json['title'] + ' ]' : ''}",
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => _exitSetup(),
         ),
       ),
-      body: Container(),
+      body: body(),
     );
+  }
+
+  Widget body() {
+    return Container();
   }
 
   void _exitSetup() {
