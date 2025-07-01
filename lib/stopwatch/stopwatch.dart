@@ -72,7 +72,9 @@ class _StopWatchState extends State<StopWatch> {
       if (_secondsElapsed > 0) {
         var s1 = "";
         if (_secondsElapsed >= _nextTime && _nextTime > -1) {
-          s1 = "；${json['interval${index}Txt']}";
+          s1 = "${json['interval${index}Txt']}";
+          s1 = s1.isEmpty ? " " : "，$s1";
+
           index = index == "1" ? "2" : "1";
           var sec2 =
               json["interval${index}Unit"] is String &&
@@ -81,9 +83,10 @@ class _StopWatchState extends State<StopWatch> {
                   : 60;
           _nextTime = (json["interval$index"] * sec2) + _secondsElapsed;
         }
+
         if ((frequency > 0 && _secondsElapsed % frequency == 0) ||
             s1.isNotEmpty) {
-          var str = _secondsElapsed.secondToChinese();
+          var str = SecondsToString(_secondsElapsed).toChinese();
           // str = formatTime(_secondsElapsed);
           speak("時間 $str$s1");
         }
@@ -154,7 +157,7 @@ class _StopWatchState extends State<StopWatch> {
       // 如果正在運行，則停止服務
       _service.invoke("stopService");
       setState(() {
-        var str = _secondsElapsed.secondToChinese();
+        var str = SecondsToString(_secondsElapsed).toChinese();
         speak("時間 $str；停止碼錶");
         _isRunning = false;
         _secondsElapsed = 0; // 根據需求決定是否重置
@@ -180,8 +183,8 @@ class _StopWatchState extends State<StopWatch> {
 
   void _reset() {
     setState(() {
-      resetHistory.add(_secondsElapsed.secondToFormat());
-      var str = _secondsElapsed.secondToChinese();
+      resetHistory.add(SecondsToString(_secondsElapsed).toFormat());
+      var str = SecondsToString(_secondsElapsed).toChinese();
       speak("時間 $str；碼錶歸零");
 
       millSec = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
@@ -232,7 +235,7 @@ class _StopWatchState extends State<StopWatch> {
       children: <Widget>[
         _history(),
         Text(
-          _secondsElapsed.secondToFormat(),
+          SecondsToString(_secondsElapsed).toFormat(),
           style: TextStyle(fontSize: 90),
           textAlign: TextAlign.center,
         ),
@@ -366,14 +369,20 @@ class _StopWatchState extends State<StopWatch> {
             json["interval1Unit"] is String && json["interval1Unit"] == "S"
                 ? "秒"
                 : "分";
-        s1 += "\n${json["interval1"]} $unit鐘後，${json["interval1Txt"]}";
+        String txt = "${json["interval1Txt"]}";
+        txt = txt.isEmpty ? "" : "後，$txt";
+
+        s1 += "\n${json["interval1"]} $unit鐘$txt";
       }
       if (json["interval2"] is num && json["interval2"] > 0) {
         String unit =
             json["interval2Unit"] is String && json["interval2Unit"] == "S"
                 ? "秒"
                 : "分";
-        s1 += "\n${json["interval2"]}  $unit鐘後，${json["interval2Txt"]}";
+        String txt = "${json["interval2Txt"]}";
+        txt = txt.isEmpty ? "" : "後，$txt";
+
+        s1 += "\n${json["interval2"]} $unit鐘$txt";
       }
     }
 
@@ -411,12 +420,9 @@ class _StopWatchState extends State<StopWatch> {
   }
 
   String _nextTimeText(String index) {
-    int sec =
-        json["interval${index}Unit"] is String &&
-                json["interval${index}Unit"] == "S"
-            ? 1
-            : 60;
-    return "在 ${_nextTime.secondToFormat()}，${json["interval${index}Txt"]}";
+    var txt = "${json["interval${index}Txt"]}";
+    txt = txt.isEmpty ? "" : "，$txt";
+    return "在 ${SecondsToString(_nextTime).toFormat()}$txt";
   }
 
   void _exitSetup() {

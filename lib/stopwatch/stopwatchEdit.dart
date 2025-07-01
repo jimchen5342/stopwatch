@@ -324,11 +324,11 @@ class _StopWatchEditState extends State<StopWatchEdit> {
       msg = "請輸入第 1 個間隔時間";
     } else if (interval2 == 0 && ctrlInterval1Txt.text.isNotEmpty) {
       msg = "請輸入第 2 個間隔時間";
-    } else if (interval1 > 0 && ctrlInterval1Txt.text.isEmpty) {
-      msg = "請輸入第 1 通知";
-    } else if (interval2 > 0 && ctrlInterval2Txt.text.isEmpty) {
-      msg = "請輸入第 2 通知";
-    } else {}
+      // } else if (interval1 > 0 && ctrlInterval1Txt.text.isEmpty) {
+      //   msg = "請輸入第 1 通知";
+      // } else if (interval2 > 0 && ctrlInterval2Txt.text.isEmpty) {
+      //   msg = "請輸入第 2 通知";
+    }
 
     if (msg.isNotEmpty) {
       alert(context, msg);

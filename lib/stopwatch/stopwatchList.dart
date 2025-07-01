@@ -51,7 +51,7 @@ class _StopWatchListState extends State<StopWatchList> {
       }
       setState(() {});
       // print(DruationToString(12).secondToTime());
-      print(15.secondToChinese());
+      print(SecondsToString(15).toChinese());
     });
   }
 
@@ -81,15 +81,18 @@ class _StopWatchListState extends State<StopWatchList> {
             json["interval1Unit"] is String && json["interval1Unit"] == "S"
                 ? "秒"
                 : "分";
-        s1 +=
-            "${s1.isNotEmpty ? '；' : ''}${json["interval1"]}${unit}鐘後${json["interval1Txt"]}";
+        String txt = "${json["interval1Txt"]}";
+        txt = txt.isEmpty ? "" : "後$txt";
+        s1 += "${s1.isNotEmpty ? '；' : ''}${json["interval1"]}${unit}鐘$txt";
       }
       if (json["interval2"] is num && json["interval2"] > 0) {
         String unit =
             json["interval2Unit"] is String && json["interval2Unit"] == "S"
                 ? "秒"
                 : "分";
-        s1 += "，${json["interval2"]}${unit}鐘後${json["interval2Txt"]}";
+        String txt = "${json["interval2Txt"]}";
+        txt = txt.isEmpty ? "" : "後$txt";
+        s1 += "，${json["interval2"]}$unit鐘$txt";
       }
     } else {
       print('myData 不包含 key "age" 或 myData 不是一個 Map');

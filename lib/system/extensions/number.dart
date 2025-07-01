@@ -1,5 +1,5 @@
-extension DruationToString on num {
-  String secondToChinese() {
+extension SecondsToString on num {
+  String toChinese() {
     // 格式化時間，將秒數轉換為 HH:mm:ss 格式
     var str = "";
     final hours = (this ~/ 3600);
@@ -21,7 +21,7 @@ extension DruationToString on num {
   }
 
   // 格式化時間，將秒數轉換為 HH:mm:ss 格式
-  String secondToFormat() {
+  String toFormat() {
     final hours = (this ~/ 3600); // .toString().padLeft(2, '0');
     final minutes = ((this % 3600) ~/ 60).toString().padLeft(2, '0');
     final seconds = (this % 60).toString().padLeft(2, '0');
