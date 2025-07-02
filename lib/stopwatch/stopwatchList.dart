@@ -50,8 +50,6 @@ class _StopWatchListState extends State<StopWatchList> {
         storage.setJsonArray("stopwatch", _list);
       }
       setState(() {});
-      // print(DruationToString(12).secondToTime());
-      print(SecondsToString(15).toChinese());
     });
   }
 
@@ -94,9 +92,7 @@ class _StopWatchListState extends State<StopWatchList> {
         txt = txt.isEmpty ? "" : "後$txt";
         s1 += "，${json["interval2"]}$unit鐘$txt";
       }
-    } else {
-      print('myData 不包含 key "age" 或 myData 不是一個 Map');
-    }
+    } else {}
     return s1;
   }
 
@@ -209,8 +205,6 @@ class _StopWatchListState extends State<StopWatchList> {
                 _list.removeAt(index);
               }
             });
-
-            // print(_list)
           },
         );
       },

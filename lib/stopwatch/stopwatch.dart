@@ -37,12 +37,8 @@ class _StopWatchState extends State<StopWatch> {
       }
     });
 
-    _service.on('start').listen((event) {
-      print("stopWatch: start");
-    });
-    _service.on('stop').listen((event) {
-      print("stopWatch: stop");
-    });
+    _service.on('start').listen((event) {});
+    _service.on('stop').listen((event) {});
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       json = ModalRoute.of(context)?.settings.arguments;
@@ -67,8 +63,6 @@ class _StopWatchState extends State<StopWatch> {
       int sec1 = (DateTime.now().millisecondsSinceEpoch ~/ 1000) - millSec;
       _secondsElapsed = sec1;
 
-      // print("stopWatch: $sec1 / $_secondsElapsed; $second; ${DateTime.now()}");
-
       if (_secondsElapsed > 0) {
         var s1 = "";
         if (_secondsElapsed >= _nextTime && _nextTime > -1) {
@@ -87,7 +81,6 @@ class _StopWatchState extends State<StopWatch> {
         if ((frequency > 0 && _secondsElapsed % frequency == 0) ||
             s1.isNotEmpty) {
           var str = SecondsToString(_secondsElapsed).toChinese();
-          // str = formatTime(_secondsElapsed);
           speak("時間 $str$s1");
         }
       }
@@ -197,7 +190,7 @@ class _StopWatchState extends State<StopWatch> {
   void speak(String txt) async {
     var result = await tts.speak(txt);
     var s = "${DateTime.now().format(pattern: "HH:mm:ss:ms")} => $txt";
-    print("stopWatch: $s");
+    // print("stopWatch: $s");
     if (result == "1") {
       recoders.insert(0, s);
     }

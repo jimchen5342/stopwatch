@@ -139,13 +139,9 @@ class _StopWatchEditState extends State<StopWatchEdit> {
             Expanded(
               child: TextField(
                 controller: ctrlTitle,
-                // style: TextStyle(fontSize: 20),
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.all(5.0),
                   border: OutlineInputBorder(),
-                  // labelText: "whatever you want",
-                  // hintText: "whatever you want",
-                  // icon: Icon(Icons.phone_iphone),
                 ),
                 onChanged: (text) {
                   onChange(ctrlTitle);
@@ -324,10 +320,6 @@ class _StopWatchEditState extends State<StopWatchEdit> {
       msg = "請輸入第 1 個間隔時間";
     } else if (interval2 == 0 && ctrlInterval1Txt.text.isNotEmpty) {
       msg = "請輸入第 2 個間隔時間";
-      // } else if (interval1 > 0 && ctrlInterval1Txt.text.isEmpty) {
-      //   msg = "請輸入第 1 通知";
-      // } else if (interval2 > 0 && ctrlInterval2Txt.text.isEmpty) {
-      //   msg = "請輸入第 2 通知";
     }
 
     if (msg.isNotEmpty) {
@@ -339,11 +331,9 @@ class _StopWatchEditState extends State<StopWatchEdit> {
         json = {};
         var key = 1;
         for (var el in stopwatchList) {
-          print('${el["key"]} / ${key}; ${el["key"] == key}');
           if (el["key"] >= key) {
             key = el["key"] + 1;
           }
-          print("key: $key");
         }
         json["key"] = key;
         stopwatchList.add(json);
@@ -368,9 +358,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
           json["interval2Unit"] = unit["interval2"];
         }
       }
-      // print(json);
       int index = stopwatchList.indexWhere((el) {
-        print("${el['key']} / ${json['key']}; ${el['key'] == json['key']}");
         return el["key"] == json["key"];
       });
       stopwatchList[index] = json;
