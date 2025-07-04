@@ -3,6 +3,7 @@ import 'package:myapp/system/module.dart';
 import 'package:myapp/widgets/module.dart';
 import 'package:myapp/stopwatch/stopwatch.dart';
 import 'package:myapp/stopwatch/stopwatchEdit.dart';
+import 'package:flutter/services.dart';
 
 class StopWatchList extends StatefulWidget {
   const StopWatchList({super.key});
@@ -16,6 +17,7 @@ class _StopWatchListState extends State<StopWatchList> {
   List<dynamic> _list = [];
   int active = -1;
   bool _sort = false;
+  static const platform = MethodChannel('com.flutter/MethodChannel');
 
   @override
   initState() {
@@ -61,6 +63,12 @@ class _StopWatchListState extends State<StopWatchList> {
   @override
   void reassemble() async {
     super.reassemble();
+    // try { // 可以用的
+    //   final result = await platform.invokeMethod<String>('getBatteryLevel');
+    //   print('Battery level at $result % .');
+    // } on PlatformException catch (e) {
+    //   print("Failed to get battery level: '${e.message}'.");
+    // }
   }
 
   String descrip(dynamic json) {

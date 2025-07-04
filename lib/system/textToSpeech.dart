@@ -20,7 +20,7 @@ class TextToSpeech {
     });
 
     flutterTts.setCancelHandler(() {
-      print("Cancel");
+      // print("Cancel");
     });
 
     flutterTts.setPauseHandler(() {
@@ -28,27 +28,22 @@ class TextToSpeech {
     });
 
     flutterTts.setContinueHandler(() {
-      print("Continued");
+      // print("Continued");
     });
 
     flutterTts.setErrorHandler((msg) {
-      print("TTS error: $msg");
+      // print("TTS error: $msg");
     });
-    // flutterTts.setLanguage("");
-    // await flutterTts.getLanguages
   }
 
   setup() async {
     try {
-      // dynamic languages = await flutterTts.getLanguages;
-      // print("languages: $languages");
-      // if (languages != null) {
       await flutterTts.setLanguage(ttsLanguage);
       await flutterTts.setSpeechRate(0.5);
       await flutterTts.setVolume(1.0);
       await flutterTts.setPitch(1.0);
     } catch (e) {
-      print("設定 TTS 語言失敗: $e");
+      // print("設定 TTS 語言失敗: $e");
       // 可以設定一個備用語言或讓 TTS 使用系統預設
     }
   }
