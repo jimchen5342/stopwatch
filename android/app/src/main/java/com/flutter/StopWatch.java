@@ -33,7 +33,7 @@ public class StopWatch {
                 "com.flutter/MethodChannel")
                 .setMethodCallHandler(mMethodHandle);
 
-        createNotificationChannel();
+        // createNotificationChannel();
 
     }
 
@@ -63,25 +63,25 @@ public class StopWatch {
         }
     };
 
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance);
-            channel.setDescription(CHANNEL_DESCRIPTION);
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
+    // private void createNotificationChannel() {
+    //     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    //         int importance = NotificationManager.IMPORTANCE_DEFAULT;
+    //         NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance);
+    //         channel.setDescription(CHANNEL_DESCRIPTION);
+    //         NotificationManager notificationManager = getSystemService(NotificationManager.class);
+    //         notificationManager.createNotificationChannel(channel);
+    //     }
+    // }
 
-    private void showNotification() {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(android.R.drawable.ic_dialog_info) // 請替換成您自己的 icon
-                .setContentTitle("Stopwatch Notification")
-                .setContentText("This is a sample notification from Stopwatch app.")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+    // private void showNotification() {
+    //     NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+    //             .setSmallIcon(android.R.drawable.ic_dialog_info) // 請替換成您自己的 icon
+    //             .setContentTitle("Stopwatch Notification")
+    //             .setContentText("This is a sample notification from Stopwatch app.")
+    //             .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        // notificationId is a unique int for each notification that you must define
-        notificationManager.notify(1, builder.build());
-    }
+    //     NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+    //     // notificationId is a unique int for each notification that you must define
+    //     notificationManager.notify(1, builder.build());
+    // }
 }

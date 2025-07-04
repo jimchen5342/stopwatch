@@ -16,7 +16,7 @@ class StopWatch extends StatefulWidget {
 class _StopWatchState extends State<StopWatch> {
   TextToSpeech tts = TextToSpeech();
   final FlutterBackgroundService _service = FlutterBackgroundService();
-  int _secondsElapsed = 0, frequency = 60, _nextTime = -1;
+  int _secondsElapsed = 0, frequency = 60, _nextTime = -1, _finalCountdown = -1;
   bool _isRunning = false, begin = false, showButton = true;
   dynamic json;
   List<String> recoders = [];
@@ -57,6 +57,16 @@ class _StopWatchState extends State<StopWatch> {
 
   void listenToService(int second) {
     setState(() {
+      if (_finalCountdown > -1) {
+        if (_finalCountdown <= 5 && _finalCountdown > 0) {
+          speak("$_finalCountdown");
+        } else if (_finalCountdown == 0) {
+          speak("開始");
+          millSec = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+        }
+        _finalCountdown--;
+        return;
+      }
       if (second == 0) {
         millSec = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
       }
@@ -155,6 +165,7 @@ class _StopWatchState extends State<StopWatch> {
         _isRunning = false;
         _secondsElapsed = 0; // 根據需求決定是否重置
         _nextTime = -1;
+        _finalCountdown = -1;
       });
     } else {
       await _service.startService();
@@ -163,7 +174,8 @@ class _StopWatchState extends State<StopWatch> {
         recoders = [];
         resetHistory = [];
         resetNextTime();
-        speak("啟動碼錶");
+        _finalCountdown = 30;
+        speak("倒數 $_finalCountdown 秒，啟動碼錶");
         // millSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
       });
     }
@@ -188,10 +200,11 @@ class _StopWatchState extends State<StopWatch> {
   }
 
   void speak(String txt) async {
+    // print("speak: $txt");
     var result = await tts.speak(txt);
     var s = "${DateTime.now().format(pattern: "HH:mm:ss:ms")} => $txt";
     // print("stopWatch: $s");
-    if (result == "1") {
+    if (result == "1" && _finalCountdown == -1) {
       recoders.insert(0, s);
     }
   }
@@ -228,8 +241,13 @@ class _StopWatchState extends State<StopWatch> {
       children: <Widget>[
         _history(),
         Text(
-          SecondsToString(_secondsElapsed).toFormat(),
-          style: TextStyle(fontSize: 90),
+          SecondsToString(
+            _finalCountdown > 0 ? _finalCountdown : _secondsElapsed,
+          ).toFormat(),
+          style: TextStyle(
+            fontSize: 90,
+            color: _finalCountdown > 0 ? SysColor.red : null,
+          ),
           textAlign: TextAlign.center,
         ),
         // Container(height: 20),
@@ -240,7 +258,7 @@ class _StopWatchState extends State<StopWatch> {
           //   border: Border.all(color: Colors.blueAccent),
           // ),
           height: 60,
-          child: showButton == false ? null : _btn(),
+          child: showButton == false || _finalCountdown > -1 ? null : _btn(),
         ),
         if (_isRunning && _nextTime > -1)
           Container(
