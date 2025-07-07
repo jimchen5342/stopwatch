@@ -16,7 +16,11 @@ class StopWatch extends StatefulWidget {
 class _StopWatchState extends State<StopWatch> {
   TextToSpeech tts = TextToSpeech();
   final FlutterBackgroundService _service = FlutterBackgroundService();
-  int _secondsElapsed = 0, frequency = 60, _nextTime = -1, _finalCountdown = -1;
+  int _secondsElapsed = 0,
+      frequency = 60,
+      _nextTime = -1,
+      _finalCountdown = -1,
+      times = 0;
   bool _isRunning = false, begin = false, showButton = true;
   dynamic json;
   List<String> recoders = [];
@@ -44,7 +48,7 @@ class _StopWatchState extends State<StopWatch> {
       json = ModalRoute.of(context)?.settings.arguments;
       setState(() {});
 
-      if (json is Map && json.containsKey('interval')) {
+      if (json is Map && json.containsKey("interval")) {
         var sec =
             (json["intervalUnit"] is String && json["intervalUnit"] == "S"
                 ? 1
@@ -63,6 +67,7 @@ class _StopWatchState extends State<StopWatch> {
         } else if (_finalCountdown == 0) {
           speak("開始");
           millSec = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+          times = 0;
         }
         _finalCountdown--;
         return;
@@ -78,6 +83,10 @@ class _StopWatchState extends State<StopWatch> {
         if (_secondsElapsed >= _nextTime && _nextTime > -1) {
           s1 = "${json['interval${index}Txt']}";
           s1 = s1.isEmpty ? " " : "，$s1";
+          if (frequency == 0 && index == "1") {
+            s1 += "；第 ${times + 1} 次";
+            times++;
+          }
 
           index = index == "1" ? "2" : "1";
           var sec2 =
@@ -195,6 +204,7 @@ class _StopWatchState extends State<StopWatch> {
       millSec = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
       _secondsElapsed = 0;
       _nextTime = -1;
+      _finalCountdown = -1;
       resetNextTime();
     });
   }
@@ -368,12 +378,12 @@ class _StopWatchState extends State<StopWatch> {
     String s1 = "";
 
     if (json is Map) {
-      if (json.containsKey('interval') && json["interval"] > 0) {
+      if (json.containsKey("interval") && json["interval"] > 0) {
         String unit =
             json["intervalUnit"] is String && json["intervalUnit"] == "S"
                 ? "秒"
                 : "分";
-        s1 = '間隔 ${json['interval']} $unit鐘報時';
+        s1 = '間隔 ${json["interval"]} $unit鐘報時';
       }
       if (json["interval1"] is num && json["interval1"] > 0) {
         String unit =
