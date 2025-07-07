@@ -62,8 +62,8 @@ class _StopWatchState extends State<StopWatch> {
   void listenToService(int second) {
     setState(() {
       if (_finalCountdown > -1) {
-        if (_finalCountdown <= 5 && _finalCountdown > 0) {
-          speak("$_finalCountdown");
+        if (_finalCountdown <= 6 && _finalCountdown > 1) {
+          speak("${_finalCountdown - 1}");
         } else if (_finalCountdown == 0) {
           speak("開始");
           millSec = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
@@ -275,7 +275,7 @@ class _StopWatchState extends State<StopWatch> {
             margin: const EdgeInsets.all(5.0),
             child: Text(
               _nextTimeText(index),
-              style: TextStyle(fontSize: 20, color: SysColor.primary),
+              style: TextStyle(fontSize: 25, color: SysColor.primary),
             ),
           ),
         if (recoders.isNotEmpty) SizedBox(height: 10),
@@ -298,7 +298,7 @@ class _StopWatchState extends State<StopWatch> {
           child: Text(
             item,
             style: TextStyle(
-              fontSize: 26,
+              fontSize: 25,
               color: index % 2 == 0 ? SysColor.primary : null,
             ),
           ),
@@ -348,7 +348,7 @@ class _StopWatchState extends State<StopWatch> {
           ),
           child: Text(
             _isRunning ? '停止碼錶' : '啟動碼錶',
-            style: TextStyle(fontSize: 20, color: Colors.white),
+            style: TextStyle(fontSize: 25, color: Colors.white),
           ),
         ),
         if (_isRunning && _secondsElapsed > 60)
@@ -367,7 +367,7 @@ class _StopWatchState extends State<StopWatch> {
             ),
             child: Text(
               "碼錶歸零",
-              style: TextStyle(fontSize: 20, color: Colors.white),
+              style: TextStyle(fontSize: 25, color: Colors.white),
             ),
           ),
       ],

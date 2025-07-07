@@ -51,6 +51,12 @@ class _StopWatchListState extends State<StopWatchList> {
         ];
         storage.setJsonArray("stopwatch", _list);
       }
+
+      storage.getInt("stopwatchActive");
+      if (storage.getInt("stopwatchActive") != null) {
+        active = storage.getInt("stopwatchActive")!;
+      }
+      print("active: $active");
       setState(() {});
     });
   }
@@ -184,6 +190,8 @@ class _StopWatchListState extends State<StopWatchList> {
           Icons.keyboard_arrow_right,
           onTap: () async {
             active = index;
+            storage.setInt("stopwatchActive", active);
+            setState(() {});
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -194,6 +202,7 @@ class _StopWatchListState extends State<StopWatchList> {
           },
           onLongPress: () async {
             active = index;
+            setState(() {});
             final result = await Navigator.push(
               context,
               MaterialPageRoute(
@@ -203,14 +212,18 @@ class _StopWatchListState extends State<StopWatchList> {
             );
             setState(() {
               if (result != null) {
-                for (var el in _list) {
+                storage.setInt("stopwatchActive", active);
+                for (var i = 0; i < _list.length; i++) {
+                  var el = _list[i];
                   if (el["key"] == result["key"]) {
                     el = result;
                     break;
                   }
                 }
               } else {
+                storage.setInt("stopwatchActive", -1);
                 _list.removeAt(index);
+                index = -1;
               }
             });
           },
@@ -236,7 +249,13 @@ class _StopWatchListState extends State<StopWatchList> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(_list[index]["title"], style: TextStyle(fontSize: 22)),
+          Text(
+            _list[index]["title"],
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: active == index ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
           // Text(
           //   "key: ${_list[index]["key"]}",
           //   style: TextStyle(fontSize: 16, color: Colors.red),
@@ -245,7 +264,10 @@ class _StopWatchListState extends State<StopWatchList> {
       ),
       subtitle: Text(
         descrip(_list[index]),
-        style: TextStyle(fontSize: 14),
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: active == index ? FontWeight.bold : FontWeight.normal,
+        ),
         overflow: TextOverflow.ellipsis,
         maxLines: 1,
         softWrap: false,

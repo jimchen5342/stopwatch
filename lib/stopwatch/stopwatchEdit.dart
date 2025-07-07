@@ -289,6 +289,7 @@ class _StopWatchEditState extends State<StopWatchEdit> {
   onChange(TextEditingController ctrl) {
     // String text = ctrl.text;
     isEdit = true;
+    setState(() {});
   }
 
   void _exitSetup() {
