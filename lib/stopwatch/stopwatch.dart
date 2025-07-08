@@ -6,6 +6,8 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:myapp/system/module.dart';
 import 'package:myapp/widgets/module.dart';
 
+String TAG = "StopWatch";
+
 class StopWatch extends StatefulWidget {
   const StopWatch({super.key});
 
@@ -41,8 +43,12 @@ class _StopWatchState extends State<StopWatch> {
       }
     });
 
-    _service.on('start').listen((event) {});
-    _service.on('stop').listen((event) {});
+    _service.on('start').listen((event) {
+      print("$TAG: start");
+    });
+    _service.on('stop').listen((event) {
+      print("$TAG: stop");
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       json = ModalRoute.of(context)?.settings.arguments;
@@ -109,7 +115,7 @@ class _StopWatchState extends State<StopWatch> {
   @override
   void dispose() async {
     if (_isRunning) {
-      _service.invoke("stopService");
+      _service.invoke("stop");
       speak("關閉碼錶");
     }
     // tts = null;
@@ -128,7 +134,7 @@ class _StopWatchState extends State<StopWatch> {
       _isRunning = isRunning;
       if (isRunning) {
         _isRunning = false;
-        _service.invoke("stopService");
+        _service.invoke("stop");
         _secondsElapsed = 0;
         // _text = "碼錶執行中... (從背景恢復)";
         // 如果服務正在運行，可以請求一次當前時間
@@ -167,7 +173,7 @@ class _StopWatchState extends State<StopWatch> {
     bool isRunning = await _service.isRunning();
     if (isRunning) {
       // 如果正在運行，則停止服務
-      _service.invoke("stopService");
+      _service.invoke("stop");
       setState(() {
         var str = SecondsToString(_secondsElapsed).toChinese();
         speak("時間 $str；停止碼錶");
@@ -177,16 +183,15 @@ class _StopWatchState extends State<StopWatch> {
         _finalCountdown = -1;
       });
     } else {
+      await speak("${json['title']}，倒數 $_finalCountdown 秒，啟動碼錶");
+      _isRunning = true;
+      recoders = [];
+      resetHistory = [];
+      resetNextTime();
+      _finalCountdown = 30;
+      setState(() {});
       await _service.startService();
-      setState(() {
-        _isRunning = true;
-        recoders = [];
-        resetHistory = [];
-        resetNextTime();
-        _finalCountdown = 30;
-        speak("倒數 $_finalCountdown 秒，啟動碼錶");
-        // millSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-      });
+      _service.invoke("start");
     }
     Timer(Duration(seconds: 1), () {
       setState(() {
@@ -209,7 +214,7 @@ class _StopWatchState extends State<StopWatch> {
     });
   }
 
-  void speak(String txt) async {
+  Future<void> speak(String txt) async {
     // print("speak: $txt");
     var result = await tts.speak(txt);
     var s = "${DateTime.now().format(pattern: "HH:mm:ss:ms")} => $txt";

@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:myapp/system/module.dart';
 
+String TAG = "main";
 void main() {
   runApp(MyApp());
 }
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget with WidgetsBindingObserver {
       // APP 被銷毀、釋放
       bool isRunning = await _service.isRunning();
       if (isRunning) {
-        _service.invoke("stopService");
+        _service.invoke("stop");
       }
     } else if (AppLifecycleState.paused == state) {}
   }
@@ -99,32 +100,39 @@ void onStart(ServiceInstance service) async {
       service.setAsBackgroundService();
     });
   }
-  // service.on("start").listen((event) {
-  //   service.invoke('start');
-  // });
 
-  // 監聽 'stopService' 事件，停止服務
-  service.on('stopService').listen((event) {
+  int seconds = 0;
+  Timer? timer;
+  void timerCount() {
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      print("$TAG: seconds: $seconds");
+      seconds++;
+      // 更新前景通知內容
+      if (service is AndroidServiceInstance) {
+        // 如果你想在通知中顯示碼錶，可以在這裡更新
+        service.setForegroundNotificationInfo(
+          title: "背景碼錶執行中",
+          content: "已過時間：$seconds 秒",
+        );
+      }
+
+      // 將碼錶更新發送到前景 UI
+      service.invoke('update', {"seconds": seconds});
+    });
+  }
+
+  service.on("start").listen((event) {
+    timerCount();
+  });
+
+  // 監聽 'stop' 事件，停止服務
+  service.on('stop').listen((event) {
     service.stopSelf();
-    // service.invoke('stop');
+    timer!.cancel();
+    timer = null;
   });
 
   // 碼錶變數
-  int seconds = 0;
-  Timer.periodic(const Duration(seconds: 1), (timer) async {
-    seconds++;
-    // 更新前景通知內容
-    if (service is AndroidServiceInstance) {
-      // 如果你想在通知中顯示碼錶，可以在這裡更新
-      service.setForegroundNotificationInfo(
-        title: "背景碼錶執行中",
-        content: "已過時間：$seconds 秒",
-      );
-    }
-
-    // 將碼錶更新發送到前景 UI
-    service.invoke('update', {"seconds": seconds});
-  });
 
   // 初始通知（可以根據需要自訂）
   service.invoke('update', {"seconds": 0});
