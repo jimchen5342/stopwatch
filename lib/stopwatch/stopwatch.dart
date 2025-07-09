@@ -340,7 +340,7 @@ class _StopWatchState extends State<StopWatch> {
             }
           },
           style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             // textStyle: const TextStyle(fontSize: 16, color: Colors.white),
             foregroundColor: Colors.white,
             backgroundColor: _isRunning ? SysColor.red : SysColor.primary,
@@ -363,7 +363,7 @@ class _StopWatchState extends State<StopWatch> {
             onPressed: null,
             onLongPress: _reset,
             style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               foregroundColor: Colors.white,
               backgroundColor: SysColor.primary,
               shape: RoundedRectangleBorder(
