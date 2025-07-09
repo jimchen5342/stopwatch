@@ -78,11 +78,9 @@ class _StopWatchState extends State<StopWatch> {
         _finalCountdown--;
         return;
       }
-      if (second == 0) {
-        millSec = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
-      }
-      int sec1 = (DateTime.now().millisecondsSinceEpoch ~/ 1000) - millSec;
-      _secondsElapsed = sec1;
+
+      _secondsElapsed =
+          (DateTime.now().millisecondsSinceEpoch ~/ 1000) - millSec;
 
       if (_secondsElapsed > 0) {
         var s1 = "";
@@ -118,6 +116,10 @@ class _StopWatchState extends State<StopWatch> {
       _service.invoke("stop");
       speak("關閉碼錶");
     }
+    _isRunning = false;
+    _secondsElapsed = 0;
+    _nextTime = -1;
+    _finalCountdown = -1;
     // tts = null;
     super.dispose();
   }
@@ -183,12 +185,12 @@ class _StopWatchState extends State<StopWatch> {
         _finalCountdown = -1;
       });
     } else {
+      _finalCountdown = 30;
       await speak("${json['title']}，倒數 $_finalCountdown 秒，啟動碼錶");
       _isRunning = true;
       recoders = [];
       resetHistory = [];
       resetNextTime();
-      _finalCountdown = 30;
       setState(() {});
       await _service.startService();
       _service.invoke("start");
@@ -201,21 +203,20 @@ class _StopWatchState extends State<StopWatch> {
   }
 
   void _reset() {
-    setState(() {
-      resetHistory.add(SecondsToString(_secondsElapsed).toFormat());
-      var str = SecondsToString(_secondsElapsed).toChinese();
-      speak("時間 $str；碼錶歸零");
+    resetHistory.add(SecondsToString(_secondsElapsed).toFormat());
+    var str = SecondsToString(_secondsElapsed).toChinese();
+    speak("時間 $str；碼錶歸零");
 
-      millSec = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
-      _secondsElapsed = 0;
-      _nextTime = -1;
-      _finalCountdown = -1;
-      resetNextTime();
-    });
+    millSec = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+    _secondsElapsed = 0;
+    _nextTime = -1;
+    _finalCountdown = -1;
+    resetNextTime();
+    setState(() {});
   }
 
   Future<void> speak(String txt) async {
-    // print("speak: $txt");
+    print("$TAG speak: $txt");
     var result = await tts.speak(txt);
     var s = "${DateTime.now().format(pattern: "HH:mm:ss:ms")} => $txt";
     // print("stopWatch: $s");

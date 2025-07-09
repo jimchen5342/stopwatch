@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:myapp/system/module.dart';
 
-String TAG = "main";
+String TAG = "stopwatchMain";
 void main() {
   runApp(MyApp());
 }
