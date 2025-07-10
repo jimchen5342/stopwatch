@@ -31,10 +31,10 @@ class _CountDownState extends State<CountDown> {
     });
 
     _service.on('start').listen((event) {
-      print("stopWatch: start");
+      debugPrint("stopWatch: start");
     });
     _service.on('stop').listen((event) {
-      print("stopWatch: stop");
+      debugPrint("stopWatch: stop");
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {

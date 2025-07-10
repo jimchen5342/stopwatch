@@ -26,7 +26,7 @@ class _StopWatchState extends State<StopWatch> {
   bool _isRunning = false, begin = false, showButton = true;
   dynamic json;
   List<String> recoders = [];
-  var millSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+  var _secondsStart = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   String index = "-1";
   List<String> resetHistory = [];
 
@@ -44,10 +44,10 @@ class _StopWatchState extends State<StopWatch> {
     });
 
     _service.on('start').listen((event) {
-      print("$TAG: start");
+      // debugPrint("$TAG: start");
     });
     _service.on('stop').listen((event) {
-      print("$TAG: stop");
+      // debugPrint("$TAG: stop");
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -65,25 +65,56 @@ class _StopWatchState extends State<StopWatch> {
     });
   }
 
+  @override
+  void dispose() async {
+    close();
+    super.dispose();
+  }
+
+  void close() async {
+    if (await _service.isRunning() == true) {
+      _service.invoke("stop");
+      speak("關閉碼錶");
+    }
+    _isRunning = false;
+    _secondsElapsed = 0;
+    _nextTime = -1;
+    _finalCountdown = -1;
+    // tts = null;
+  }
+
   void listenToService(int second) {
     setState(() {
+      var now = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
       if (_finalCountdown > -1) {
-        if (_finalCountdown <= 6 && _finalCountdown > 1) {
-          speak("${_finalCountdown - 1}");
+        if (_finalCountdown == 20 ||
+            _finalCountdown == 10 ||
+            _finalCountdown == 5) {
+          speak("倒數 $_finalCountdown 秒");
         } else if (_finalCountdown == 0) {
           speak("開始");
-          millSec = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+          _secondsStart = now;
           times = 0;
         }
         _finalCountdown--;
         return;
       }
 
-      _secondsElapsed =
-          (DateTime.now().millisecondsSinceEpoch ~/ 1000) - millSec;
-
+      _secondsElapsed = now - _secondsStart;
+      // debugPrint("$TAG _secondsElapsed: $_secondsElapsed, _nextTime: $_nextTime");
       if (_secondsElapsed > 0) {
         var s1 = "";
+        if (json.containsKey('interval1') && json.containsKey('interval2')) {
+          if (json["interval1"] is num && json["interval2"] is num) {
+            var isec = json["interval$index"],
+                idiff = _nextTime - _secondsElapsed;
+            if (isec > 30 && idiff == 10) {
+              speak("倒數 $idiff 秒");
+            } else if (isec > 10 && idiff == 5) {
+              speak("倒數 $idiff 秒");
+            }
+          }
+        }
         if (_secondsElapsed >= _nextTime && _nextTime > -1) {
           s1 = "${json['interval${index}Txt']}";
           s1 = s1.isEmpty ? " " : "，$s1";
@@ -108,20 +139,6 @@ class _StopWatchState extends State<StopWatch> {
         }
       }
     });
-  }
-
-  @override
-  void dispose() async {
-    if (_isRunning) {
-      _service.invoke("stop");
-      speak("關閉碼錶");
-    }
-    _isRunning = false;
-    _secondsElapsed = 0;
-    _nextTime = -1;
-    _finalCountdown = -1;
-    // tts = null;
-    super.dispose();
   }
 
   @override
@@ -206,23 +223,23 @@ class _StopWatchState extends State<StopWatch> {
     resetHistory.add(SecondsToString(_secondsElapsed).toFormat());
     var str = SecondsToString(_secondsElapsed).toChinese();
     speak("時間 $str；碼錶歸零");
-
-    millSec = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
     _secondsElapsed = 0;
     _nextTime = -1;
     _finalCountdown = -1;
+    _secondsStart = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
     resetNextTime();
     setState(() {});
   }
 
   Future<void> speak(String txt) async {
-    print("$TAG speak: $txt");
+    debugPrint("$TAG speak: $txt");
     var result = await tts.speak(txt);
     var s = "${DateTime.now().format(pattern: "HH:mm:ss:ms")} => $txt";
-    // print("stopWatch: $s");
+    // debugPrint("stopWatch: $s");
     if (result == "1" && _finalCountdown == -1) {
       recoders.insert(0, s);
     }
+    return;
   }
 
   @override
@@ -274,7 +291,8 @@ class _StopWatchState extends State<StopWatch> {
           //   border: Border.all(color: Colors.blueAccent),
           // ),
           height: 60,
-          child: showButton == false || _finalCountdown > -1 ? null : _btn(),
+          child:
+              showButton == false || _finalCountdown > -1 ? null : _btnsRow(),
         ),
         if (_isRunning && _nextTime > -1)
           Container(
@@ -320,61 +338,56 @@ class _StopWatchState extends State<StopWatch> {
     );
   }
 
-  Widget _btn() {
+  OutlinedButton _btn(
+    txt, {
+    Function()? onPressed,
+    Function()? onLongPress,
+    Color backgroundColor = Colors.blue,
+  }) {
+    return OutlinedButton(
+      onPressed: onPressed,
+      onLongPress: onLongPress,
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        foregroundColor: Colors.white,
+        backgroundColor: backgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        side: BorderSide(width: 5, color: backgroundColor),
+      ),
+      child: Text(txt, style: TextStyle(fontSize: 25, color: Colors.white)),
+    );
+  }
+
+  Widget _btnsRow() {
     return Row(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        // 長按，停止碼錶
-        OutlinedButton(
+        _btn(
+          _isRunning ? '停止碼錶' : '啟動碼錶',
+          backgroundColor: _isRunning ? SysColor.red : SysColor.primary,
           // 啟動碼錶
           onPressed: () {
             if (!_isRunning) {
               _toggleService();
             }
           },
-          // 停止碼錶
+          // 長按，停止碼錶
           onLongPress: () {
             if (_isRunning) {
               _toggleService();
             }
           },
-          style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            // textStyle: const TextStyle(fontSize: 16, color: Colors.white),
-            foregroundColor: Colors.white,
-            backgroundColor: _isRunning ? SysColor.red : SysColor.primary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            side: BorderSide(
-              width: 5,
-              color: _isRunning ? SysColor.red : SysColor.primary,
-            ),
-          ),
-          child: Text(
-            _isRunning ? '停止碼錶' : '啟動碼錶',
-            style: TextStyle(fontSize: 25, color: Colors.white),
-          ),
         ),
-        if (_isRunning && _secondsElapsed > 60)
+        if (_isRunning && _secondsElapsed > 20)
           // 碼錶歸零, 要長按
-          OutlinedButton(
+          _btn(
+            "碼錶歸零",
+            backgroundColor: SysColor.orange,
             onPressed: null,
             onLongPress: _reset,
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              foregroundColor: Colors.white,
-              backgroundColor: SysColor.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              // side: BorderSide(width: 5, color: Colors.green),
-            ),
-            child: Text(
-              "碼錶歸零",
-              style: TextStyle(fontSize: 25, color: Colors.white),
-            ),
           ),
       ],
     );
@@ -453,6 +466,7 @@ class _StopWatchState extends State<StopWatch> {
   }
 
   void _exitSetup() {
+    close();
     Navigator.of(context).pop();
   }
 }

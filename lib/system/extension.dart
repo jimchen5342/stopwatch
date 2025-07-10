@@ -1,4 +1,5 @@
-import 'dart:ui';
+// import 'dart:ui';
+import 'package:flutter/material.dart';
 
 extension DurationExtension on Duration {
   String format() {
@@ -100,4 +101,5 @@ extension SysColor on Color {
   static Color get gray => HexColor.fromHex("#eeeeee");
   static Color get white => HexColor.fromHex("#ffffff");
   static Color get red => HexColor.fromHex("#C01921");
+  static Color get orange => Colors.deepOrangeAccent;
 }

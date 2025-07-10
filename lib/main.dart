@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget with WidgetsBindingObserver {
   }
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    // print("stopWatch: didChangeAppLifecycleState: $state");
+    // debugPrint("stopWatch: didChangeAppLifecycleState: $state");
     if (AppLifecycleState.detached == state) {
       // APP 被銷毀、釋放
       bool isRunning = await _service.isRunning();
@@ -105,7 +105,7 @@ void onStart(ServiceInstance service) async {
   Timer? timer;
   void timerCount() {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-      print("$TAG: seconds: $seconds");
+      // debugPrint("$TAG: seconds: $seconds");
       seconds++;
       // 更新前景通知內容
       if (service is AndroidServiceInstance) {
@@ -122,11 +122,13 @@ void onStart(ServiceInstance service) async {
   }
 
   service.on("start").listen((event) {
+    // debugPrint("$TAG service.start");
     timerCount();
   });
 
   // 監聽 'stop' 事件，停止服務
   service.on('stop').listen((event) {
+    // debugPrint("$TAG service.stop");
     service.stopSelf();
     timer!.cancel();
     timer = null;

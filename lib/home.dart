@@ -34,13 +34,6 @@ class _HomeState extends State<Home> {
           version = "";
         });
       });
-
-      // getItem
-      // String appName = packageInfo.appName;
-      // String packageName = packageInfo.packageName;
-      // String version = packageInfo.version;
-      // String buildNumber = packageInfo.buildNumber;
-      // // print("buildNumber: $buildNumber");
     });
   }
 

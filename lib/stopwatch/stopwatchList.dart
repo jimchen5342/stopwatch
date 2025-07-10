@@ -56,7 +56,7 @@ class _StopWatchListState extends State<StopWatchList> {
       if (storage.getInt("stopwatchActive") != null) {
         active = storage.getInt("stopwatchActive")!;
       }
-      print("active: $active");
+      debugPrint("active: $active");
       setState(() {});
     });
   }
@@ -71,9 +71,9 @@ class _StopWatchListState extends State<StopWatchList> {
     super.reassemble();
     // try { // 可以用的
     //   final result = await platform.invokeMethod<String>('getBatteryLevel');
-    //   print('Battery level at $result % .');
+    //   debugPrint('Battery level at $result % .');
     // } on PlatformException catch (e) {
-    //   print("Failed to get battery level: '${e.message}'.");
+    //   debugPrint("Failed to get battery level: '${e.message}'.");
     // }
   }
 
@@ -138,7 +138,7 @@ class _StopWatchListState extends State<StopWatchList> {
           //   icon: Icon(Icons.delete, color: Colors.white),
           //   onPressed: () async {
           //     String? s = await alert(context, "alert 測試", ok: "yes", no: "no");
-          //     print("sretuurn: $s");
+          //     debugPrint("sretuurn: $s");
           //   },
           // ),
         ],
