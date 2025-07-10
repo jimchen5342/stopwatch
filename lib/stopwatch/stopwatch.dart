@@ -87,9 +87,7 @@ class _StopWatchState extends State<StopWatch> {
     setState(() {
       var now = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
       if (_finalCountdown > -1) {
-        if (_finalCountdown == 20 ||
-            _finalCountdown == 10 ||
-            _finalCountdown == 5) {
+        if (_finalCountdown == 20 || _finalCountdown == 10) {
           speak("倒數 $_finalCountdown 秒");
         } else if (_finalCountdown == 0) {
           speak("開始");
@@ -108,9 +106,7 @@ class _StopWatchState extends State<StopWatch> {
           if (json["interval1"] is num && json["interval2"] is num) {
             var isec = json["interval$index"],
                 idiff = _nextTime - _secondsElapsed;
-            if (isec > 30 && idiff == 10) {
-              speak("倒數 $idiff 秒");
-            } else if (isec > 10 && idiff == 5) {
+            if (isec >= 60 && idiff == 10) {
               speak("倒數 $idiff 秒");
             }
           }
