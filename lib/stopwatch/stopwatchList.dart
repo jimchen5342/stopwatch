@@ -48,6 +48,17 @@ class _StopWatchListState extends State<StopWatchList> {
             "interval2Unit": "S",
             "interval2Txt": "慢走",
           },
+          {
+            "key": 4,
+            "title": "彈力帶",
+            "interval": 0,
+            "interval1": 20,
+            "interval1Unit": "S",
+            "interval1Txt": "休息",
+            "interval2": 10,
+            "interval2Unit": "S",
+            "interval2Txt": "開始",
+          },
         ];
         storage.setJsonArray("stopwatch", _list);
       }
@@ -56,7 +67,7 @@ class _StopWatchListState extends State<StopWatchList> {
       if (storage.getInt("stopwatchActive") != null) {
         active = storage.getInt("stopwatchActive")!;
       }
-      debugPrint("active: $active");
+      // debugPrint("active: $active");
       setState(() {});
     });
   }
@@ -69,12 +80,13 @@ class _StopWatchListState extends State<StopWatchList> {
   @override
   void reassemble() async {
     super.reassemble();
-    // try { // 可以用的
-    //   final result = await platform.invokeMethod<String>('getBatteryLevel');
-    //   debugPrint('Battery level at $result % .');
-    // } on PlatformException catch (e) {
-    //   debugPrint("Failed to get battery level: '${e.message}'.");
-    // }
+    try {
+      // 可以用的
+      final result = await platform.invokeMethod<String>('getBatteryLevel');
+      debugPrint('Battery level at $result % .1');
+    } on PlatformException catch (e) {
+      debugPrint("Failed to get battery level: '${e.message}'.");
+    }
   }
 
   String descrip(dynamic json) {
@@ -134,13 +146,19 @@ class _StopWatchListState extends State<StopWatchList> {
               },
             ),
           // 測試用
-          // IconButton(
-          //   icon: Icon(Icons.delete, color: Colors.white),
-          //   onPressed: () async {
-          //     String? s = await alert(context, "alert 測試", ok: "yes", no: "no");
-          //     debugPrint("sretuurn: $s");
-          //   },
-          // ),
+          IconButton(
+            icon: Icon(Icons.delete, color: Colors.red),
+            onPressed: () async {
+              try {
+                final result = await platform.invokeMethod<String>(
+                  'getBatteryLevel',
+                );
+                debugPrint('Battery level at $result % .1');
+              } on PlatformException catch (e) {
+                debugPrint("Failed to get battery level: '${e.message}'.");
+              }
+            },
+          ),
         ],
       ),
       // backgroundColor: Colors.blue.withAlpha(1),
@@ -189,13 +207,17 @@ class _StopWatchListState extends State<StopWatchList> {
           index,
           Icons.keyboard_arrow_right,
           onTap: () async {
+            int timestamp = DateTime.now().microsecondsSinceEpoch;
+            var date = new DateTime.fromMicrosecondsSinceEpoch(timestamp);
+            debugPrint("$TAG timestamp: ${date.format(pattern: 'mm:ss')}");
+
             active = index;
             storage.setInt("stopwatchActive", active);
             setState(() {});
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const StopWatch(),
+                builder: (context) => StopWatch(timestamp: timestamp),
                 settings: RouteSettings(arguments: _list[index]),
               ),
             );

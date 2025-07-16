@@ -10,7 +10,7 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         
-        stopWatch = StopWatch(flutterEngine)
+        stopWatch = StopWatch(this, flutterEngine)
     }
 
     override fun onDestroy() {

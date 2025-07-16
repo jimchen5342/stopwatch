@@ -9,7 +9,8 @@ import 'package:myapp/widgets/module.dart';
 String TAG = "StopWatch";
 
 class StopWatch extends StatefulWidget {
-  const StopWatch({super.key});
+  final int timestamp;
+  const StopWatch({super.key, this.timestamp = 0});
 
   @override
   State<StopWatch> createState() => _StopWatchState();
@@ -38,18 +39,21 @@ class _StopWatchState extends State<StopWatch> {
 
     // 監聽來自背景服務的 'update' 事件
     _service.on('update').listen((event) {
+      if (event != null && event.containsKey("timestamp")) {
+        int timestamp = event["timestamp"] as int;
+        // var date1 = new DateTime.fromMicrosecondsSinceEpoch(widget.timestamp);
+        // var date2 = new DateTime.fromMicrosecondsSinceEpoch(timestamp);
+        // debugPrint(
+        //   "$TAG widget.timestamp: ${date1.format(pattern: 'mm:ss')}, update.timestamp: ${date2.format(pattern: 'mm:ss')}, ${event["timestamp"] == widget.timestamp}",
+        // );
+        if (event["timestamp"] != widget.timestamp) {
+          return;
+        }
+      }
       if (begin && event != null && event.containsKey("seconds")) {
         listenToService(event["seconds"]);
       }
     });
-
-    _service.on('start').listen((event) {
-      // debugPrint("$TAG: start");
-    });
-    _service.on('stop').listen((event) {
-      // debugPrint("$TAG: stop");
-    });
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       json = ModalRoute.of(context)?.settings.arguments;
       setState(() {});
@@ -72,6 +76,9 @@ class _StopWatchState extends State<StopWatch> {
   }
 
   void close() async {
+    // var date = new DateTime.fromMicrosecondsSinceEpoch(widget.timestamp);
+    // debugPrint("$TAG close: ${date.format(pattern: 'mm:ss')}");
+
     if (await _service.isRunning() == true) {
       _service.invoke("stop");
       speak("關閉碼錶");
@@ -80,6 +87,7 @@ class _StopWatchState extends State<StopWatch> {
     _secondsElapsed = 0;
     _nextTime = -1;
     _finalCountdown = -1;
+    // _service.on('update').listen(null);
     // tts = null;
   }
 
@@ -87,9 +95,11 @@ class _StopWatchState extends State<StopWatch> {
     setState(() {
       var now = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
       if (_finalCountdown > -1) {
-        if (_finalCountdown == 20 || _finalCountdown == 10) {
+        if (_finalCountdown == 20 ||
+            _finalCountdown == 10 ||
+            _finalCountdown == 5) {
           speak("倒數 $_finalCountdown 秒");
-        } else if (_finalCountdown == 0) {
+        } else if (_finalCountdown == 1) {
           speak("開始");
           _secondsStart = now;
           times = 0;
@@ -198,7 +208,7 @@ class _StopWatchState extends State<StopWatch> {
         _finalCountdown = -1;
       });
     } else {
-      _finalCountdown = 30;
+      _finalCountdown = 15;
       await speak("${json['title']}，倒數 $_finalCountdown 秒，啟動碼錶");
       _isRunning = true;
       recoders = [];
@@ -206,7 +216,7 @@ class _StopWatchState extends State<StopWatch> {
       resetNextTime();
       setState(() {});
       await _service.startService();
-      _service.invoke("start");
+      _service.invoke("start", {"timestamp": widget.timestamp});
     }
     Timer(Duration(seconds: 1), () {
       setState(() {

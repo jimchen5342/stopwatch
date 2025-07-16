@@ -18,22 +18,22 @@ import androidx.core.app.NotificationManagerCompat;
 
 public class StopWatch {
     public static EventChannel.EventSink eventSink;
-    private static final String CHANNEL = "com.flutter/stopwatch";
-    private static final String CHANNEL_ID = "stopwatch_channel_id";
-    private static final CharSequence CHANNEL_NAME = "Stopwatch Channel";
-    private static final String CHANNEL_DESCRIPTION = "Notifications for the Stopwatch app";
+    private LocalNotification notificationHelper;
+    Context ctx;
+    String TAG = "StopWatch";
 
-
-    public StopWatch(FlutterEngine flutterEngine) {
-        Log.i("StopWatch", "initital");
+    public StopWatch(Context ctx, FlutterEngine flutterEngine) {
+        
         GeneratedPluginRegistrant.registerWith(flutterEngine);
+
+        this.ctx = ctx;
+        notificationHelper = new LocalNotification(ctx);
         
         new MethodChannel(
                 flutterEngine.getDartExecutor(),
                 "com.flutter/MethodChannel")
                 .setMethodCallHandler(mMethodHandle);
 
-        // createNotificationChannel();
 
     }
 
@@ -45,6 +45,12 @@ public class StopWatch {
         @Override
         public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
             if(call.method.equals("getBatteryLevel")) { // 可以用的，2025-07-04
+                Log.i(TAG, "sendNotification");
+                notificationHelper.sendNotification(
+                        "新通知來囉！",
+                        "這是一個從獨立類別發送的通知內容。"
+                );
+
                 result.success("OK");
             } else {
                 result.notImplemented();
@@ -63,25 +69,4 @@ public class StopWatch {
         }
     };
 
-    // private void createNotificationChannel() {
-    //     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-    //         int importance = NotificationManager.IMPORTANCE_DEFAULT;
-    //         NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance);
-    //         channel.setDescription(CHANNEL_DESCRIPTION);
-    //         NotificationManager notificationManager = getSystemService(NotificationManager.class);
-    //         notificationManager.createNotificationChannel(channel);
-    //     }
-    // }
-
-    // private void showNotification() {
-    //     NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-    //             .setSmallIcon(android.R.drawable.ic_dialog_info) // 請替換成您自己的 icon
-    //             .setContentTitle("Stopwatch Notification")
-    //             .setContentText("This is a sample notification from Stopwatch app.")
-    //             .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-    //     NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-    //     // notificationId is a unique int for each notification that you must define
-    //     notificationManager.notify(1, builder.build());
-    // }
 }
