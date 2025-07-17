@@ -29,7 +29,6 @@ public class LocalNotification {
    * @param message 通知內容
    */
   public void sendNotification(String title, String message) {
-        Log.i("StopWatch", "initital2");
     // 建立 PendingIntent 給按鈕 1
     Intent intentButton1 = new Intent(context, MyNotificationReceiver.class);
     intentButton1.setAction(MyNotificationReceiver.ACTION_BUTTON_1);

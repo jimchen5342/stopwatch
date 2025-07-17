@@ -44,7 +44,7 @@ public class StopWatch {
     MethodChannel.MethodCallHandler mMethodHandle = new MethodChannel.MethodCallHandler() {
         @Override
         public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
-            if(call.method.equals("getBatteryLevel")) { // 可以用的，2025-07-04
+            if(call.method.equals("sendNotification")) {
                 Log.i(TAG, "sendNotification");
                 notificationHelper.sendNotification(
                         "新通知來囉！",

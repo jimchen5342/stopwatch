@@ -27,7 +27,7 @@ android {
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = 1 // flutter.versionCode
-        versionName = "2025-07-14 08:20" // flutter.versionName
+        versionName = "2025-07-17 07:50" // flutter.versionName
         setProperty("archivesBaseName", "stopwatch")
     }
 
@@ -42,4 +42,9 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation("androidx.appcompat:appcompat:1.6.1") // Use the latest version
+    implementation("androidx.activity:activity-ktx:1.8.2") // Use the latest version
 }

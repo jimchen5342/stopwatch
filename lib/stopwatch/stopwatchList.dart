@@ -80,13 +80,6 @@ class _StopWatchListState extends State<StopWatchList> {
   @override
   void reassemble() async {
     super.reassemble();
-    try {
-      // 可以用的
-      final result = await platform.invokeMethod<String>('getBatteryLevel');
-      debugPrint('Battery level at $result % .1');
-    } on PlatformException catch (e) {
-      debugPrint("Failed to get battery level: '${e.message}'.");
-    }
   }
 
   String descrip(dynamic json) {
@@ -151,7 +144,7 @@ class _StopWatchListState extends State<StopWatchList> {
             onPressed: () async {
               try {
                 final result = await platform.invokeMethod<String>(
-                  'getBatteryLevel',
+                  'sendNotification',
                 );
                 debugPrint('Battery level at $result % .1');
               } on PlatformException catch (e) {
