@@ -47,4 +47,5 @@ flutter {
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1") // Use the latest version
     implementation("androidx.activity:activity-ktx:1.8.2") // Use the latest version
+    implementation("androidx.fragment:fragment:1.8.2") // 或更高版本
 }
