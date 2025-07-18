@@ -39,7 +39,7 @@ dependencies:
   flutter_background_service_android: ^6.3.0 # 請使用最新版本
   localstorage: ^6.0.0
   package_info_plus: ^8.3.0
-  
+  permission_handler: ^12.0.1
 
 dev_dependencies:
   flutter_test:

@@ -4,6 +4,7 @@ import 'package:myapp/countdown/countdownList.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:myapp/system/module.dart';
 import 'dart:async';
+import 'package:permission_handler/permission_handler.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -13,6 +14,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  String TAG = "stopwatchHome";
   int _selectedIndex = 0; // 用於追蹤目前選中的索引
   String version = " ";
   StorageManager storage = StorageManager();
@@ -28,12 +30,14 @@ class _HomeState extends State<Home> {
       if (index is int) {
         _selectedIndex = index;
       }
-      setState(() {
+      setState(() {});
+
+      if (await requestPostNotificationsPermission() == true) {
         Timer(Duration(seconds: 2), () {
           setState(() {});
           version = "";
         });
-      });
+      }
     });
   }
 
@@ -89,5 +93,23 @@ class _HomeState extends State<Home> {
       onTap: _onItemTapped, // 點擊項目時的回調函數
       // type: BottomNavigationBarType.fixed, // 當項目多於3個時，可以設為 shifting 或 fixed
     ));
+  }
+
+  Future<bool> requestPostNotificationsPermission() async {
+    bool b = false;
+    var status = await Permission.notification.status;
+    debugPrint("$TAG requestPostNotificationsPermission1: $status");
+    if (status.isDenied) {
+      // 權限被拒絕，發出請求
+      status = await Permission.notification.request();
+      debugPrint("$TAG requestPostNotificationsPermission2: $status");
+      if (status.isGranted) {
+        b = true;
+      }
+    } else if (status.isGranted) {
+      b = true;
+    }
+
+    return b;
   }
 }
