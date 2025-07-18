@@ -22,6 +22,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Map;
+
 public class MainActivity extends FlutterActivity {
     String TAG = "StopWatch";
     public static EventChannel.EventSink eventSink;
@@ -45,7 +47,10 @@ public class MainActivity extends FlutterActivity {
         @Override
         public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
             if(call.method.equals("sendNotification")) {
-                Log.i(TAG, "sendNotification");
+                Map<String, Object> arguments = call.arguments();
+                String name = (String) arguments.get("name");
+                
+                Log.i(TAG, "sendNotification：" + name);
                 notificationHelper.sendNotification(
                         "新通知來囉！",
                         "這是一個從獨立類別發送的通知內容。"

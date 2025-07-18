@@ -145,6 +145,7 @@ class _StopWatchListState extends State<StopWatchList> {
               try {
                 final result = await platform.invokeMethod<String>(
                   'sendNotification',
+                  {"name": "jim"},
                 );
                 debugPrint('Battery level at $result % .1');
               } on PlatformException catch (e) {
