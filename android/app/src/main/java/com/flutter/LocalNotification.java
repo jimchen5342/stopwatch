@@ -28,7 +28,7 @@ public class LocalNotification {
    * @param title 通知標題
    * @param message 通知內容
    */
-  public void sendNotification(String title, String message) {
+  public void sendNotification(String message) {
     // 建立 PendingIntent 給按鈕 1
     Intent intentButton1 = new Intent(context, MyNotificationReceiver.class);
     intentButton1.setAction(MyNotificationReceiver.ACTION_BUTTON_1);
@@ -66,8 +66,8 @@ public class LocalNotification {
 
     NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.running) // 替換為您的通知小圖示
-            .setContentTitle("鎖定螢幕通知 (Java)")
-            .setContentText("這是一個帶有按鈕的通知，會在鎖定螢幕上顯示。")
+            .setContentTitle("計時碼錶")
+            .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH) // 設定高優先級
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC) // 設定在鎖定螢幕上顯示完整內容
             .addAction(action1) // 加入按鈕 1

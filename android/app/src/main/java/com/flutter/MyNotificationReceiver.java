@@ -7,8 +7,8 @@ import android.widget.Toast;
 import androidx.core.app.NotificationManagerCompat;
 
 public class MyNotificationReceiver extends BroadcastReceiver {
-  public static final String ACTION_BUTTON_1 = "com.example.app.ACTION_BUTTON_1";
-  public static final String ACTION_BUTTON_2 = "com.example.app.ACTION_BUTTON_2";
+  public static final String ACTION_BUTTON_1 = "com.flutter.stopwatch.ACTION_BUTTON_1";
+  public static final String ACTION_BUTTON_2 = "com.flutter.stopwatch.ACTION_BUTTON_2";
   public static final String EXTRA_NOTIFICATION_ID = "notification_id";
 
   @Override

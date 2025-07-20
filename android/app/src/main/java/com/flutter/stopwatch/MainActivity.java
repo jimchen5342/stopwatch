@@ -10,18 +10,6 @@ import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugins.GeneratedPluginRegistrant;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import android.widget.Toast;
-
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import androidx.appcompat.app.AppCompatActivity;
-
 import java.util.Map;
 
 public class MainActivity extends FlutterActivity {
@@ -48,14 +36,10 @@ public class MainActivity extends FlutterActivity {
         public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
             if(call.method.equals("sendNotification")) {
                 Map<String, Object> arguments = call.arguments();
-                String name = (String) arguments.get("name");
+                String message = (String) arguments.get("message");
                 
-                Log.i(TAG, "sendNotification：" + name);
-                notificationHelper.sendNotification(
-                        "新通知來囉！",
-                        "這是一個從獨立類別發送的通知內容。"
-                );
-
+                Log.i(TAG, "sendNotification：" + message);
+                notificationHelper.sendNotification(message);
                 result.success("OK");
             } else {
                 result.notImplemented();

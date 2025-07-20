@@ -43,8 +43,8 @@
 
         <receiver android:name="com.flutter.MyNotificationReceiver" android:exported="false">
             <intent-filter>
-                <action android:name="com.example.app.ACTION_BUTTON_1"/>
-                <action android:name="com.example.app.ACTION_BUTTON_2"/>
+                <action android:name="com.flutter.stopwatch.ACTION_BUTTON_1"/>
+                <action android:name="com.flutter.stopwatch.ACTION_BUTTON_2"/>
             </intent-filter>
         </receiver>
     </application>
