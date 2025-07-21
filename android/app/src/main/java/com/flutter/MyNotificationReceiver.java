@@ -18,7 +18,7 @@ public class MyNotificationReceiver extends BroadcastReceiver {
 
     if (ACTION_BUTTON_STOP.equals(action)) {
       // 處理按鈕 1 的點擊
-      Toast.makeText(context, "STOP 按鈕被點擊", Toast.LENGTH_SHORT).show();
+      // Toast.makeText(context, "STOP 按鈕被點擊", Toast.LENGTH_SHORT).show();
       com.flutter.stopwatch.MainActivity.methodResult.success("STOP");
     // } else if (ACTION_BUTTON_2.equals(action)) {
     //   // 處理按鈕 2 的點擊

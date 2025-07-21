@@ -39,12 +39,12 @@ public class MainActivity extends FlutterActivity {
                 String title = (String) arguments.get("title");
                 String message = (String) arguments.get("message");
                 
-                Log.i(TAG, "sendNotification：" + message);
+//                Log.i(TAG, "sendNotification：" + message);
                 localNotification.sendNotification(title, message);
                 // result.success("OK");
                 methodResult = result;
             } else if(call.method.equals("stopNotification")) {
-                Log.i(TAG, "stopNotification");
+//                Log.i(TAG, "stopNotification");
                 localNotification.cancel();
                 result.success("OK");
             } else {

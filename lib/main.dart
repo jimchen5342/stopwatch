@@ -61,14 +61,13 @@ Future<void> initializeService() async {
     androidConfiguration: AndroidConfiguration(
       // 當服務啟動時執行的函數
       onStart: onStart,
-      // 是否自動啟動服務
       autoStart: false, // 我們將手動啟動
-      isForegroundMode: true,
+      isForegroundMode: false,
       // 前景通知的設定
       // notificationChannelId: 'my_foreground',
-      initialNotificationTitle: '背景碼錶',
-      initialNotificationContent: '正在初始化...',
-      foregroundServiceNotificationId: 888,
+      // initialNotificationTitle: '背景碼錶',
+      // initialNotificationContent: '正在初始化...',
+      // foregroundServiceNotificationId: 888,
     ),
     // iOS 設定 (此範例主要針對 Android)
     iosConfiguration: IosConfiguration(
@@ -143,7 +142,7 @@ void onStart(ServiceInstance service) async {
   service.on('stop').listen((event) {
     debugPrint("$TAG service.stop");
     service.stopSelf();
-    timer!.cancel();
+    if(timer != null) timer!.cancel();
     timer = null;
   });
 

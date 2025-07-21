@@ -77,24 +77,27 @@ class _StopWatchState extends State<StopWatch> {
     close();
     super.dispose();
   }
-
   sendNotification(String message) async {
     try {
-      if (message == "停止") {
-        final result = await platform.invokeMethod<String>('stopNotification');
-        debugPrint('stopNotification.result: $result');
-      } else {
-        final result = await platform.invokeMethod<String>('sendNotification', {
-          "title": "${json['title']}",
-          "message": message,
-        });
-        bool isRunning = await _service.isRunning();
-        if (isRunning) {
-          // 如果正在運行，則停止服務
-          _toggleService();
-        }
-        debugPrint('sendNotification.result: $result');
+      final result = await platform.invokeMethod<String>('sendNotification', {
+        "title": "${json['title']}",
+        "message": message,
+      });
+      bool isRunning = await _service.isRunning();
+      if (isRunning) {
+        // 如果正在運行，則停止服務
+        _toggleService();
       }
+      debugPrint('sendNotification.result: $result');
+    } on PlatformException catch (e) {
+      debugPrint("Failed to get battery level: '${e.message}'.");
+    }
+  }
+
+  stopNotification() async {
+    try {
+      final result = await platform.invokeMethod<String>('stopNotification');
+      debugPrint('stopNotification.result: $result');
     } on PlatformException catch (e) {
       debugPrint("Failed to get battery level: '${e.message}'.");
     }
@@ -107,6 +110,7 @@ class _StopWatchState extends State<StopWatch> {
     if (await _service.isRunning() == true) {
       _service.invoke("stop");
       speak("關閉碼錶");
+      stopNotification();
     }
     _isRunning = false;
     _secondsElapsed = 0;
@@ -223,7 +227,7 @@ class _StopWatchState extends State<StopWatch> {
     bool isRunning = await _service.isRunning();
     if (isRunning) {
       // 如果正在運行，則停止服務
-      sendNotification("停止");
+      stopNotification();
       _service.invoke("stop");
       setState(() {
         var str = SecondsToString(_secondsElapsed).toChinese();
