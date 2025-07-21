@@ -80,15 +80,20 @@ class _StopWatchState extends State<StopWatch> {
 
   sendNotification(String message) async {
     try {
-      final result = await platform.invokeMethod<String>('sendNotification', {
-        "title": "${json['title']}",
-        "message": message,
-      });
-      debugPrint('sendNotification.result: $result');
-      bool isRunning = await _service.isRunning();
-      if (isRunning) {
-        // 如果正在運行，則停止服務
-        _toggleService();
+      if (message == "停止") {
+        final result = await platform.invokeMethod<String>('stopNotification');
+        debugPrint('stopNotification.result: $result');
+      } else {
+        final result = await platform.invokeMethod<String>('sendNotification', {
+          "title": "${json['title']}",
+          "message": message,
+        });
+        bool isRunning = await _service.isRunning();
+        if (isRunning) {
+          // 如果正在運行，則停止服務
+          _toggleService();
+        }
+        debugPrint('sendNotification.result: $result');
       }
     } on PlatformException catch (e) {
       debugPrint("Failed to get battery level: '${e.message}'.");

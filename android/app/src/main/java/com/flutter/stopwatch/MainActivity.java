@@ -43,6 +43,10 @@ public class MainActivity extends FlutterActivity {
                 localNotification.sendNotification(title, message);
                 // result.success("OK");
                 methodResult = result;
+            } else if(call.method.equals("stopNotification")) {
+                Log.i(TAG, "stopNotification");
+                localNotification.cancel();
+                result.success("OK");
             } else {
                 result.notImplemented();
             }
