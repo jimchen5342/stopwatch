@@ -3,7 +3,6 @@ import 'package:myapp/system/module.dart';
 import 'package:myapp/widgets/module.dart';
 import 'package:myapp/stopwatch/stopwatch.dart';
 import 'package:myapp/stopwatch/stopwatchEdit.dart';
-import 'package:flutter/services.dart';
 
 class StopWatchList extends StatefulWidget {
   const StopWatchList({super.key});
@@ -17,7 +16,6 @@ class _StopWatchListState extends State<StopWatchList> {
   List<dynamic> _list = [];
   int active = -1;
   bool _sort = false;
-  static const platform = MethodChannel('com.flutter/MethodChannel');
 
   @override
   initState() {
@@ -139,20 +137,12 @@ class _StopWatchListState extends State<StopWatchList> {
               },
             ),
           // 測試用
-          IconButton(
-            icon: Icon(Icons.delete, color: Colors.red),
-            onPressed: () async {
-              try {
-                final result = await platform.invokeMethod<String>(
-                  'sendNotification',
-                  {"message": "jim"},
-                );
-                debugPrint('Battery level at $result % .1');
-              } on PlatformException catch (e) {
-                debugPrint("Failed to get battery level: '${e.message}'.");
-              }
-            },
-          ),
+          // IconButton(
+          //   icon: Icon(Icons.delete, color: Colors.red),
+          //   onPressed: () async {
+
+          //   },
+          // ),
         ],
       ),
       // backgroundColor: Colors.blue.withAlpha(1),

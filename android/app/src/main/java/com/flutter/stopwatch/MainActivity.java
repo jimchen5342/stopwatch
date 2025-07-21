@@ -14,8 +14,8 @@ import java.util.Map;
 
 public class MainActivity extends FlutterActivity {
     String TAG = "StopWatch";
-    public static EventChannel.EventSink eventSink;
-    private LocalNotification notificationHelper;
+    private LocalNotification localNotification;
+    public static MethodChannel.Result methodResult;
 
     @Override
     public void configureFlutterEngine(FlutterEngine flutterEngine) {
@@ -23,7 +23,7 @@ public class MainActivity extends FlutterActivity {
 
         GeneratedPluginRegistrant.registerWith(flutterEngine);
 
-        notificationHelper = new LocalNotification(this);
+        localNotification = new LocalNotification(this);
 
         new MethodChannel(
                 flutterEngine.getDartExecutor(),
@@ -36,30 +36,27 @@ public class MainActivity extends FlutterActivity {
         public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
             if(call.method.equals("sendNotification")) {
                 Map<String, Object> arguments = call.arguments();
+                String title = (String) arguments.get("title");
                 String message = (String) arguments.get("message");
                 
                 Log.i(TAG, "sendNotification：" + message);
-                notificationHelper.sendNotification(message);
-                result.success("OK");
+                localNotification.sendNotification(title, message);
+                // result.success("OK");
+                methodResult = result;
             } else {
                 result.notImplemented();
             }
 
         }
     };
-    EventChannel.StreamHandler mEnventHandle = new EventChannel.StreamHandler() {
-        @Override
-        public void onListen(Object o, EventChannel.EventSink eventSink) {
-             MainActivity.eventSink = eventSink;
-        }
-
-        @Override
-        public void onCancel(Object o) {
-        }
-    };
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        methodResult = null;
+        // mMethodHandle.cancel();
+        mMethodHandle = null;
+        localNotification.cancel();
+        localNotification = null;
     }
 }

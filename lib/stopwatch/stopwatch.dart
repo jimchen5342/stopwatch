@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:core';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:myapp/system/textToSpeech.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:myapp/system/module.dart';
 import 'package:myapp/widgets/module.dart';
+import 'package:flutter/services.dart';
 
 String TAG = "StopWatch";
 
@@ -30,6 +32,7 @@ class _StopWatchState extends State<StopWatch> {
   var _secondsStart = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   String index = "-1";
   List<String> resetHistory = [];
+  static const platform = MethodChannel('com.flutter/MethodChannel');
 
   @override
   initState() {
@@ -73,6 +76,23 @@ class _StopWatchState extends State<StopWatch> {
   void dispose() async {
     close();
     super.dispose();
+  }
+
+  sendNotification(String message) async {
+    try {
+      final result = await platform.invokeMethod<String>('sendNotification', {
+        "title": "${json['title']}",
+        "message": message,
+      });
+      debugPrint('sendNotification.result: $result');
+      bool isRunning = await _service.isRunning();
+      if (isRunning) {
+        // 如果正在運行，則停止服務
+        _toggleService();
+      }
+    } on PlatformException catch (e) {
+      debugPrint("Failed to get battery level: '${e.message}'.");
+    }
   }
 
   void close() async {
@@ -198,6 +218,7 @@ class _StopWatchState extends State<StopWatch> {
     bool isRunning = await _service.isRunning();
     if (isRunning) {
       // 如果正在運行，則停止服務
+      sendNotification("停止");
       _service.invoke("stop");
       setState(() {
         var str = SecondsToString(_secondsElapsed).toChinese();
@@ -217,6 +238,7 @@ class _StopWatchState extends State<StopWatch> {
       setState(() {});
       await _service.startService();
       _service.invoke("start", {"timestamp": widget.timestamp});
+      sendNotification("開始");
     }
     Timer(Duration(seconds: 1), () {
       setState(() {
