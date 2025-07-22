@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/system/module.dart';
 import 'package:myapp/widgets/module.dart';
-import 'package:myapp/stopwatch/stopwatch.dart';
-import 'package:myapp/stopwatch/stopwatchEdit.dart';
+// import 'package:myapp/train/train.dart';
+// import 'package:myapp/train/trainEdit.dart';
 
-class StopWatchList extends StatefulWidget {
-  const StopWatchList({super.key});
+class TrainList extends StatefulWidget {
+  const TrainList({super.key});
 
   @override
-  State<StopWatchList> createState() => _StopWatchListState();
+  State<TrainList> createState() => _TrainListState();
 }
 
-class _StopWatchListState extends State<StopWatchList> {
+class _TrainListState extends State<TrainList> {
   StorageManager storage = StorageManager();
   List<dynamic> _list = [];
   int active = -1;
@@ -23,47 +23,14 @@ class _StopWatchListState extends State<StopWatchList> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // storage.clear();
-      _list = storage.getJsonArray("stopwatch");
+      _list = storage.getJsonArray("train");
       if (_list.isEmpty) {
-        _list = [
-          {"key": 1, "title": "預設", "interval": 1},
-          {
-            "key": 2,
-            "title": "超慢跑",
-            "interval": 1,
-            "interval1": 4,
-            "interval1Txt": "休息",
-            "interval2": 1,
-            "interval2Txt": "運動",
-          },
-          {
-            "key": 3,
-            "title": "健走",
-            "interval": 1,
-            "interval1": 1,
-            "interval1Txt": "跑步",
-            "interval2": 20,
-            "interval2Unit": "S",
-            "interval2Txt": "慢走",
-          },
-          {
-            "key": 4,
-            "title": "彈力帶",
-            "interval": 0,
-            "interval1": 20,
-            "interval1Unit": "S",
-            "interval1Txt": "休息",
-            "interval2": 10,
-            "interval2Unit": "S",
-            "interval2Txt": "開始",
-          },
-        ];
-        storage.setJsonArray("stopwatch", _list);
+        defalutList();
       }
 
-      storage.getInt("stopwatchActive");
-      if (storage.getInt("stopwatchActive") != null) {
-        active = storage.getInt("stopwatchActive")!;
+      storage.getInt("trainActive");
+      if (storage.getInt("trainActive") != null) {
+        active = storage.getInt("trainActive")!;
       }
       // debugPrint("active: $active");
       setState(() {});
@@ -78,38 +45,19 @@ class _StopWatchListState extends State<StopWatchList> {
   @override
   void reassemble() async {
     super.reassemble();
+    // storage.setJsonArray("train", []);
+  }
+
+  void defalutList() {
+    _list = [
+      {"key": 1000, "title": "啞鈴", "items": []},
+      {"key": 1001, "title": "平板", "items": []},
+    ];
+    storage.setJsonArray("train", _list);
   }
 
   String descrip(dynamic json) {
     String s1 = "";
-
-    if (json is Map) {
-      if (json.containsKey('interval') && json["interval"] > 0) {
-        String unit =
-            json["intervalUnit"] is String && json["intervalUnit"] == "S"
-                ? "秒"
-                : "分";
-        s1 = '間隔 ${json['interval']} $unit鐘報時';
-      }
-      if (json["interval1"] is num && json["interval1"] > 0) {
-        String unit =
-            json["interval1Unit"] is String && json["interval1Unit"] == "S"
-                ? "秒"
-                : "分";
-        String txt = "${json["interval1Txt"]}";
-        txt = txt.isEmpty ? "" : "後$txt";
-        s1 += "${s1.isNotEmpty ? '；' : ''}${json["interval1"]}${unit}鐘$txt";
-      }
-      if (json["interval2"] is num && json["interval2"] > 0) {
-        String unit =
-            json["interval2Unit"] is String && json["interval2Unit"] == "S"
-                ? "秒"
-                : "分";
-        String txt = "${json["interval2Txt"]}";
-        txt = txt.isEmpty ? "" : "後$txt";
-        s1 += "，${json["interval2"]}$unit鐘$txt";
-      }
-    } else {}
     return s1;
   }
 
@@ -117,7 +65,7 @@ class _StopWatchListState extends State<StopWatchList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar(
-        "碼錶清單",
+        "訓練清單",
         actions: [
           if (_sort == false)
             IconButton(
@@ -176,7 +124,7 @@ class _StopWatchListState extends State<StopWatchList> {
           }
           final dynamic item = _list.removeAt(oldIndex);
           _list.insert(newIndex, item);
-          storage.setJsonArray("stopwatch", _list);
+          storage.setJsonArray("train", _list);
         });
       },
     );
@@ -192,45 +140,43 @@ class _StopWatchListState extends State<StopWatchList> {
           Icons.keyboard_arrow_right,
           onTap: () async {
             int timestamp = DateTime.now().microsecondsSinceEpoch;
-            // var date = new DateTime.fromMicrosecondsSinceEpoch(timestamp);
-            // debugPrint("$TAG timestamp: ${date.format(pattern: 'mm:ss')}");
 
             active = index;
-            storage.setInt("stopwatchActive", active);
+            storage.setInt("trainActive", active);
             setState(() {});
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => StopWatch(timestamp: timestamp),
-                settings: RouteSettings(arguments: _list[index]),
-              ),
-            );
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => Train(timestamp: timestamp),
+            //     settings: RouteSettings(arguments: _list[index]),
+            //   ),
+            // );
           },
           onLongPress: () async {
             active = index;
             setState(() {});
-            final result = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const StopWatchEdit(),
-                settings: RouteSettings(arguments: _list[index]),
-              ),
-            );
+            // final result = await Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => const TrainEdit(),
+            //     settings: RouteSettings(arguments: _list[index]),
+            //   ),
+            // );
             setState(() {
-              if (result != null) {
-                storage.setInt("stopwatchActive", active);
-                for (var i = 0; i < _list.length; i++) {
-                  var el = _list[i];
-                  if (el["key"] == result["key"]) {
-                    el = result;
-                    break;
-                  }
-                }
-              } else {
-                storage.setInt("stopwatchActive", -1);
-                _list.removeAt(index);
-                index = -1;
-              }
+              // if (result != null) {
+              //   storage.setInt("trainActive", active);
+              //   for (var i = 0; i < _list.length; i++) {
+              //     var el = _list[i];
+              //     if (el["key"] == result["key"]) {
+              //       el = result;
+              //       break;
+              //     }
+              //   }
+              // } else {
+              //   storage.setInt("trainActive", -1);
+              //   _list.removeAt(index);
+              //   index = -1;
+              // }
             });
           },
         );
@@ -289,15 +235,15 @@ class _StopWatchListState extends State<StopWatchList> {
   }
 
   void _onAdd() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const StopWatchEdit()),
-    );
-    if (result != null) {
-      setState(() {
-        _list.add(result);
-      });
-    }
+    // final result = await Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => const TrainEdit()),
+    // );
+    // if (result != null) {
+    //   setState(() {
+    //     _list.add(result);
+    //   });
+    // }
   }
 
   void showSnackBar() {

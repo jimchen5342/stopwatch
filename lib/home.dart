@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/stopwatch/stopwatchList.dart';
-import 'package:myapp/countdown/countdownList.dart';
+import 'package:myapp/train/trainList.dart';
+// import 'package:myapp/countdown/countdownList.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:myapp/system/module.dart';
 import 'dart:async';
@@ -45,7 +46,8 @@ class _HomeState extends State<Home> {
   // 這些可以是任何你想要顯示的 Widget，例如不同的頁面或畫面
   static const List<Widget> _widgetOptions = <Widget>[
     StopWatchList(), // 碼錶
-    CountDownList(),
+    TrainList(), // 訓練
+    // CountDownList(),
   ];
 
   // 當點擊 BottomNavigationBarItem 時調用的函數
@@ -82,10 +84,14 @@ class _HomeState extends State<Home> {
       backgroundColor: SysColor.primary, // <-- This works for fixed
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.access_time_sharp),
-          label: '碼錶',
+          icon: Icon(Icons.access_time_filled_rounded),
+          label: '碼錶清單',
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.alarm), label: '計時器'),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.list_alt_sharp),
+          label: '訓練清單',
+        ),
+        // BottomNavigationBarItem(icon: Icon(Icons.alarm), label: '計時器'),
       ],
       currentIndex: _selectedIndex, // 目前選中的項目索引
       selectedItemColor: Colors.white, // 選中項目的顏色
@@ -98,18 +104,17 @@ class _HomeState extends State<Home> {
   Future<bool> requestPostNotificationsPermission() async {
     bool b = false;
     var status = await Permission.notification.status;
-    debugPrint("$TAG requestPostNotificationsPermission1: $status");
+    // debugPrint("$TAG requestPostNotificationsPermission1: $status");
     if (status.isDenied) {
       // 權限被拒絕，發出請求
       status = await Permission.notification.request();
-      debugPrint("$TAG requestPostNotificationsPermission2: $status");
+      // debugPrint("$TAG requestPostNotificationsPermission2: $status");
       if (status.isGranted) {
         b = true;
       }
     } else if (status.isGranted) {
       b = true;
     }
-
     return b;
   }
 }
