@@ -71,7 +71,7 @@ public class LocalNotification {
 
     NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.running) // 替換為您的通知小圖示
-            .setContentTitle("計時碼錶-" + title)
+            .setContentTitle(title) // "計時碼錶-" +
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH) // 設定高優先級
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC) // 設定在鎖定螢幕上顯示完整內容
@@ -83,8 +83,8 @@ public class LocalNotification {
 
     // Android Oreo (API 26) 及以上版本需要 NotificationChannel
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      CharSequence channelName = "我的 Java 通知頻道";
-      String channelDescription = "用於顯示重要 Java 通知的頻道";
+      CharSequence channelName = title;
+      String channelDescription = message;
       int importance = NotificationManager.IMPORTANCE_HIGH;
       NotificationChannel channel = new NotificationChannel(CHANNEL_ID, channelName, importance);
       channel.setDescription(channelDescription);

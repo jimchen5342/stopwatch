@@ -77,11 +77,12 @@ class _StopWatchState extends State<StopWatch> {
     close();
     super.dispose();
   }
-  sendNotification(String message) async {
+
+  sendNotification() async {
     try {
       final result = await platform.invokeMethod<String>('sendNotification', {
         "title": "${json['title']}",
-        "message": message,
+        "message": descript().replaceAll("\n", "；"),
       });
       bool isRunning = await _service.isRunning();
       if (isRunning) {
@@ -247,7 +248,7 @@ class _StopWatchState extends State<StopWatch> {
       setState(() {});
       await _service.startService();
       _service.invoke("start", {"timestamp": widget.timestamp});
-      sendNotification("開始");
+      sendNotification();
     }
     Timer(Duration(seconds: 1), () {
       setState(() {
@@ -430,7 +431,7 @@ class _StopWatchState extends State<StopWatch> {
     );
   }
 
-  Widget _content() {
+  String descript() {
     String s1 = "";
 
     if (json is Map) {
@@ -462,11 +463,17 @@ class _StopWatchState extends State<StopWatch> {
         s1 += "\n${json["interval2"]} $unit鐘$txt";
       }
     }
+    if (s1.indexOf("\n") == 0) {
+      s1 = s1.substring(1);
+    }
+    return s1;
+  }
 
+  Widget _content() {
     return Expanded(
       child: Center(
         child: Text(
-          s1,
+          descript(),
           style: TextStyle(fontSize: 25, color: SysColor.primary),
         ),
       ),
