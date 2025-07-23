@@ -20,7 +20,7 @@ import com.flutter.MyNotificationReceiver;
 
 public class LocalNotification {
   private static final String CHANNEL_ID = "stopwatch_local_notification";
-  private static final int NOTIFICATION_ID = 1;
+  private static final int NOTIFICATION_ID = 888;
 
   private Context context;
 
