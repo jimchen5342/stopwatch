@@ -46,28 +46,24 @@ public class LocalNotification {
     );
 
     // 建立 PendingIntent 給按鈕 2
-//     Intent intentButton2 = new Intent(context, MyNotificationReceiver.class);
-//     intentButton2.setAction(MyNotificationReceiver.ACTION_BUTTON_2);
-//     intentButton2.putExtra(MyNotificationReceiver.EXTRA_NOTIFICATION_ID, NOTIFICATION_ID);
-//     PendingIntent pendingIntentButton2 = PendingIntent.getBroadcast(
-//             context,
-//             1, // requestCode 必須不同，如果 Intent 的其他部分相同
-//             intentButton2,
-//             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-//     );
+    Intent intentButton2 = new Intent(context, MyNotificationReceiver.class);
+    intentButton2.setAction(MyNotificationReceiver.ACTION_BUTTON_NEXT);
+    intentButton2.putExtra(MyNotificationReceiver.EXTRA_NOTIFICATION_ID, NOTIFICATION_ID);
+    PendingIntent pendingIntentButton2 = PendingIntent.getBroadcast(
+            context,
+            1, // requestCode 必須不同，如果 Intent 的其他部分相同
+            intentButton2,
+            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+    );
 
     // 建立 NotificationCompat.Action
     NotificationCompat.Action actionStop = new NotificationCompat.Action.Builder(
             android.R.drawable.btn_star_big_on, // 替換為您的圖示資源
-            "STOP",
+            "Stop",
             pendingIntentButton1
     ).build();
 
-//     NotificationCompat.Action action2 = new NotificationCompat.Action.Builder(
-//             android.R.drawable.star_big_on, // 替換為您的圖示資源
-//             "按鈕 2 (Java)",
-//             pendingIntentButton2
-//     ).build();
+
 
     NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.running) // 替換為您的通知小圖示
@@ -75,9 +71,16 @@ public class LocalNotification {
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH) // 設定高優先級
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC) // 設定在鎖定螢幕上顯示完整內容
-            .addAction(actionStop) // 加入按鈕 1
-        //     .addAction(action2) // 加入按鈕 2
+            .addAction(actionStop)
             .setAutoCancel(true); // 點擊通知主體時自動取消 (可選)
+    /* 還沒有寫
+    NotificationCompat.Action actionNext = new NotificationCompat.Action.Builder(
+            android.R.drawable.star_big_on, // 替換為您的圖示資源
+            "Next",
+            pendingIntentButton2
+    ).build();
+    builder.addAction(actionNext);
+    */
 
     NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
