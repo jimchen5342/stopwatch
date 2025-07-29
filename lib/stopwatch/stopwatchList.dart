@@ -56,6 +56,11 @@ class _StopWatchListState extends State<StopWatchList> {
             "interval2": 10,
             "interval2Unit": "S",
             "interval2Txt": "開始",
+          },{
+            "key": 5,
+            "title": "深蹲",
+            "interval": 20,
+            "intervalUnit": "S",
           },
         ];
         storage.setJsonArray("stopwatch", _list);

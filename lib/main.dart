@@ -21,7 +21,12 @@ class MyApp extends StatelessWidget with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await storage.initStorage();
-      // storage.clear();
+      storage.clear();
+
+      bool isRunning = await _service.isRunning();
+      if (isRunning) {
+        _service.invoke("stop");
+      }
     });
   }
   @override
@@ -61,13 +66,13 @@ Future<void> initializeService() async {
     androidConfiguration: AndroidConfiguration(
       // 當服務啟動時執行的函數
       onStart: onStart,
-      autoStart: false, // 我們將手動啟動
+      autoStart: false, // 手動啟動
       isForegroundMode: true, // 啟用前景模式, 不要改
       // 前景通知的設定
       // notificationChannelId: 'my_foreground',
-      // initialNotificationTitle: '背景碼錶',
-      // initialNotificationContent: '正在初始化...',
-      // foregroundServiceNotificationId: 888,
+      initialNotificationTitle: '背景碼錶',
+      initialNotificationContent: '正在初始化...',
+      foregroundServiceNotificationId: 888,
     ),
     // iOS 設定 (此範例主要針對 Android)
     iosConfiguration: IosConfiguration(

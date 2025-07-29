@@ -21,11 +21,8 @@ class StopWatch extends StatefulWidget {
 class _StopWatchState extends State<StopWatch> {
   TextToSpeech tts = TextToSpeech();
   final FlutterBackgroundService _service = FlutterBackgroundService();
-  int _secondsElapsed = 0,
-      frequency = 60,
-      _nextTime = -1,
-      _finalCountdown = -1,
-      times = 0;
+  int _secondsElapsed = 0,  frequency = 60, _nextTime = -1,
+      _finalCountdown = -1, times = 0;
   bool _isRunning = false, begin = false, showButton = true;
   dynamic json;
   List<String> recoders = [];
@@ -85,8 +82,7 @@ class _StopWatchState extends State<StopWatch> {
         "message": descript().replaceAll("\n", "；"),
       });
       bool isRunning = await _service.isRunning();
-      if (isRunning) {
-        // 如果正在運行，則停止服務
+      if (isRunning) { // 如果正在運行，則停止服務
         _toggleService();
       }
       debugPrint('sendNotification.result: $result');
@@ -107,8 +103,8 @@ class _StopWatchState extends State<StopWatch> {
   void close() async {
     // var date = new DateTime.fromMicrosecondsSinceEpoch(widget.timestamp);
     // debugPrint("$TAG close: ${date.format(pattern: 'mm:ss')}");
-
-    if (await _service.isRunning() == true) {
+    bool isRunning = await _service.isRunning();
+    if (isRunning == true) {
       _service.invoke("stop");
       speak("關閉碼錶");
       stopNotification();

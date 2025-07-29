@@ -20,7 +20,7 @@ import com.flutter.MyNotificationReceiver;
 
 public class LocalNotification {
   private static final String CHANNEL_ID = "stopwatch_local_notification";
-  private static final int NOTIFICATION_ID = 888;
+  private static final int NOTIFICATION_ID = 5342;
 
   private Context context;
 
@@ -33,7 +33,7 @@ public class LocalNotification {
    * @param title 通知標題
    * @param message 通知內容
    */
-  public void sendNotification(String title, String message) {
+  public void sendNotification(String title, String message, boolean next) {
     // 建立 PendingIntent 給按鈕 1
     Intent intentButton1 = new Intent(context, MyNotificationReceiver.class);
     intentButton1.setAction(MyNotificationReceiver.ACTION_BUTTON_STOP);
@@ -73,14 +73,13 @@ public class LocalNotification {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC) // 設定在鎖定螢幕上顯示完整內容
             .addAction(actionStop)
             .setAutoCancel(true); // 點擊通知主體時自動取消 (可選)
-    /* 還沒有寫
-    NotificationCompat.Action actionNext = new NotificationCompat.Action.Builder(
-            android.R.drawable.star_big_on, // 替換為您的圖示資源
-            "Next",
-            pendingIntentButton2
-    ).build();
-    builder.addAction(actionNext);
-    */
+    if(next) {
+      builder.addAction(new NotificationCompat.Action.Builder(
+              android.R.drawable.ic_media_next, // 替換為您的圖示資源
+              "Next",
+              pendingIntentButton2
+      ).build());
+    }
 
     NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
@@ -96,23 +95,14 @@ public class LocalNotification {
       notificationManager.createNotificationChannel(channel);
     }
 
-    // 顯示通知
-    // 在實際應用中，確保您有 POST_NOTIFICATIONS 權限 (Android 13+)
-      if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-          // TODO: Consider calling
-          //    ActivityCompat#requestPermissions
-          // here to request the missing permissions, and then overriding
-          //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-          //                                          int[] grantResults)
-          // to handle the case where the user grants the permission. See the documentation
-          // for ActivityCompat#requestPermissions for more details.
-          return;
-      }
-      notificationManager.notify(NOTIFICATION_ID, builder.build());
+    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+        return;
+    }
+    notificationManager.notify(NOTIFICATION_ID, builder.build());
   }
 
   public void cancel() {
     NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-      notificationManager.cancel(NOTIFICATION_ID);
+    notificationManager.cancel(NOTIFICATION_ID);
   }
 }
