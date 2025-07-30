@@ -288,6 +288,7 @@ class _StopWatchListState extends State<StopWatchList> {
         color: trailing == Icons.keyboard_arrow_right ? null : Colors.red,
       ),
       selected: active == index,
+      selectedTileColor: Colors.blue.withValues(alpha: 0.15),
       onTap: onTap,
       onLongPress: onLongPress,
     );

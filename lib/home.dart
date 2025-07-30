@@ -27,13 +27,11 @@ class _HomeState extends State<Home> {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       version = packageInfo.version;
 
-      var index = storage.getInt("bottomNavigationIndex");
-      if (index is int) {
-        _selectedIndex = index;
-      }
-      setState(() {});
-
       if (await requestPostNotificationsPermission() == true) {
+        var index = storage.getInt("bottomNavigationIndex");
+        if (index is int) {
+          _selectedIndex = index;
+        }
         Timer(Duration(seconds: 2), () {
           setState(() {});
           version = "";
@@ -42,15 +40,12 @@ class _HomeState extends State<Home> {
     });
   }
 
-  // 準備要顯示在不同分頁的 Widget 列表
-  // 這些可以是任何你想要顯示的 Widget，例如不同的頁面或畫面
   static const List<Widget> _widgetOptions = <Widget>[
     StopWatchList(), // 碼錶
     TrainList(), // 訓練
     // CountDownList(),
   ];
 
-  // 當點擊 BottomNavigationBarItem 時調用的函數
   void _onItemTapped(int index) {
     storage.setInt("bottomNavigationIndex", index);
     setState(() {
@@ -63,8 +58,8 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body:
           version.isNotEmpty
-              ? _versiion()
-              : _widgetOptions.elementAt(_selectedIndex),
+          ? _versiion()
+          : _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: version.isNotEmpty ? null : bottom(),
     );
   }

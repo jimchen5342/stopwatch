@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await storage.initStorage();
-      storage.clear();
+      // storage.clear();
 
       bool isRunning = await _service.isRunning();
       if (isRunning) {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/system/module.dart';
 import 'package:myapp/widgets/module.dart';
-// import 'package:myapp/train/train.dart';
+import 'package:myapp/train/train.dart';
 // import 'package:myapp/train/trainEdit.dart';
 
 class TrainList extends StatefulWidget {
@@ -53,7 +53,7 @@ class _TrainListState extends State<TrainList> {
   void defalutList() {
     _list = [
       {"key": 1000, "title": "啞鈴", "workout": 60, "rest": 30, "cycle": 2,
-        "items": ["肩推", "彎舉", "前平舉", "側平舉"]},
+        "items": ["肩推", "二頭彎舉", "前平舉", "側平舉"]},
       {"key": 1001, "title": "平板撐", "workout": 60 * 2, "rest": 60, "cycle": 2,
          "items": ["俯身登山跑", "俯身側跨步", "俯身收腿跳", "肘支撐開合跳"]},
       {"key": 1002, "title": "高強度間歇訓練", "workout": 60 * 2, "rest": 30, "cycle": 2,
@@ -162,13 +162,13 @@ class _TrainListState extends State<TrainList> {
             active = index;
             storage.setInt("trainActive", active);
             setState(() {});
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => Train(timestamp: timestamp),
-            //     settings: RouteSettings(arguments: _list[index]),
-            //   ),
-            // );
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Train(timestamp: timestamp),
+                settings: RouteSettings(arguments: _list[index]),
+              ),
+            );
           },
           onLongPress: () async {
             active = index;
@@ -211,6 +211,7 @@ class _TrainListState extends State<TrainList> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final Color oddItemColor = colorScheme.primary.withValues(alpha: 0.05);
     final Color evenItemColor = colorScheme.primary.withValues(alpha: 0.15);
+    // #5cadff
 
     return ListTile(
       key: Key('$index'),
@@ -247,6 +248,7 @@ class _TrainListState extends State<TrainList> {
         color: trailing == Icons.keyboard_arrow_right ? null : Colors.red,
       ),
       selected: active == index,
+      selectedTileColor: Colors.blue.withValues(alpha: 0.15),
       onTap: onTap,
       onLongPress: onLongPress,
     );
