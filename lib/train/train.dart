@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:core';
-import 'dart:nativewrappers/_internal/vm/lib/ffi_patch.dart';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:myapp/system/textToSpeech.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
