@@ -46,18 +46,36 @@ class _TrainListState extends State<TrainList> {
   void reassemble() async {
     super.reassemble();
     // storage.setJsonArray("train", []);
+    // defalutList();
+    // setState(() {});
   }
 
   void defalutList() {
     _list = [
-      {"key": 1000, "title": "啞鈴", "items": []},
-      {"key": 1001, "title": "平板", "items": []},
+      {"key": 1000, "title": "啞鈴", "workout": 60, "rest": 30, "cycle": 2,
+        "items": ["肩推", "彎舉", "前平舉", "側平舉"]},
+      {"key": 1001, "title": "平板撐", "workout": 60 * 2, "rest": 60, "cycle": 2,
+         "items": ["俯身登山跑", "俯身側跨步", "俯身收腿跳", "肘支撐開合跳"]},
+      {"key": 1002, "title": "高強度間歇訓練", "workout": 60 * 2, "rest": 30, "cycle": 2,
+        "items": ["開合跳", "跨下擊掌", "單側提膝", "對側提膝", "提膝下壓", "向後踢腿", "原地踢臀", "深蹲"]},
+      {"key": 1003, "title": "彈力帶", "workout": 30, "rest": 1, "cycle": 2,
+        "items": ["二頭彎舉", "過頭肩推", "前平舉", "肩背下拉", "", "", "", ""]},
     ];
     storage.setJsonArray("train", _list);
   }
 
   String descrip(dynamic json) {
     String s1 = "";
+    if (json is Map) {
+      if (json.containsKey('items')){
+        var items = json["items"] as List;
+        for(var i = 0; i < items.length;i++){
+          if(items[i].length > 0) {
+            s1 += (s1.isNotEmpty ? ", " : "") + items[i];
+          }
+        }
+      }
+    }
     return s1;
   }
 
@@ -198,8 +216,8 @@ class _TrainListState extends State<TrainList> {
       key: Key('$index'),
       tileColor: index % 2 == 0 ? oddItemColor : evenItemColor,
       title: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             _list[index]["title"],
@@ -208,10 +226,10 @@ class _TrainListState extends State<TrainList> {
               fontWeight: active == index ? FontWeight.bold : FontWeight.normal,
             ),
           ),
-          // Text(
-          //   "key: ${_list[index]["key"]}",
-          //   style: TextStyle(fontSize: 16, color: Colors.red),
-          // ),
+          Text(
+            SecondsToString(_list[index]["workout"]).toChinese(),
+            style: TextStyle(fontSize: 20, color: Colors.red),
+          ),
         ],
       ),
       subtitle: Text(
@@ -246,8 +264,7 @@ class _TrainListState extends State<TrainList> {
     // }
   }
 
-  void showSnackBar() {
-    // 可以用的，
+  void showSnackBar() { // 可以用的，
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text('Hello, Snackbar!')));

@@ -58,7 +58,7 @@ class _StopWatchListState extends State<StopWatchList> {
             "interval2Txt": "開始",
           },{
             "key": 5,
-            "title": "深蹲",
+            "title": "靠牆深蹲",
             "interval": 20,
             "intervalUnit": "S",
           },
