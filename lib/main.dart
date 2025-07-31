@@ -6,9 +6,12 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:myapp/system/module.dart';
 
+import "package:myapp/permission.dart";
+
 String TAG = "stopwatchMain";
 void main() {
   runApp(MyApp());
+  // runApp(StoragePermissionExample());
 }
 
 class MyApp extends StatelessWidget with WidgetsBindingObserver {
@@ -52,7 +55,7 @@ class MyApp extends StatelessWidget with WidgetsBindingObserver {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: SysColor.primary),
       ),
-      home: const Home(),
+      home: const StoragePermissionExample(), // const Home(),
     );
   }
 }
