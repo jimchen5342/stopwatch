@@ -26,6 +26,7 @@ class _HomeState extends State<Home> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       version = packageInfo.version;
+      setState(() {});
 
       if (await requestPostNotificationsPermission() == true) {
         var index = storage.getInt("bottomNavigationIndex");
@@ -58,8 +59,8 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body:
           version.isNotEmpty
-          ? _versiion()
-          : _widgetOptions.elementAt(_selectedIndex),
+              ? _versiion()
+              : _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: version.isNotEmpty ? null : bottom(),
     );
   }
@@ -104,6 +105,21 @@ class _HomeState extends State<Home> {
       // 權限被拒絕，發出請求
       status = await Permission.notification.request();
       // debugPrint("$TAG requestPostNotificationsPermission2: $status");
+      if (status.isGranted) {
+        b = true;
+      }
+    } else if (status.isGranted) {
+      b = true;
+    }
+    return b;
+  }
+
+  Future<bool> requestStoragePermission() async {
+    // 沒有效，2025-07-31
+    bool b = false;
+    var status = await Permission.storage.status;
+    if (status.isDenied) {
+      status = await Permission.storage.request();
       if (status.isGranted) {
         b = true;
       }

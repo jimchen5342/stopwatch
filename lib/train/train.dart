@@ -20,12 +20,11 @@ class Train extends StatefulWidget {
 class _TrainState extends State<Train> {
   TextToSpeech tts = TextToSpeech();
   final FlutterBackgroundService _service = FlutterBackgroundService();
-  int _secondsElapsed = 0,  frequency = 60, _nextTime = -1,
-      _finalCountdown = -1, times = 0;
+  int _secondsElapsed = 0, _finalCountdown = -1, times = 0, active = -1;
   bool _isRunning = false, begin = false, showButton = true;
   dynamic json;
   List<dynamic> recoders = [];
-  
+
   var _secondsStart = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   String index = "-1";
   static const platform = MethodChannel('com.flutter/MethodChannel');
@@ -39,12 +38,6 @@ class _TrainState extends State<Train> {
     // 監聽來自背景服務的 'update' 事件
     _service.on('update').listen((event) {
       if (event != null && event.containsKey("timestamp")) {
-        int timestamp = event["timestamp"] as int;
-        // var date1 = new DateTime.fromMicrosecondsSinceEpoch(widget.timestamp);
-        // var date2 = new DateTime.fromMicrosecondsSinceEpoch(timestamp);
-        // debugPrint(
-        //   "$TAG widget.timestamp: ${date1.format(pattern: 'mm:ss')}, update.timestamp: ${date2.format(pattern: 'mm:ss')}, ${event["timestamp"] == widget.timestamp}",
-        // );
         if (event["timestamp"] != widget.timestamp) {
           return;
         }
@@ -56,7 +49,7 @@ class _TrainState extends State<Train> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       json = ModalRoute.of(context)?.settings.arguments;
       setState(() {});
-       
+
       if (json is Map) {
         if (json.containsKey("items")) {
           recoders = json["items"] as List<dynamic>;
@@ -71,14 +64,16 @@ class _TrainState extends State<Train> {
     super.dispose();
   }
 
-  sendNotification() async { // 還沒有寫 message 值.....
+  sendNotification() async {
+    // 還沒有寫 message 值.....
     try {
       final result = await platform.invokeMethod<String>('sendNotification', {
         "title": "${json['title']}",
-        "message": "還沒寫值.....", // 
+        "message": "還沒寫值.....", //
       });
       bool isRunning = await _service.isRunning();
-      if (isRunning) { // 如果正在運行，則停止服務
+      if (isRunning) {
+        // 如果正在運行，則停止服務
         _toggleService();
       }
       debugPrint('sendNotification.result: $result');
@@ -103,10 +98,6 @@ class _TrainState extends State<Train> {
       speak("關閉碼錶");
       stopNotification();
     }
-    _isRunning = false;
-    _secondsElapsed = 0;
-    _nextTime = -1;
-    _finalCountdown = -1;
     // _service.on('update').listen(null);
     // tts = null;
   }
@@ -129,41 +120,7 @@ class _TrainState extends State<Train> {
       }
 
       _secondsElapsed = now - _secondsStart;
-      // debugPrint("$TAG _secondsElapsed: $_secondsElapsed, _nextTime: $_nextTime");
-      if (_secondsElapsed > 0) {
-        var s1 = "";
-        if (json.containsKey('interval1') && json.containsKey('interval2')) {
-          if (json["interval1"] is num && json["interval2"] is num) {
-            var isec = json["interval$index"],
-                idiff = _nextTime - _secondsElapsed;
-            if (isec >= 60 && idiff == 10) {
-              speak("倒數 $idiff 秒");
-            }
-          }
-        }
-        if (_secondsElapsed >= _nextTime && _nextTime > -1) {
-          s1 = "${json['interval${index}Txt']}";
-          s1 = s1.isEmpty ? " " : "，$s1";
-          if (frequency == 0 && index == "1") {
-            s1 += "；第 ${times + 1} 次";
-            times++;
-          }
-
-          index = index == "1" ? "2" : "1";
-          var sec2 =
-              json["interval${index}Unit"] is String &&
-                      json["interval${index}Unit"] == "S"
-                  ? 1
-                  : 60;
-          _nextTime = (json["interval$index"] * sec2) + _secondsElapsed;
-        }
-
-        if ((frequency > 0 && _secondsElapsed % frequency == 0) ||
-            s1.isNotEmpty) {
-          var str = SecondsToString(_secondsElapsed).toChinese();
-          speak("時間 $str$s1");
-        }
-      }
+      if (_secondsElapsed > 0) {}
     });
   }
 
@@ -181,17 +138,12 @@ class _TrainState extends State<Train> {
         _isRunning = false;
         _service.invoke("stop");
         _secondsElapsed = 0;
-        // _text = "碼錶執行中... (從背景恢復)";
-        // 如果服務正在運行，可以請求一次當前時間
-        // 注意：這需要你在 onStart 中處理一個 'requestCurrentTime' 之類的事件
       } else {
-        // _text = "";
         _secondsElapsed = 0;
       }
       setState(() {});
     });
   }
-
 
   // 啟動或停止服務的函數
   void _toggleService() async {
@@ -209,7 +161,6 @@ class _TrainState extends State<Train> {
         speak("時間 $str；停止碼錶");
         _isRunning = false;
         _secondsElapsed = 0; // 根據需求決定是否重置
-        _nextTime = -1;
         _finalCountdown = -1;
       });
     } else {
@@ -228,16 +179,6 @@ class _TrainState extends State<Train> {
     });
   }
 
-  void _reset() {
-    var str = SecondsToString(_secondsElapsed).toChinese();
-    speak("時間 $str；碼錶歸零");
-    _secondsElapsed = 0;
-    _nextTime = -1;
-    _finalCountdown = -1;
-    _secondsStart = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
-    setState(() {});
-  }
-
   Future<void> speak(String txt) async {
     debugPrint("$TAG speak: $txt");
     var result = await tts.speak(txt);
@@ -254,20 +195,16 @@ class _TrainState extends State<Train> {
         if (didPop) return;
         _exitSetup();
       },
-      child: scaffold(),
-    );
-  }
-
-  Widget scaffold() {
-    return Scaffold(
-      appBar: appBar(
-        "碼錶${json != null ? ' [ ' + json['title'] + ' ]' : ''}",
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => _exitSetup(),
+      child: Scaffold(
+        appBar: appBar(
+          json != null ? json['title'] : '',
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => _exitSetup(),
+          ),
         ),
+        body: Center(child: body()),
       ),
-      body: Center(child: body()),
     );
   }
 
@@ -276,6 +213,16 @@ class _TrainState extends State<Train> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
+        Expanded(
+          child: Container(
+            margin: const EdgeInsets.all(5.0),
+            // padding: const EdgeInsets.all(2.0),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.blueAccent),
+            ),
+            child: plan(),
+          ),
+        ),
         Text(
           "test",
           style: TextStyle(
@@ -288,7 +235,28 @@ class _TrainState extends State<Train> {
     );
   }
 
-   void _exitSetup() {
+  Widget plan() {
+    return ListView.builder(
+      itemCount: recoders.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          contentPadding: EdgeInsets.only(left: 10, right: 10),
+          isThreeLine: false,
+          minTileHeight: 10,
+          title: Text(
+            recoders[index],
+            style: TextStyle(
+              // fontSize: 25,
+              color: active == index ? SysColor.red : null,
+            ),
+          ),
+          // contentPadding: EdgeInsets.all(0.0),
+        );
+      },
+    );
+  }
+
+  void _exitSetup() {
     close();
     Navigator.of(context).pop();
   }
