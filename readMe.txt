@@ -10,8 +10,12 @@ https://api.flutter.dev/flutter/material/Icons-class.html
 adb -s emulator-5554 uninstall com.flutter.stopwatch
 
 adb -s emulator-5554 shell ls storage/emulated/0
-adb -s emulator-5554 shell mkdir storage/emulated/0/stopwatch
-adb -s emulator-5554 shell ls storage/emulated/0/stopwatch
+adb -s emulator-5554 shell mkdir storage/emulated/0/Download/stopwatch
+adb -s emulator-5554 shell ls storage/emulated/0/Download/stopwatch
+adb -s emulator-5554 shell ls sdcard/stopwatch
 
-adb -s emulator-5554 push datafile/stopwatch.json storage/emulated/0/stopwatch
-adb -s emulator-5554 push datafile/train.json storage/emulated/0/stopwatch
+adb -s emulator-5554 push datafile/stopwatch.json storage/emulated/0/Download/stopwatch
+adb -s emulator-5554 push datafile/train.json storage/emulated/0/Download/stopwatch
+
+
+adb -s emulator-5554 push datafile/train.json  /storage/emulated/0/Android/data/com.flutter.stopwatch/files/downloads

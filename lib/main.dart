@@ -6,8 +6,6 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:myapp/system/module.dart';
 
-import "package:myapp/permission.dart";
-
 String TAG = "stopwatchMain";
 void main() {
   runApp(MyApp());
@@ -55,7 +53,7 @@ class MyApp extends StatelessWidget with WidgetsBindingObserver {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: SysColor.primary),
       ),
-      home: const StoragePermissionExample(), // const Home(),
+      home: const Home(),
     );
   }
 }
@@ -159,21 +157,3 @@ void onStart(ServiceInstance service) async {
   // 初始通知（可以根據需要自訂）
   service.invoke('update', {"seconds": 0, "timestamp": timestamp});
 }
-
-/*
-
-Future<void> readJsonFromSDCard() async {
-  await requestStoragePermission();
-
-  // 假設檔案位於 /sdcard/Download/data.json
-  final file = File('/sdcard/Download/data.json');
-
-  if (await file.exists()) {
-    final contents = await file.readAsString();
-    final jsonData = jsonDecode(contents);
-    print(jsonData); // 或進一步處理資料
-  } else {
-    print('檔案不存在');
-  }
-}
- */
