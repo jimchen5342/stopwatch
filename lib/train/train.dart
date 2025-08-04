@@ -208,18 +208,36 @@ class _TrainState extends State<Train> {
     );
   }
 
+  // SecondsToString(_list[index]["workout"]).toChinese()
   Widget body() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              json != null ? SecondsToString(json["workout"]).toChinese() : "",
+              style: TextStyle(fontSize: 20, color: Colors.red),
+            ),
+            Text(
+              json != null ? SecondsToString(json["rest"]).toChinese() : "",
+              style: TextStyle(fontSize: 20, color: Colors.red),
+            ),
+            Text(
+              json != null ? SecondsToString(json["cycle"]).toChinese() : "",
+              style: TextStyle(fontSize: 20, color: Colors.red),
+            ),
+          ],
+        ),
         Expanded(
           child: Container(
             margin: const EdgeInsets.all(5.0),
+            // color: SysColor.gray,
             // padding: const EdgeInsets.all(2.0),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.blueAccent),
-            ),
+            // decoration: BoxDecoration(border: Border.all(color: SysColor.gray)),
             child: plan(),
           ),
         ),
@@ -243,15 +261,16 @@ class _TrainState extends State<Train> {
           contentPadding: EdgeInsets.only(left: 5, right: 5, top: 0, bottom: 0),
           isThreeLine: false,
           minTileHeight: 10,
+          tileColor: index % 2 == 0 ? SysColor.oddItem : SysColor.evenItem,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 margin: const EdgeInsets.only(right: 5.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blueAccent),
-                ),
+                // decoration: BoxDecoration(
+                //   border: Border.all(color: Colors.blueAccent),
+                // ),
                 child: Text(
                   "${(index + 1).toString().padLeft(2, '0') + "."}",
                   style: TextStyle(
@@ -263,9 +282,9 @@ class _TrainState extends State<Train> {
               ),
               Container(
                 margin: const EdgeInsets.only(right: 5.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.blueAccent),
-                ),
+                // decoration: BoxDecoration(
+                //   border: Border.all(color: Colors.blueAccent),
+                // ),
                 child: Text(
                   recoders[index],
                   style: TextStyle(
@@ -277,6 +296,8 @@ class _TrainState extends State<Train> {
               ),
             ],
           ),
+          selected: active == index,
+          selectedTileColor: SysColor.selectedItem,
         );
       },
     );

@@ -118,13 +118,9 @@ class _StopWatchListState extends State<StopWatchList> {
   }
 
   ListTile listTile(int index, IconData trailing, {Function()? onTap}) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final Color oddItemColor = colorScheme.primary.withValues(alpha: 0.05);
-    final Color evenItemColor = colorScheme.primary.withValues(alpha: 0.15);
-
     return ListTile(
       key: Key('$index'),
-      tileColor: index % 2 == 0 ? oddItemColor : evenItemColor,
+      tileColor: index % 2 == 0 ? SysColor.oddItem : SysColor.evenItem,
       title: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -157,7 +153,7 @@ class _StopWatchListState extends State<StopWatchList> {
         color: trailing == Icons.keyboard_arrow_right ? null : Colors.red,
       ),
       selected: active == index,
-      selectedTileColor: Colors.blue.withValues(alpha: 0.15),
+      selectedTileColor: SysColor.selectedItem,
       onTap: onTap,
     );
   }

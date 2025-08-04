@@ -102,4 +102,7 @@ extension SysColor on Color {
   static Color get white => HexColor.fromHex("#ffffff");
   static Color get red => HexColor.fromHex("#C01921");
   static Color get orange => Colors.deepOrangeAccent;
+  static Color get oddItem => Colors.grey.withValues(alpha: 0.2);
+  static Color get evenItem => Colors.white70;
+  static Color get selectedItem => Colors.blue.withValues(alpha: 0.15);
 }
