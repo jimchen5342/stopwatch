@@ -3,6 +3,7 @@ import 'package:myapp/system/module.dart';
 import 'package:myapp/widgets/module.dart';
 import 'package:myapp/stopwatch/stopwatch.dart';
 import 'package:myapp/stopwatch/stopwatchEdit.dart';
+import 'package:myapp/system/fetch.dart';
 
 class StopWatchList extends StatefulWidget {
   const StopWatchList({super.key});
@@ -23,54 +24,12 @@ class _StopWatchListState extends State<StopWatchList> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // storage.clear();
+      active = storage.getInt("stopwatchActive", defaultVaule: -1);
       _list = storage.getJsonArray("stopwatch");
-      if (_list.isEmpty) {
-        _list = [
-          {"key": 1, "title": "預設", "interval": 1},
-          {
-            "key": 2,
-            "title": "超慢跑",
-            "interval": 1,
-            "interval1": 4,
-            "interval1Txt": "休息",
-            "interval2": 1,
-            "interval2Txt": "運動",
-          },
-          {
-            "key": 3,
-            "title": "健走",
-            "interval": 1,
-            "interval1": 1,
-            "interval1Txt": "跑步",
-            "interval2": 20,
-            "interval2Unit": "S",
-            "interval2Txt": "慢走",
-          },
-          {
-            "key": 4,
-            "title": "彈力帶",
-            "interval": 0,
-            "interval1": 20,
-            "interval1Unit": "S",
-            "interval1Txt": "休息",
-            "interval2": 10,
-            "interval2Unit": "S",
-            "interval2Txt": "開始",
-          },{
-            "key": 5,
-            "title": "靠牆深蹲",
-            "interval": 20,
-            "intervalUnit": "S",
-          },
-        ];
+      if (_list.isEmpty && active == -1) {
+        _list = await fetch("stopwatch");
         storage.setJsonArray("stopwatch", _list);
       }
-
-      storage.getInt("stopwatchActive");
-      if (storage.getInt("stopwatchActive") != null) {
-        active = storage.getInt("stopwatchActive")!;
-      }
-      // debugPrint("active: $active");
       setState(() {});
     });
   }
@@ -121,69 +80,11 @@ class _StopWatchListState extends State<StopWatchList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(
-        "碼錶清單",
-        actions: [
-          if (_sort == false)
-            IconButton(
-              icon: Icon(Icons.add, color: Colors.white),
-              onPressed: _onAdd,
-            ),
-          if (_list.length > 2)
-            IconButton(
-              icon: Icon(
-                Icons.reorder_sharp,
-                color: _sort ? Colors.red : Colors.white,
-              ),
-              onPressed: () async {
-                setState(() {
-                  _sort = !_sort;
-                });
-              },
-            ),
-          // 測試用
-          // IconButton(
-          //   icon: Icon(Icons.delete, color: Colors.red),
-          //   onPressed: () async {
-
-          //   },
-          // ),
+      appBar: appBar("碼錶清單", actions: [
         ],
       ),
       // backgroundColor: Colors.blue.withAlpha(1),
-      body: _sort ? reorderable() : listView(),
-      floatingActionButton:
-          (_sort == false)
-              ? FloatingActionButton(
-                backgroundColor: SysColor.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(40.0),
-                ),
-                onPressed: _onAdd,
-                child: Icon(Icons.add, size: 30.0),
-              )
-              : null,
-    );
-  }
-
-  Widget reorderable() {
-    return ReorderableListView(
-      padding: const EdgeInsets.symmetric(horizontal: 0),
-      children: <Widget>[
-        for (int index = 0; index < _list.length; index += 1)
-          listTile(index, Icons.drag_handle),
-      ],
-      onReorder: (int oldIndex, int newIndex) {
-        setState(() {
-          if (oldIndex < newIndex) {
-            newIndex -= 1;
-          }
-          final dynamic item = _list.removeAt(oldIndex);
-          _list.insert(newIndex, item);
-          storage.setJsonArray("stopwatch", _list);
-        });
-      },
+      body: listView(),
     );
   }
 
@@ -211,44 +112,12 @@ class _StopWatchListState extends State<StopWatchList> {
               ),
             );
           },
-          onLongPress: () async {
-            active = index;
-            setState(() {});
-            final result = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const StopWatchEdit(),
-                settings: RouteSettings(arguments: _list[index]),
-              ),
-            );
-            setState(() {
-              if (result != null) {
-                storage.setInt("stopwatchActive", active);
-                for (var i = 0; i < _list.length; i++) {
-                  var el = _list[i];
-                  if (el["key"] == result["key"]) {
-                    el = result;
-                    break;
-                  }
-                }
-              } else {
-                storage.setInt("stopwatchActive", -1);
-                _list.removeAt(index);
-                index = -1;
-              }
-            });
-          },
         );
       },
     );
   }
 
-  ListTile listTile(
-    int index,
-    IconData trailing, {
-    Function()? onTap,
-    Function()? onLongPress,
-  }) {
+  ListTile listTile(int index, IconData trailing, {Function()? onTap}) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final Color oddItemColor = colorScheme.primary.withValues(alpha: 0.05);
     final Color evenItemColor = colorScheme.primary.withValues(alpha: 0.15);
@@ -290,7 +159,6 @@ class _StopWatchListState extends State<StopWatchList> {
       selected: active == index,
       selectedTileColor: Colors.blue.withValues(alpha: 0.15),
       onTap: onTap,
-      onLongPress: onLongPress,
     );
   }
 

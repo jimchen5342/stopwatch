@@ -28,8 +28,8 @@ class StorageManager {
     localStorage.setItem(key, value);
   }
 
-  getInt(String key) {
-    var s = localStorage.getItem(key) ?? "0";
+  getInt(String key, {int defaultVaule = 0}) {
+    var s = localStorage.getItem(key) ?? "$defaultVaule";
     return int.parse(s);
   }
 

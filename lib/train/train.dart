@@ -240,17 +240,43 @@ class _TrainState extends State<Train> {
       itemCount: recoders.length,
       itemBuilder: (context, index) {
         return ListTile(
-          contentPadding: EdgeInsets.only(left: 10, right: 10),
+          contentPadding: EdgeInsets.only(left: 5, right: 5, top: 0, bottom: 0),
           isThreeLine: false,
           minTileHeight: 10,
-          title: Text(
-            recoders[index],
-            style: TextStyle(
-              // fontSize: 25,
-              color: active == index ? SysColor.red : null,
-            ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(right: 5.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.blueAccent),
+                ),
+                child: Text(
+                  "${(index + 1).toString().padLeft(2, '0') + "."}",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight:
+                        active == index ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(right: 5.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.blueAccent),
+                ),
+                child: Text(
+                  recoders[index],
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight:
+                        active == index ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+              ),
+            ],
           ),
-          // contentPadding: EdgeInsets.all(0.0),
         );
       },
     );
