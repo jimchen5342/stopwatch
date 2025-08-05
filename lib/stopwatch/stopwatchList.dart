@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:myapp/system/module.dart';
 import 'package:myapp/widgets/module.dart';
 import 'package:myapp/stopwatch/stopwatch.dart';
-import 'package:myapp/stopwatch/stopwatchEdit.dart';
 import 'package:myapp/system/fetch.dart';
 
 class StopWatchList extends StatefulWidget {
@@ -16,7 +15,7 @@ class _StopWatchListState extends State<StopWatchList> {
   StorageManager storage = StorageManager();
   List<dynamic> _list = [];
   int active = -1;
-  bool _sort = false;
+  bool _isBusy = false;
 
   @override
   initState() {
@@ -27,8 +26,7 @@ class _StopWatchListState extends State<StopWatchList> {
       active = storage.getInt("stopwatchActive", defaultVaule: -1);
       _list = storage.getJsonArray("stopwatch");
       if (_list.isEmpty && active == -1) {
-        _list = await fetch("stopwatch");
-        storage.setJsonArray("stopwatch", _list);
+        await download();
       }
       setState(() {});
     });
@@ -80,12 +78,38 @@ class _StopWatchListState extends State<StopWatchList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar("碼錶清單", actions: [
+      appBar: appBar(
+        "碼錶清單",
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh, color: Colors.white),
+            onPressed: () async {
+              await download();
+            },
+          ),
         ],
       ),
       // backgroundColor: Colors.blue.withAlpha(1),
-      body: listView(),
+      body: _isBusy ? waitCursor() : listView(),
     );
+  }
+
+  download() async {
+    setState(() {
+      _isBusy = true; // Show wait cursor
+    });
+    await Future.delayed(Duration(seconds: 1));
+
+    _list = await fetch("stopwatch");
+    storage.setJsonArray("stopwatch", _list);
+
+    setState(() {
+      _isBusy = false;
+    });
+  }
+
+  Widget waitCursor() {
+    return Center(child: CircularProgressIndicator());
   }
 
   Widget listView() {
@@ -156,18 +180,6 @@ class _StopWatchListState extends State<StopWatchList> {
       selectedTileColor: SysColor.selectedItem,
       onTap: onTap,
     );
-  }
-
-  void _onAdd() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const StopWatchEdit()),
-    );
-    if (result != null) {
-      setState(() {
-        _list.add(result);
-      });
-    }
   }
 
   void showSnackBar() {

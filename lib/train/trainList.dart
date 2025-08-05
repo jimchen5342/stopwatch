@@ -15,6 +15,7 @@ class _TrainListState extends State<TrainList> {
   StorageManager storage = StorageManager();
   List<dynamic> _list = [];
   int active = -1;
+  var _isBusy = false;
 
   @override
   initState() {
@@ -25,8 +26,7 @@ class _TrainListState extends State<TrainList> {
       active = storage.getInt("trainActive", defaultVaule: -1);
       _list = storage.getJsonArray("train");
       if (_list.isEmpty && active == -1) {
-        _list = await fetch("train");
-        storage.setJsonArray("train", _list);
+        download();
       }
       setState(() {});
     });
@@ -42,6 +42,19 @@ class _TrainListState extends State<TrainList> {
     super.reassemble();
     // storage.setJsonArray("train", []);
     // setState(() {});
+  }
+
+  download() async {
+    setState(() {
+      _isBusy = true; // Show wait cursor
+    });
+    await Future.delayed(Duration(seconds: 1));
+
+    _list = await fetch("train");
+    storage.setJsonArray("train", _list);
+    setState(() {
+      _isBusy = false;
+    });
   }
 
   String descrip(dynamic json) {
@@ -62,12 +75,24 @@ class _TrainListState extends State<TrainList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar("訓練清單", actions: [
+      appBar: appBar(
+        "訓練清單",
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh, color: Colors.white),
+            onPressed: () async {
+              await download();
+            },
+          ),
         ],
       ),
       // backgroundColor: Colors.blue.withAlpha(1),
-      body: listView(),
+      body: _isBusy ? waitCursor() : listView(),
     );
+  }
+
+  Widget waitCursor() {
+    return Center(child: CircularProgressIndicator());
   }
 
   Widget listView() {

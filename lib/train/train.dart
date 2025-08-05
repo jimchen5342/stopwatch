@@ -203,7 +203,7 @@ class _TrainState extends State<Train> {
             onPressed: () => _exitSetup(),
           ),
         ),
-        body: Center(child: body()),
+        body: Container(margin: const EdgeInsets.all(5.0), child: body()),
       ),
     );
   }
@@ -215,29 +215,31 @@ class _TrainState extends State<Train> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              json != null ? SecondsToString(json["workout"]).toChinese() : "",
+              "訓練：${json != null ? SecondsToString(json["workout"]).toChinese() : ""}",
               style: TextStyle(fontSize: 20, color: Colors.red),
             ),
             Text(
-              json != null ? SecondsToString(json["rest"]).toChinese() : "",
+              "休息：${json != null ? SecondsToString(json["rest"]).toChinese() : ""}",
               style: TextStyle(fontSize: 20, color: Colors.red),
             ),
             Text(
-              json != null ? SecondsToString(json["cycle"]).toChinese() : "",
+              "${json != null ? json["cycle"] : ""}組",
               style: TextStyle(fontSize: 20, color: Colors.red),
             ),
           ],
         ),
+        SizedBox(height: 10),
         Expanded(
           child: Container(
-            margin: const EdgeInsets.all(5.0),
-            // color: SysColor.gray,
-            // padding: const EdgeInsets.all(2.0),
-            // decoration: BoxDecoration(border: Border.all(color: SysColor.gray)),
+            margin: const EdgeInsets.all(0.0),
+            // color: SysColor.orange,
+            decoration: BoxDecoration(
+              border: Border.all(color: SysColor.gray, width: 2),
+            ),
             child: plan(),
           ),
         ),
