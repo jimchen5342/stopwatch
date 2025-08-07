@@ -21,8 +21,11 @@ class StopWatch extends StatefulWidget {
 class _StopWatchState extends State<StopWatch> {
   TextToSpeech tts = TextToSpeech();
   final FlutterBackgroundService _service = FlutterBackgroundService();
-  int _secondsElapsed = 0,  frequency = 60, _nextTime = -1,
-      _finalCountdown = -1, times = 0;
+  int _secondsElapsed = 0,
+      frequency = 60,
+      _nextTime = -1,
+      _finalCountdown = -1,
+      times = 0;
   bool _isRunning = false, begin = false, showButton = true;
   dynamic json;
   List<String> recoders = [];
@@ -82,7 +85,8 @@ class _StopWatchState extends State<StopWatch> {
         "message": descript().replaceAll("\n", "；"),
       });
       bool isRunning = await _service.isRunning();
-      if (isRunning) { // 如果正在運行，則停止服務
+      if (isRunning) {
+        // 如果正在運行，則停止服務
         _toggleService();
       }
       debugPrint('sendNotification.result: $result');
@@ -138,8 +142,8 @@ class _StopWatchState extends State<StopWatch> {
       // debugPrint("$TAG _secondsElapsed: $_secondsElapsed, _nextTime: $_nextTime");
       if (_secondsElapsed > 0) {
         var s1 = "";
-        if (json.containsKey('interval1') && json.containsKey('interval2')) {
-          if (json["interval1"] is num && json["interval2"] is num) {
+        if (json.containsKey('itv1') && json.containsKey('itv2')) {
+          if (json["itv1"] is num && json["itv2"] is num) {
             var isec = json["interval$index"],
                 idiff = _nextTime - _secondsElapsed;
             if (isec >= 60 && idiff == 10) {
@@ -200,14 +204,12 @@ class _StopWatchState extends State<StopWatch> {
 
   void resetNextTime() {
     if (json is Map) {
-      if (json.containsKey('interval1') && json.containsKey('interval2')) {
-        if (json["interval1"] is num && json["interval2"] is num) {
-          if (json["interval1"] > 0 && json["interval2"] > 0) {
+      if (json.containsKey('itv1') && json.containsKey('itv2')) {
+        if (json["itv1"] is num && json["itv2"] is num) {
+          if (json["itv1"] > 0 && json["itv2"] > 0) {
             var sec =
-                json["interval1Unit"] is String && json["interval1Unit"] == "S"
-                    ? 1
-                    : 60;
-            _nextTime = json["interval1"] * sec;
+                json["itv1Unit"] is String && json["itv1Unit"] == "S" ? 1 : 60;
+            _nextTime = json["itv1"] * sec;
             index = "1";
           }
         }
@@ -438,25 +440,21 @@ class _StopWatchState extends State<StopWatch> {
                 : "分";
         s1 = '間隔 ${json["interval"]} $unit鐘報時';
       }
-      if (json["interval1"] is num && json["interval1"] > 0) {
+      if (json["itv1"] is num && json["itv1"] > 0) {
         String unit =
-            json["interval1Unit"] is String && json["interval1Unit"] == "S"
-                ? "秒"
-                : "分";
-        String txt = "${json["interval1Txt"]}";
+            json["itv1Unit"] is String && json["itv1Unit"] == "S" ? "秒" : "分";
+        String txt = "${json["itv1Txt"]}";
         txt = txt.isEmpty ? "" : "後，$txt";
 
-        s1 += "\n${json["interval1"]} $unit鐘$txt";
+        s1 += "\n${json["itv1"]} $unit鐘$txt";
       }
-      if (json["interval2"] is num && json["interval2"] > 0) {
+      if (json["itv2"] is num && json["itv2"] > 0) {
         String unit =
-            json["interval2Unit"] is String && json["interval2Unit"] == "S"
-                ? "秒"
-                : "分";
-        String txt = "${json["interval2Txt"]}";
+            json["itv2Unit"] is String && json["itv2Unit"] == "S" ? "秒" : "分";
+        String txt = "${json["itv2Txt"]}";
         txt = txt.isEmpty ? "" : "後，$txt";
 
-        s1 += "\n${json["interval2"]} $unit鐘$txt";
+        s1 += "\n${json["itv2"]} $unit鐘$txt";
       }
     }
     if (s1.indexOf("\n") == 0) {

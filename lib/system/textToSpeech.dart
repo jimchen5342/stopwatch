@@ -1,26 +1,36 @@
-// ignore_for_file: camel_case_types
-
+// ignore: file_names
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:flutter/foundation.dart';
+import 'package:myapp/system/module.dart';
+import 'dart:async';
 
 class TextToSpeech {
   late FlutterTts flutterTts;
   String ttsLanguage = "zh-TW"; // 預設中文台灣
+  String TAG = "StopWatch-TTS";
 
   TextToSpeech() {
     flutterTts = FlutterTts();
     _getDefaultEngine();
     _getDefaultVoice();
+    // _getLanguages();
 
     flutterTts.setStartHandler(() {
-      // debugPrint("Playing");
+      debugPrint(
+        "$TAG: Playing....${DateTime.now().format(pattern: 'mm:ss.ms')}",
+      );
     });
 
+    // TODO: Consider handling potential issues if a new speak call occurs before the previous one completes.
     flutterTts.setCompletionHandler(() {
-      // debugPrint("Complete");
+      debugPrint(
+        "$TAG: Complete....${DateTime.now().format(pattern: 'mm:ss.ms')}",
+      );
+      _completer?.complete("Completed");
     });
 
     flutterTts.setCancelHandler(() {
-      // debugPrint("Cancel");
+      // debugPrint("$TAG: Cancel");
     });
 
     flutterTts.setPauseHandler(() {
@@ -32,7 +42,7 @@ class TextToSpeech {
     });
 
     flutterTts.setErrorHandler((msg) {
-      // debugPrint("TTS error: $msg");
+      debugPrint("$TAG: error: $msg");
     });
   }
 
@@ -48,22 +58,35 @@ class TextToSpeech {
     }
   }
 
+  Completer<String>? _completer;
+
   Future<String> speak(String text) async {
+    _completer = Completer<String>();
     var result = await flutterTts.speak(text);
-    return '$result';
+    if (result == 1) {
+      return _completer!.future;
+    }
+    return 'Failed to speak';
   }
 
   Future<void> _getDefaultEngine() async {
     var engine = await flutterTts.getDefaultEngine;
     if (engine != null) {
-      print(engine);
+      debugPrint(engine);
     }
   }
 
   Future<void> _getDefaultVoice() async {
     var voice = await flutterTts.getDefaultVoice;
     if (voice != null) {
-      print(voice);
+      // debugPrint(voice);
     }
+  }
+
+  Future<void> _getLanguages() async {
+    List<dynamic> languages = await flutterTts.getLanguages;
+    languages.forEach((language) {
+      // debugPrint(language);
+    });
   }
 }

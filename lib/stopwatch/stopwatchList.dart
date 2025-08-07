@@ -53,23 +53,19 @@ class _StopWatchListState extends State<StopWatchList> {
                 : "分";
         s1 = '間隔 ${json['interval']} $unit鐘報時';
       }
-      if (json["interval1"] is num && json["interval1"] > 0) {
+      if (json["itv1"] is num && json["itv1"] > 0) {
         String unit =
-            json["interval1Unit"] is String && json["interval1Unit"] == "S"
-                ? "秒"
-                : "分";
-        String txt = "${json["interval1Txt"]}";
+            json["itv1Unit"] is String && json["itv1Unit"] == "S" ? "秒" : "分";
+        String txt = "${json["itv1Txt"]}";
         txt = txt.isEmpty ? "" : "後$txt";
-        s1 += "${s1.isNotEmpty ? '；' : ''}${json["interval1"]}${unit}鐘$txt";
+        s1 += "${s1.isNotEmpty ? '；' : ''}${json["itv1"]}${unit}鐘$txt";
       }
-      if (json["interval2"] is num && json["interval2"] > 0) {
+      if (json["itv2"] is num && json["itv2"] > 0) {
         String unit =
-            json["interval2Unit"] is String && json["interval2Unit"] == "S"
-                ? "秒"
-                : "分";
-        String txt = "${json["interval2Txt"]}";
+            json["itv2Unit"] is String && json["itv2Unit"] == "S" ? "秒" : "分";
+        String txt = "${json["itv2Txt"]}";
         txt = txt.isEmpty ? "" : "後$txt";
-        s1 += "，${json["interval2"]}$unit鐘$txt";
+        s1 += "，${json["itv2"]}$unit鐘$txt";
       }
     } else {}
     return s1;
