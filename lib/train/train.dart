@@ -24,6 +24,7 @@ class _TrainState extends State<Train> {
   bool _isRunning = false, begin = false, showButton = true;
   dynamic json;
   List<dynamic> recoders = [];
+  final ScrollController _scrollController = ScrollController();
 
   var _secondsStart = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   String index = "-1";
@@ -127,6 +128,9 @@ class _TrainState extends State<Train> {
   @override
   void reassemble() async {
     super.reassemble();
+    active = 3;
+    scrollTo();
+    setState(() {});
   }
 
   // 檢查服務狀態並更新 UI
@@ -203,7 +207,11 @@ class _TrainState extends State<Train> {
             onPressed: () => _exitSetup(),
           ),
         ),
-        body: Container(margin: const EdgeInsets.all(5.0), child: body()),
+        body: Container(
+          // margin: const EdgeInsets.all(5.0),
+          color: SysColor.gray,
+          child: Container(margin: const EdgeInsets.all(5.0), child: body()),
+        ),
       ),
     );
   }
@@ -236,72 +244,94 @@ class _TrainState extends State<Train> {
         Expanded(
           child: Container(
             margin: const EdgeInsets.all(0.0),
-            // color: SysColor.orange,
             decoration: BoxDecoration(
-              border: Border.all(color: SysColor.gray, width: 2),
+              border: Border.all(color: Colors.white38, width: 2),
+              borderRadius: BorderRadius.circular(10.0),
             ),
+            clipBehavior: Clip.hardEdge,
             child: plan(),
           ),
         ),
-        Text(
-          "test",
-          style: TextStyle(
-            fontSize: 90,
-            color: _finalCountdown > 0 ? SysColor.red : null,
-          ),
-          textAlign: TextAlign.center,
-        ),
+        footer(),
       ],
     );
   }
 
   Widget plan() {
-    return ListView.builder(
-      itemCount: recoders.length,
-      itemBuilder: (context, index) {
-        return ListTile(
-          contentPadding: EdgeInsets.only(left: 5, right: 5, top: 0, bottom: 0),
-          isThreeLine: false,
-          minTileHeight: 10,
-          tileColor: index % 2 == 0 ? SysColor.oddItem : SysColor.evenItem,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                margin: const EdgeInsets.only(right: 5.0),
-                // decoration: BoxDecoration(
-                //   border: Border.all(color: Colors.blueAccent),
-                // ),
-                child: Text(
-                  "${(index + 1).toString().padLeft(2, '0') + "."}",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight:
-                        active == index ? FontWeight.bold : FontWeight.normal,
+    // 不能用 ListView，不然會 overflow 會有問題
+    return SingleChildScrollView(
+      controller: _scrollController,
+      child: Column(
+        children: List.generate(recoders.length, (index) {
+          return Container(
+            margin: const EdgeInsets.only(right: 5.0),
+            width: double.infinity,
+            color:
+                active == index
+                    ? SysColor.selectedItem
+                    : (index % 2 == 0 ? SysColor.oddItem : SysColor.evenItem),
+            height: 80,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  // margin: const EdgeInsets.only(right: 5.0),
+                  padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+                  child: Text(
+                    "${(index + 1).toString().padLeft(2, '0')}.",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight:
+                          active == index ? FontWeight.bold : FontWeight.normal,
+                      color: active == index ? SysColor.primary : null,
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(right: 5.0),
-                // decoration: BoxDecoration(
-                //   border: Border.all(color: Colors.blueAccent),
-                // ),
-                child: Text(
-                  recoders[index],
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight:
-                        active == index ? FontWeight.bold : FontWeight.normal,
+                Container(
+                  margin: const EdgeInsets.only(right: 5.0),
+                  child: Text(
+                    recoders[index],
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight:
+                          active == index ? FontWeight.bold : FontWeight.normal,
+                      color: active == index ? SysColor.primary : null,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ),
-              ),
-            ],
-          ),
-          selected: active == index,
-          selectedTileColor: SysColor.selectedItem,
-        );
-      },
+              ],
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget footer() {
+    return Container(
+      margin: const EdgeInsets.all(5.0),
+      width: double.infinity,
+      height: 100,
+      // color: Colors.amber,
+      child: Text(
+        "test",
+        style: TextStyle(
+          fontSize: 40,
+          color: _finalCountdown > 0 ? SysColor.red : null,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  void scrollTo() {
+    _scrollController.animateTo(
+      active * 80.0, // 目標位置（以像素為單位）
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
     );
   }
 
