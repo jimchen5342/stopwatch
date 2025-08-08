@@ -96,7 +96,7 @@ class _TrainState extends State<Train> {
     bool isRunning = await _service.isRunning();
     if (isRunning == true) {
       _service.invoke("stop");
-      speak("關閉碼錶");
+      speak("關閉");
       stopNotification();
     }
     // _service.on('update').listen(null);
@@ -162,14 +162,14 @@ class _TrainState extends State<Train> {
       _service.invoke("stop");
       setState(() {
         var str = SecondsToString(_secondsElapsed).toChinese();
-        speak("時間 $str；停止碼錶");
+        speak("時間 $str；停止");
         _isRunning = false;
         _secondsElapsed = 0; // 根據需求決定是否重置
         _finalCountdown = -1;
       });
     } else {
       _finalCountdown = 15;
-      await speak("${json['title']}，倒數 $_finalCountdown 秒，啟動碼錶");
+      await speak("${json['title']}，倒數 $_finalCountdown 秒，啟動");
       _isRunning = true;
       setState(() {});
       await _service.startService();
@@ -253,6 +253,7 @@ class _TrainState extends State<Train> {
           ),
         ),
         footer(),
+        _btnsRow(),
       ],
     );
   }
@@ -324,6 +325,53 @@ class _TrainState extends State<Train> {
         ),
         textAlign: TextAlign.center,
       ),
+    );
+  }
+
+  OutlinedButton _btn(
+    txt, {
+    Function()? onPressed,
+    Function()? onLongPress,
+    Color backgroundColor = Colors.blue,
+  }) {
+    return OutlinedButton(
+      onPressed: onPressed,
+      onLongPress: onLongPress,
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        foregroundColor: Colors.white,
+        backgroundColor: backgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        side: BorderSide(width: 5, color: backgroundColor),
+      ),
+      child: Text(txt, style: TextStyle(fontSize: 25, color: Colors.white)),
+    );
+  }
+
+  Widget _btnsRow() {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _btn(
+          _isRunning ? '停止' : '啟動',
+          backgroundColor: _isRunning ? SysColor.red : SysColor.primary,
+          // 啟動
+          onPressed: () {
+            if (!_isRunning) {
+              _toggleService();
+            }
+          },
+          // 長按，停止
+          onLongPress: () {
+            if (_isRunning) {
+              _toggleService();
+            }
+          },
+        ),
+      ],
     );
   }
 

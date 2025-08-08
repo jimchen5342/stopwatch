@@ -137,10 +137,10 @@ class _TrainListState extends State<TrainList> {
               fontWeight: active == index ? FontWeight.bold : FontWeight.normal,
             ),
           ),
-          Text(
-            SecondsToString(_list[index]["workout"]).toChinese(),
-            style: TextStyle(fontSize: 20, color: Colors.red),
-          ),
+          // Text(
+          //   SecondsToString(_list[index]["workout"]).toChinese(),
+          //   style: TextStyle(fontSize: 20, color: Colors.red),
+          // ),
         ],
       ),
       subtitle: Text(
