@@ -43,7 +43,7 @@ class _StopWatchState extends State<StopWatch> {
     // 監聽來自背景服務的 'update' 事件
     _service.on('update').listen((event) {
       if (event != null && event.containsKey("timestamp")) {
-        int timestamp = event["timestamp"] as int;
+        // int timestamp = event["timestamp"] as int;
         // var date1 = new DateTime.fromMicrosecondsSinceEpoch(widget.timestamp);
         // var date2 = new DateTime.fromMicrosecondsSinceEpoch(timestamp);
         // debugPrint(
@@ -144,7 +144,7 @@ class _StopWatchState extends State<StopWatch> {
         var s1 = "";
         if (json.containsKey('itv1') && json.containsKey('itv2')) {
           if (json["itv1"] is num && json["itv2"] is num) {
-            var isec = json["interval$index"],
+            var isec = json["itv$index"],
                 idiff = _nextTime - _secondsElapsed;
             if (isec >= 60 && idiff == 10) {
               speak("倒數 $idiff 秒");
@@ -152,7 +152,7 @@ class _StopWatchState extends State<StopWatch> {
           }
         }
         if (_secondsElapsed >= _nextTime && _nextTime > -1) {
-          s1 = "${json['interval${index}Txt']}";
+          s1 = "${json['itv${index}Txt']}";
           s1 = s1.isEmpty ? " " : "，$s1";
           if (frequency == 0 && index == "1") {
             s1 += "；第 ${times + 1} 次";
@@ -161,11 +161,11 @@ class _StopWatchState extends State<StopWatch> {
 
           index = index == "1" ? "2" : "1";
           var sec2 =
-              json["interval${index}Unit"] is String &&
-                      json["interval${index}Unit"] == "S"
+              json["itv${index}Unit"] is String &&
+                      json["itv${index}Unit"] == "S"
                   ? 1
                   : 60;
-          _nextTime = (json["interval$index"] * sec2) + _secondsElapsed;
+          _nextTime = (json["itv$index"] * sec2) + _secondsElapsed;
         }
 
         if ((frequency > 0 && _secondsElapsed % frequency == 0) ||
@@ -498,7 +498,7 @@ class _StopWatchState extends State<StopWatch> {
   }
 
   String _nextTimeText(String index) {
-    var txt = "${json["interval${index}Txt"]}";
+    var txt = "${json["itv${index}Txt"]}";
     txt = txt.isEmpty ? "" : "，$txt";
     return "在 ${SecondsToString(_nextTime).toFormat()}$txt";
   }
