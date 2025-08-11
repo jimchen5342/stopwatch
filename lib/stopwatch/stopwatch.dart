@@ -43,7 +43,7 @@ class _StopWatchState extends State<StopWatch> {
     // 監聽來自背景服務的 'update' 事件
     _service.on('update').listen((event) {
       if (event != null && event.containsKey("timestamp")) {
-        int timestamp = event["timestamp"] as int;
+        // int timestamp = event["timestamp"] as int;
         // var date1 = new DateTime.fromMicrosecondsSinceEpoch(widget.timestamp);
         // var date2 = new DateTime.fromMicrosecondsSinceEpoch(timestamp);
         // debugPrint(
