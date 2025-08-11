@@ -222,24 +222,7 @@ class _TrainState extends State<Train> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              "訓練：${json != null ? SecondsToString(json["workout"]).toChinese() : ""}",
-              style: TextStyle(fontSize: 20, color: Colors.red),
-            ),
-            Text(
-              "休息：${json != null ? SecondsToString(json["rest"]).toChinese() : ""}",
-              style: TextStyle(fontSize: 20, color: Colors.red),
-            ),
-            Text(
-              "${json != null ? json["cycle"] : ""}組",
-              style: TextStyle(fontSize: 20, color: Colors.red),
-            ),
-          ],
-        ),
+        header(),
         SizedBox(height: 10),
         Expanded(
           child: Container(
@@ -254,6 +237,29 @@ class _TrainState extends State<Train> {
         ),
         footer(),
         _btnsRow(),
+      ],
+    );
+  }
+
+  Widget header() {
+    var fontSize = 20.0;
+    var red = Colors.red;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          "訓練：${json != null ? SecondsToString(json["workout"]).toChinese() : ""}",
+          style: TextStyle(fontSize: fontSize, color: red),
+        ),
+        Text(
+          "休息：${json != null ? SecondsToString(json["rest"]).toChinese() : ""}",
+          style: TextStyle(fontSize: fontSize, color: red),
+        ),
+        Text(
+          "${json != null ? json["cycle"] : ""}組",
+          style: TextStyle(fontSize: fontSize, color: red),
+        ),
       ],
     );
   }
