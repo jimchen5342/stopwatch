@@ -57,6 +57,7 @@ class _TrainState extends State<Train> {
           recoders = json["items"] as List<dynamic>;
         }
       }
+      _isRunning = true;
     });
   }
 
@@ -132,7 +133,8 @@ class _TrainState extends State<Train> {
 
     // active = 3;
     // scrollTo();
-    // setState(() {});
+    _isRunning = true;
+    setState(() {});
   }
 
   // 檢查服務狀態並更新 UI
@@ -220,27 +222,26 @@ class _TrainState extends State<Train> {
 
   // SecondsToString(_list[index]["workout"]).toChinese()
   Widget body() {
+    var container = Container(
+      height: _isRunning ? double.infinity : height * 3.5, //
+      // width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 10.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.4), width: 2),
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+      clipBehavior: Clip.hardEdge,
+      child: plan(),
+    );
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         header(),
         SizedBox(height: 10),
-        Expanded(
-          child: Container(
-            margin: const EdgeInsets.all(0.0),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.grey.withValues(alpha: 0.4),
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(5.0),
-            ),
-            clipBehavior: Clip.hardEdge,
-            child: plan(),
-          ),
-        ),
-        footer(),
+        if (_isRunning) container,
+        Expanded(child: !_isRunning ? container : counter()),
         _btnsRow(),
       ],
     );
@@ -349,13 +350,13 @@ class _TrainState extends State<Train> {
     );
   }
 
-  Widget footer() {
+  Widget counter() {
     return Container(
       margin: const EdgeInsets.all(5.0),
       width: double.infinity,
       // color: Colors.amber,
       child: Text(
-        "test",
+        "00:00",
         style: TextStyle(
           fontSize: 40,
           color: _finalCountdown > 0 ? SysColor.red : null,
