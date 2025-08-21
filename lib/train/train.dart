@@ -21,6 +21,7 @@ class _TrainState extends State<Train> {
   TextToSpeech tts = TextToSpeech();
   final FlutterBackgroundService _service = FlutterBackgroundService();
   int _secondsElapsed = 0, _finalCountdown = -1, times = 0, active = -1;
+  var height = 60.0;
   bool _isRunning = false, begin = false, showButton = true;
   dynamic json;
   List<dynamic> recoders = [];
@@ -128,9 +129,10 @@ class _TrainState extends State<Train> {
   @override
   void reassemble() async {
     super.reassemble();
-    active = 3;
-    scrollTo();
-    setState(() {});
+
+    // active = 3;
+    // scrollTo();
+    // setState(() {});
   }
 
   // 檢查服務狀態並更新 UI
@@ -228,8 +230,11 @@ class _TrainState extends State<Train> {
           child: Container(
             margin: const EdgeInsets.all(0.0),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.white38, width: 2),
-              borderRadius: BorderRadius.circular(10.0),
+              border: Border.all(
+                color: Colors.grey.withValues(alpha: 0.4),
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(5.0),
             ),
             clipBehavior: Clip.hardEdge,
             child: plan(),
@@ -243,23 +248,35 @@ class _TrainState extends State<Train> {
 
   Widget header() {
     var fontSize = 20.0;
-    var red = Colors.red;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           "訓練：${json != null ? SecondsToString(json["workout"]).toChinese() : ""}",
-          style: TextStyle(fontSize: fontSize, color: red),
+          style: TextStyle(
+            fontSize: fontSize,
+            fontWeight: FontWeight.bold,
+            color: SysColor.primary,
+          ),
         ),
         Text(
           "休息：${json != null ? SecondsToString(json["rest"]).toChinese() : ""}",
-          style: TextStyle(fontSize: fontSize, color: red),
+          style: TextStyle(
+            fontSize: fontSize,
+            fontWeight: FontWeight.bold,
+            color: SysColor.primary,
+          ),
         ),
-        Text(
-          "${json != null ? json["cycle"] : ""}組",
-          style: TextStyle(fontSize: fontSize, color: red),
-        ),
+        if (json != null && json["cycle"] > 1)
+          Text(
+            "${json["cycle"]}組",
+            style: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: SysColor.primary,
+            ),
+          ),
       ],
     );
   }
@@ -271,20 +288,29 @@ class _TrainState extends State<Train> {
       child: Column(
         children: List.generate(recoders.length, (index) {
           return Container(
-            margin: const EdgeInsets.only(right: 5.0),
+            // margin: const EdgeInsets.only(right: 5.0),
             width: double.infinity,
             color:
                 active == index
                     ? SysColor.selectedItem
                     : (index % 2 == 0 ? SysColor.oddItem : SysColor.evenItem),
-            height: 80,
+            height: height,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  // margin: const EdgeInsets.only(right: 5.0),
-                  padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+                  padding: const EdgeInsets.only(
+                    left: 5.0,
+                    right: 10.0,
+                    top: 5,
+                  ),
+                  // decoration: BoxDecoration(
+                  //   border: Border.all(
+                  //     color: Colors.grey.withValues(alpha: 0.4),
+                  //     width: 2,
+                  //   ),
+                  // ),
                   child: Text(
                     "${(index + 1).toString().padLeft(2, '0')}.",
                     style: TextStyle(
@@ -297,6 +323,12 @@ class _TrainState extends State<Train> {
                 ),
                 Container(
                   margin: const EdgeInsets.only(right: 5.0),
+                  // decoration: BoxDecoration(
+                  //   border: Border.all(
+                  //     color: Colors.grey.withValues(alpha: 0.4),
+                  //     width: 2,
+                  //   ),
+                  // ),
                   child: Text(
                     recoders[index],
                     style: TextStyle(
@@ -321,7 +353,6 @@ class _TrainState extends State<Train> {
     return Container(
       margin: const EdgeInsets.all(5.0),
       width: double.infinity,
-      height: 100,
       // color: Colors.amber,
       child: Text(
         "test",
@@ -383,7 +414,7 @@ class _TrainState extends State<Train> {
 
   void scrollTo() {
     _scrollController.animateTo(
-      active * 80.0, // 目標位置（以像素為單位）
+      active * height, // 目標位置（以像素為單位）
       duration: Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
