@@ -48,6 +48,7 @@ class _TrainState extends State<Train> {
         listenToService(event["seconds"]);
       }
     });
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       json = ModalRoute.of(context)?.settings.arguments;
       setState(() {});
@@ -57,7 +58,6 @@ class _TrainState extends State<Train> {
           recoders = json["items"] as List<dynamic>;
         }
       }
-      _isRunning = true;
     });
   }
 
@@ -242,7 +242,7 @@ class _TrainState extends State<Train> {
         SizedBox(height: 10),
         if (_isRunning) container,
         Expanded(child: !_isRunning ? container : counter()),
-        _btnsRow(),
+        // btnsRow(),
       ],
     );
   }
@@ -366,7 +366,7 @@ class _TrainState extends State<Train> {
     );
   }
 
-  OutlinedButton _btn(
+  OutlinedButton btn(
     txt, {
     Function()? onPressed,
     Function()? onLongPress,
@@ -388,12 +388,12 @@ class _TrainState extends State<Train> {
     );
   }
 
-  Widget _btnsRow() {
+  Widget btnsRow() {
     return Row(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _btn(
+        btn(
           _isRunning ? '停止' : '啟動',
           backgroundColor: _isRunning ? SysColor.red : SysColor.primary,
           // 啟動
