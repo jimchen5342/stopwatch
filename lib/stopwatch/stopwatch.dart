@@ -125,9 +125,7 @@ class _StopWatchState extends State<StopWatch> {
     setState(() {
       var now = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
       if (_finalCountdown > -1) {
-        if (_finalCountdown == 20 ||
-            _finalCountdown == 10 ||
-            _finalCountdown == 5) {
+        if (_finalCountdown == 5) { // _finalCountdown == 10 ||
           speak("倒數 $_finalCountdown 秒");
         } else if (_finalCountdown == 1) {
           speak("開始");
