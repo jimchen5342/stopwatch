@@ -34,18 +34,18 @@ public class LocalNotification {
    * @param message 通知內容
    */
   public void sendNotification(String title, String message, boolean next) {
-    // 建立 PendingIntent 給按鈕 1
+    // 建立 PendingIntent 給按鈕 Stop
     Intent intentButton1 = new Intent(context, MyNotificationReceiver.class);
     intentButton1.setAction(MyNotificationReceiver.ACTION_BUTTON_STOP);
     intentButton1.putExtra(MyNotificationReceiver.EXTRA_NOTIFICATION_ID, NOTIFICATION_ID);
-    PendingIntent pendingIntentButton1 = PendingIntent.getBroadcast(
+    PendingIntent pendingIntentButtonStop = PendingIntent.getBroadcast(
             context,
             0, // requestCode
             intentButton1,
             PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
     );
 
-    // 建立 PendingIntent 給按鈕 2
+    // 建立 PendingIntent 給按鈕 Next
     Intent intentButton2 = new Intent(context, MyNotificationReceiver.class);
     intentButton2.setAction(MyNotificationReceiver.ACTION_BUTTON_NEXT);
     intentButton2.putExtra(MyNotificationReceiver.EXTRA_NOTIFICATION_ID, NOTIFICATION_ID);
@@ -60,10 +60,8 @@ public class LocalNotification {
     NotificationCompat.Action actionStop = new NotificationCompat.Action.Builder(
             android.R.drawable.btn_star_big_on, // 替換為您的圖示資源
             "Stop",
-            pendingIntentButton1
+            pendingIntentButtonStop
     ).build();
-
-
 
     NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.running) // 替換為您的通知小圖示

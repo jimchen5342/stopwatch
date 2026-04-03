@@ -236,7 +236,7 @@ class _StopWatchState extends State<StopWatch> {
         _finalCountdown = -1;
       });
     } else {
-      _finalCountdown = 15;
+      _finalCountdown = 10;
       await speak("${json['title']}，倒數 $_finalCountdown 秒，啟動碼錶");
       _isRunning = true;
       recoders = [];

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/stopwatch/stopwatchList.dart';
 import 'package:myapp/train/trainList.dart';
+import 'package:myapp/counting/counting.dart';
 // import 'package:myapp/countdown/countdownList.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:myapp/system/module.dart';
@@ -44,6 +45,7 @@ class _HomeState extends State<Home> {
   static const List<Widget> _widgetOptions = <Widget>[
     StopWatchList(), // 碼錶
     TrainList(), // 訓練
+    Counting(), // 計次，還沒想好怎麼做 UI，先放在這裡；2026-04-03
     // CountDownList(),
   ];
 
@@ -87,6 +89,10 @@ class _HomeState extends State<Home> {
           icon: Icon(Icons.list_alt_sharp),
           label: '訓練清單',
         ),
+        // BottomNavigationBarItem( // 計次，還沒想好怎麼做 UI，先放在這裡；2026-04-03
+        //   icon: Icon(Icons.list_alt_sharp),
+        //   label: '計次', 
+        // ),
         // BottomNavigationBarItem(icon: Icon(Icons.alarm), label: '計時器'),
       ],
       currentIndex: _selectedIndex, // 目前選中的項目索引

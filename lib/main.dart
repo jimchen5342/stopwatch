@@ -69,10 +69,10 @@ Future<void> initializeService() async {
       autoStart: false, // 手動啟動
       isForegroundMode: true, // 啟用前景模式, 不要改
       // 前景通知的設定
-      // notificationChannelId: 'my_foreground',
-      initialNotificationTitle: '背景碼錶',
-      initialNotificationContent: '正在初始化...',
-      foregroundServiceNotificationId: 888,
+      notificationChannelId: 'stopwatch_local_notification',
+      initialNotificationTitle: '碼錶',
+      initialNotificationContent: '初始化...',
+      foregroundServiceNotificationId: 5342,
     ),
     // iOS 設定 (此範例主要針對 Android)
     iosConfiguration: IosConfiguration(
