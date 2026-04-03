@@ -261,28 +261,8 @@ class _TrainState extends State<Train> {
             color: SysColor.primary,
           ),
         ),
-<<<<<<< HEAD
-        Text(
-          "休息：${json != null ? SecondsToString(json["rest"]).toChinese() : ""}",
-          style: TextStyle(
-            fontSize: fontSize,
-            fontWeight: FontWeight.bold,
-            color: SysColor.primary,
-          ),
-        ),
-        if (json != null && json["cycle"] > 1)
-          Text(
-            "${json["cycle"]}組",
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: SysColor.primary,
-            ),
-          ),
-=======
         // footer(),
-        _btnsRow(),
->>>>>>> dd2a221 (2026-04-03 20:30)
+        // _btnsRow(),
       ],
     );
   }
