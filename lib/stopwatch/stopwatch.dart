@@ -85,7 +85,7 @@ class _StopWatchState extends State<StopWatch> {
         "message": descript().replaceAll("\n", "；"),
       });
       bool isRunning = await _service.isRunning();
-      if (isRunning) {
+      if (isRunning && _finalCountdown == -1) {
         // 如果正在運行，則停止服務
         _toggleService();
       }
@@ -235,15 +235,17 @@ class _StopWatchState extends State<StopWatch> {
       });
     } else {
       _finalCountdown = 10;
+      await _service.startService();
+      _service.invoke("start", {"timestamp": widget.timestamp});
+      sendNotification();
+      _finalCountdown = 10;
       await speak("${json['title']}，倒數 $_finalCountdown 秒，啟動碼錶");
       _isRunning = true;
       recoders = [];
       resetHistory = [];
       resetNextTime();
       setState(() {});
-      await _service.startService();
-      _service.invoke("start", {"timestamp": widget.timestamp});
-      sendNotification();
+      
     }
     Timer(Duration(seconds: 1), () {
       setState(() {
