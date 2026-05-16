@@ -67,6 +67,7 @@ Future<void> initializeService() async {
       // 當服務啟動時執行的函數
       onStart: onStart,
       autoStart: false, // 手動啟動
+      autoStartOnBoot: false, // 不要在開機時自動啟動
       isForegroundMode: true, // 啟用前景模式, 不要改
       // 前景通知的設定
       notificationChannelId: 'stopwatch_local_notification',
