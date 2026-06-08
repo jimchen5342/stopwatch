@@ -33,7 +33,7 @@ public class LocalNotification {
    * @param title 通知標題
    * @param message 通知內容
    */
-  public void sendNotification(String title, String message, boolean next) {
+  public void sendNotification(String title, String message) {
     // 建立 PendingIntent 給按鈕 Stop
     Intent intentButton1 = new Intent(context, MyNotificationReceiver.class);
     intentButton1.setAction(MyNotificationReceiver.ACTION_BUTTON_STOP);
@@ -59,7 +59,7 @@ public class LocalNotification {
     // 建立 NotificationCompat.Action
     NotificationCompat.Action actionStop = new NotificationCompat.Action.Builder(
             android.R.drawable.btn_star_big_on, // 替換為您的圖示資源
-            "Stop",
+            "結束計時",
             pendingIntentButtonStop
     ).build();
 
@@ -71,13 +71,11 @@ public class LocalNotification {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC) // 設定在鎖定螢幕上顯示完整內容
             .addAction(actionStop)
             .setAutoCancel(true); // 點擊通知主體時自動取消 (可選)
-    if(next) {
-      builder.addAction(new NotificationCompat.Action.Builder(
-              android.R.drawable.ic_media_next, // 替換為您的圖示資源
-              "Next",
-              pendingIntentButton2
-      ).build());
-    }
+    builder.addAction(new NotificationCompat.Action.Builder(
+            android.R.drawable.ic_media_next, // 替換為您的圖示資源
+            "重新開始",
+            pendingIntentButton2
+    ).build());
 
     NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 

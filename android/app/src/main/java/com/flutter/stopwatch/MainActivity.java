@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class MainActivity extends FlutterActivity {
     String TAG = "StopWatch";
-    private LocalNotification localNotification;
+    public static LocalNotification localNotification;
     public static MethodChannel.Result methodResult;
 
     @Override
@@ -39,7 +39,7 @@ public class MainActivity extends FlutterActivity {
                 String title = (String) arguments.get("title");
                 String message = (String) arguments.get("message");
                 
-                localNotification.sendNotification(title, message, false);
+                localNotification.sendNotification(title, message);
                 methodResult = result;
             } else if(call.method.equals("stopNotification")) {
                 localNotification.cancel();

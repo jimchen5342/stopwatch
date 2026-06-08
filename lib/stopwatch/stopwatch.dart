@@ -84,14 +84,20 @@ class _StopWatchState extends State<StopWatch> {
         "title": "${json['title']}",
         "message": descript().replaceAll("\n", "；"),
       });
+
+      // debugPrint('sendNotification.result: $result');
+
       bool isRunning = await _service.isRunning();
       if (isRunning && _finalCountdown == -1) {
-        // 如果正在運行，則停止服務
-        _toggleService();
+        if(result == "STOP") {
+          // 如果正在運行，則停止服務
+          _toggleService();
+        } else if(result == "NEXT") {
+          _reset();
+        }
       }
-      debugPrint('sendNotification.result: $result');
     } on PlatformException catch (e) {
-      debugPrint("Failed to get battery level: '${e.message}'.");
+      debugPrint("Failed: '${e.message}'.");
     }
   }
 
@@ -100,7 +106,7 @@ class _StopWatchState extends State<StopWatch> {
       final result = await platform.invokeMethod<String>('stopNotification');
       debugPrint('stopNotification.result: $result');
     } on PlatformException catch (e) {
-      debugPrint("Failed to get battery level: '${e.message}'.");
+      debugPrint("Failed: '${e.message}'.");
     }
   }
 
@@ -185,7 +191,6 @@ class _StopWatchState extends State<StopWatch> {
     setState(() {
       _isRunning = isRunning;
       if (isRunning) {
-        _isRunning = false;
         _service.invoke("stop");
         _secondsElapsed = 0;
         // _text = "碼錶執行中... (從背景恢復)";
@@ -238,14 +243,12 @@ class _StopWatchState extends State<StopWatch> {
       await _service.startService();
       _service.invoke("start", {"timestamp": widget.timestamp});
       sendNotification();
-      _finalCountdown = 10;
-      await speak("${json['title']}，倒數 $_finalCountdown 秒，啟動碼錶");
+      await speak("${json['title']}"); // ，倒數 $_finalCountdown 秒，啟動碼錶
       _isRunning = true;
       recoders = [];
       resetHistory = [];
       resetNextTime();
       setState(() {});
-      
     }
     Timer(Duration(seconds: 1), () {
       setState(() {
@@ -254,20 +257,21 @@ class _StopWatchState extends State<StopWatch> {
     });
   }
 
-  void _reset() {
+  void _reset() async {
+    var sec = 15;
     resetHistory.add(SecondsToString(_secondsElapsed).toFormat());
     var str = SecondsToString(_secondsElapsed).toChinese();
-    speak("時間 $str；碼錶歸零");
+    await speak("時間 $str；碼錶歸零，倒數 $sec 秒，重新開始");
     _secondsElapsed = 0;
     _nextTime = -1;
-    _finalCountdown = -1;
+    _finalCountdown = sec;
     _secondsStart = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
     resetNextTime();
+    sendNotification();
     setState(() {});
   }
 
   Future<void> speak(String txt) async {
-    debugPrint("$TAG speak: $txt");
     var result = await tts.speak(txt);
     var s = "${DateTime.now().format(pattern: "HH:mm:ss:ms")} => $txt";
     // debugPrint("stopWatch: $s");

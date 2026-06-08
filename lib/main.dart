@@ -9,7 +9,6 @@ import 'package:myapp/system/module.dart';
 String TAG = "stopwatchMain";
 void main() {
   runApp(MyApp());
-  // runApp(StoragePermissionExample());
 }
 
 class MyApp extends StatelessWidget with WidgetsBindingObserver {

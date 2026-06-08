@@ -20,8 +20,14 @@ public class MyNotificationReceiver extends BroadcastReceiver {
     if (MainActivity.methodResult != null) {
       if (ACTION_BUTTON_STOP.equals(action)) {
         MainActivity.methodResult.success("STOP");
+        MainActivity.methodResult = null; // 避免重複觸發
+        MainActivity.localNotification.cancel();
+        // MainActivity.localNotification = null;
       } else if (ACTION_BUTTON_NEXT.equals(action)) {
         MainActivity.methodResult.success("NEXT");
+        MainActivity.methodResult = null; // 避免重複觸發
+        MainActivity.localNotification.cancel();
+        // MainActivity.localNotification = null;
       }
     } else {
       Log.w("StopWatchReceiver", "methodResult was null, action: " + action + ". The event will be lost.");

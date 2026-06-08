@@ -16,16 +16,16 @@ class TextToSpeech {
     // _getLanguages();
 
     flutterTts.setStartHandler(() {
-      debugPrint(
-        "$TAG: Playing....${DateTime.now().format(pattern: 'mm:ss.ms')}",
-      );
+      // debugPrint(
+      //   "$TAG: Playing....${DateTime.now().format(pattern: 'mm:ss.ms')}",
+      // );
     });
 
     // TODO: Consider handling potential issues if a new speak call occurs before the previous one completes.
     flutterTts.setCompletionHandler(() {
-      debugPrint(
-        "$TAG: Complete....${DateTime.now().format(pattern: 'mm:ss.ms')}",
-      );
+      // debugPrint(
+      //   "$TAG: Complete....${DateTime.now().format(pattern: 'mm:ss.ms')}",
+      // );
       _completer?.complete("Completed");
     });
 
@@ -62,6 +62,7 @@ class TextToSpeech {
 
   Future<String> speak(String text) async {
     _completer = Completer<String>();
+    debugPrint("speak: $text");
     var result = await flutterTts.speak(text);
     if (result == 1) {
       return _completer!.future;
