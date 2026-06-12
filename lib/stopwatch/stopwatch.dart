@@ -8,8 +8,6 @@ import 'package:myapp/system/module.dart';
 import 'package:myapp/widgets/module.dart';
 import 'package:flutter/services.dart';
 
-String TAG = "StopWatch";
-
 class StopWatch extends StatefulWidget {
   final int timestamp;
   const StopWatch({super.key, this.timestamp = 0});
@@ -19,71 +17,74 @@ class StopWatch extends StatefulWidget {
 }
 
 class _StopWatchState extends State<StopWatch> {
-  TextToSpeech tts = TextToSpeech();
+  // static const String _tag = "StopWatch";
+  static const MethodChannel _platform = MethodChannel('com.flutter/MethodChannel');
+
+  final TextToSpeech tts = TextToSpeech();
   final FlutterBackgroundService _service = FlutterBackgroundService();
+  StreamSubscription? _serviceSubscription;
+
   int _secondsElapsed = 0,
-      frequency = 60,
+      _frequency = 60,
       _nextTime = -1,
       _finalCountdown = -1,
-      times = 0;
-  bool _isRunning = false, begin = false, showButton = true;
-  dynamic json;
-  List<String> recoders = [];
-  var _secondsStart = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-  String index = "-1";
-  List<String> resetHistory = [];
-  static const platform = MethodChannel('com.flutter/MethodChannel');
+      _times = 0;
+  bool _isRunning = false, _begin = false, _showButton = true;
+  Map<String, dynamic>? _json;
+  int _secondsStart = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+  String _currentIndex = "-1";
+  List<String> _resetHistory = [];
 
   @override
-  initState() {
+  void initState() {
     super.initState();
     tts.setup();
     _checkServiceStatus();
 
-    // 監聽來自背景服務的 'update' 事件
-    _service.on('update').listen((event) {
+    _serviceSubscription = _service.on('update').listen((event) {
       if (event != null && event.containsKey("timestamp")) {
         if (event["timestamp"] != widget.timestamp) {
           return;
         }
       }
-      if (begin && event != null && event.containsKey("seconds")) {
-        listenToService(event["seconds"]);
+      if (_begin && event != null && event.containsKey("seconds")) {
+        _listenToService(event["seconds"]);
       }
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      json = ModalRoute.of(context)?.settings.arguments;
-      setState(() {});
 
-      if (json is Map && json.containsKey("interval")) {
-        var sec =
-            (json["intervalUnit"] is String && json["intervalUnit"] == "S"
-                ? 1
-                : 60);
-        frequency = json["interval"] * sec;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is Map<String, dynamic>) {
+        setState(() {
+          _json = args;
+          final interval = _json!["interval"] as int? ?? 0;
+          final unit = _json!["intervalUnit"] == "S" ? 1 : 60;
+          _frequency = interval * unit;
+          resetNextTime();
+        });
       }
-      resetNextTime();
     });
   }
 
   @override
-  void dispose() async {
-    close();
+  void dispose() {
+    _serviceSubscription?.cancel();
+    _close();
     super.dispose();
   }
 
-  sendNotification() async {
+  Future<void> sendNotification() async {
+    if (_json == null) return;
     try {
-      final result = await platform.invokeMethod<String>('sendNotification', {
-        "title": "${json['title']}",
-        "message": descript().replaceAll("\n", "；"),
+      final result = await _platform.invokeMethod<String>('sendNotification', {
+        "title": "${_json!['title']}",
+        "message": _getDescription().replaceAll("\n", "；"),
       });
 
-      // debugPrint('sendNotification.result: $result');
-
+      if (!mounted) return;
+      
       bool isRunning = await _service.isRunning();
       if (isRunning && _finalCountdown == -1) {
-      // if (isRunning && _secondsElapsed > 0) {
         if(result == "STOP") {
           // 如果正在運行，則停止服務
           _toggleService();
@@ -96,139 +97,125 @@ class _StopWatchState extends State<StopWatch> {
     }
   }
 
-  stopNotification() async {
+  Future<void> _stopNotification() async {
     try {
-      final result = await platform.invokeMethod<String>('stopNotification');
-      debugPrint('stopNotification.result: $result');
+      await _platform.invokeMethod<String>('stopNotification');
     } on PlatformException catch (e) {
       debugPrint("Failed: '${e.message}'.");
     }
   }
 
-  void close() async {
-    // var date = new DateTime.fromMicrosecondsSinceEpoch(widget.timestamp);
-    // debugPrint("$TAG close: ${date.format(pattern: 'mm:ss')}");
+  void _close() async {
     bool isRunning = await _service.isRunning();
-    if (isRunning == true) {
+    if (isRunning) {
       _service.invoke("stop");
       speak("關閉碼錶");
-      stopNotification();
+      _stopNotification();
     }
     _isRunning = false;
     _secondsElapsed = 0;
     _nextTime = -1;
     _finalCountdown = -1;
-    // _service.on('update').listen(null);
-    // tts = null;
   }
 
-  void listenToService(int second) {
+  void _listenToService(int second) {
     setState(() {
-      var now = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
-      if(_isRunning == false) {
-        return;
-      }
+      final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      if (!_isRunning) return;
+
       if (_finalCountdown > -1) {
         if (_finalCountdown == 1) {
           _finalCountdown = -1;
           speak("開始");
           _secondsStart = now;
-          times = 0;
+          _times = 0;
         } else {
-          if (_finalCountdown == 5) { // _finalCountdown == 10 ||
+          if (_finalCountdown == 5) {
             speak("倒數 $_finalCountdown 秒");
           }
           _finalCountdown--;
-          return;
         } 
+        return;
       }
 
       _secondsElapsed = now - _secondsStart;
-      // debugPrint("$TAG _secondsElapsed: $_secondsElapsed, _nextTime: $_nextTime");
       if (_secondsElapsed > 0) {
-        var s1 = "";
-        if (json.containsKey('itv1') && json.containsKey('itv2')) {
-          if (json["itv1"] is num && json["itv2"] is num) {
-            var isec = json["itv$index"], idiff = _nextTime - _secondsElapsed;
-            if (isec >= 60 && idiff == 10) {
-              speak("倒數 $idiff 秒");
+        String intervalSpeakText = "";
+        if (_json != null && _json!.containsKey('itv1') && _json!.containsKey('itv2')) {
+          final currentItv = _json!["itv$_currentIndex"];
+          if (currentItv is num) {
+            final diff = _nextTime - _secondsElapsed;
+            if (currentItv >= 60 && diff == 10) {
+              speak("倒數 $diff 秒");
             }
           }
         }
+
         if (_secondsElapsed >= _nextTime && _nextTime > -1) {
-          s1 = "${json['itv${index}Txt']}";
-          s1 = s1.isEmpty ? " " : "，$s1";
-          if (frequency == 0 && index == "1") {
-            s1 += "；第 ${times + 1} 次";
-            times++;
+          intervalSpeakText = "${_json?['itv${_currentIndex}Txt'] ?? ''}";
+          intervalSpeakText = intervalSpeakText.isEmpty ? " " : "，$intervalSpeakText";
+          
+          if (_frequency == 0 && _currentIndex == "1") {
+            intervalSpeakText += "；第 ${_times + 1} 次";
+            _times++;
           }
 
-          index = index == "1" ? "2" : "1";
-          var sec2 =
-              json["itv${index}Unit"] is String &&
-                      json["itv${index}Unit"] == "S"
-                  ? 1
-                  : 60;
-          _nextTime = (json["itv$index"] * sec2) + _secondsElapsed;
+          _currentIndex = _currentIndex == "1" ? "2" : "1";
+          final unit = _json!["itv${_currentIndex}Unit"] == "S" ? 1 : 60;
+          final nextVal = _json!["itv$_currentIndex"] as num? ?? 0;
+          _nextTime = (nextVal.toInt() * unit) + _secondsElapsed;
         }
 
-        if ((frequency > 0 && _secondsElapsed % frequency == 0) ||
-            s1.isNotEmpty) {
-          var str = SecondsToString(_secondsElapsed).toChinese();
-          speak("時間 $str$s1");
+        if ((_frequency > 0 && _secondsElapsed % _frequency == 0) || intervalSpeakText.isNotEmpty) {
+          final timeStr = SecondsToString(_secondsElapsed).toChinese();
+          speak("時間 $timeStr$intervalSpeakText");
         }
       }
     });
-  }
-
-  @override
-  void reassemble() async {
-    super.reassemble();
   }
 
   // 檢查服務狀態並更新 UI
   void _checkServiceStatus() async {
     bool isRunning = await _service.isRunning();
     setState(() {
-      _isRunning = isRunning;
+      _isRunning = false; // 初始化時強制為 false，讓使用者手動啟動
       if (isRunning) {
         _service.invoke("stop");
-      } else {
       }
       _secondsElapsed = 0;
-      setState(() {});
     });
   }
 
   void resetNextTime() {
-    if (json is Map) {
-      if (json.containsKey('itv1') && json.containsKey('itv2')) {
-        if (json["itv1"] is num && json["itv2"] is num) {
-          if (json["itv1"] > 0 && json["itv2"] > 0) {
-            var sec =
-                json["itv1Unit"] is String && json["itv1Unit"] == "S" ? 1 : 60;
-            _nextTime = json["itv1"] * sec;
-            index = "1";
-          }
-        }
+    final map = _json;
+    if (map != null && map.containsKey('itv1') && map.containsKey('itv2')) {
+      final itv1 = map["itv1"];
+      final itv2 = map["itv2"];
+      if (itv1 is num && itv2 is num && itv1 > 0 && itv2 > 0) {
+        final unit = map["itv1Unit"] == "S" ? 1 : 60;
+        _nextTime = itv1.toInt() * unit;
+        _currentIndex = "1";
       }
     }
   }
 
   // 啟動或停止服務的函數
   void _toggleService() async {
+    if (_json == null) return;
+    
     setState(() {
-      showButton = false;
+      _showButton = false;
     });
-    begin = true;
+    _begin = true;
     bool isRunning = await _service.isRunning();
     if (isRunning) {
       // 如果正在運行，則停止服務
-      stopNotification();
+      _stopNotification();
       _service.invoke("stop");
       setState(() {
-        var str = SecondsToString(_secondsElapsed).toChinese();
-        resetHistory.add(SecondsToString(_secondsElapsed).toFormat());
+        final str = SecondsToString(_secondsElapsed).toChinese();
+        // _resetHistory.add(SecondsToString(_secondsElapsed).toFormat());
+        _addHistory();
         speak("時間 $str；停止碼錶");
         _isRunning = false;
         _secondsElapsed = 0; // 根據需求決定是否重置
@@ -239,30 +226,34 @@ class _StopWatchState extends State<StopWatch> {
       await _service.startService();
       _service.invoke("start", {"timestamp": widget.timestamp});
       sendNotification();
-      await speak("${json['title']}"); // ，倒數 $_finalCountdown 秒，啟動碼錶
+      await speak("${_json?['title']}"); // ，倒數 $_finalCountdown 秒，啟動碼錶
       _finalCountdown = 10;
       _isRunning = true;
-      recoders = [];
       // resetHistory = [];
       resetNextTime();
       setState(() {});
     }
     Timer(Duration(seconds: 1), () {
       setState(() {
-        showButton = !showButton;
+        _showButton = !_showButton;
       });
     });
   }
 
+  void _addHistory() {
+    final startTimeStr = DateTime.fromMillisecondsSinceEpoch(_secondsStart * 1000).format(pattern: 'HH:mm:ss');
+    final elapsed = SecondsToString(_secondsElapsed).toFormat();
+    _resetHistory.add("$startTimeStr,$elapsed");
+  }
+
   void _reset() async {
-    resetHistory.add(SecondsToString(_secondsElapsed).toFormat());
+    _addHistory();
     var str = SecondsToString(_secondsElapsed).toChinese();
     _finalCountdown = -1;
     _secondsElapsed = 0;
     _isRunning = false;
-    showButton = false;
+    _showButton = false;
     setState(() {});
-
       var sec = 15;
       await speak("時間 $str；碼錶歸零，倒數 $sec 秒，重新開始");
       _nextTime = -1;
@@ -274,19 +265,14 @@ class _StopWatchState extends State<StopWatch> {
       setState(() {
         Timer(Duration(seconds: 1), () {
           setState(() {
-            showButton = !showButton;
+            _showButton = !_showButton;
           });
         });
       });    
   }
 
   Future<void> speak(String txt) async {
-    var result = await tts.speak(txt);
-    var s = "${DateTime.now().format(pattern: "HH:mm:ss:ms")} => $txt";
-    // debugPrint("stopWatch: $s");
-    if (result == "1" && _secondsElapsed > 0) {
-      recoders.insert(0, s);
-    }
+    await tts.speak(txt);
     return;
   }
 
@@ -305,7 +291,7 @@ class _StopWatchState extends State<StopWatch> {
   Widget scaffold() {
     return Scaffold(
       appBar: appBar(
-        "碼錶${json != null ? ' [ ' + json['title'] + ' ]' : ''}",
+        "碼錶${_json != null ? ' [ ' + _json!['title'] + ' ]' : ''}",
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => _exitSetup(),
@@ -320,7 +306,6 @@ class _StopWatchState extends State<StopWatch> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        _history(),
         Text(
           SecondsToString(
             _finalCountdown > 0 ? _finalCountdown : _secondsElapsed,
@@ -340,49 +325,50 @@ class _StopWatchState extends State<StopWatch> {
           // ),
           height: 60,
           child:
-            showButton == false || _finalCountdown > -1 ? null : _btnsRow(),
+            _showButton == false || _finalCountdown > -1 ? null : _btnsRow(),
         ),
         if (_isRunning && _nextTime > -1)
           Container(
             margin: const EdgeInsets.all(5.0),
             child: Text(
-              _nextTimeText(index),
+              _nextTimeText(_currentIndex),
               style: TextStyle(fontSize: 25, color: SysColor.primary),
             ),
           ),
-        if (recoders.isNotEmpty) SizedBox(height: 10),
-        if (recoders.isNotEmpty) _recorders(),
-        if (recoders.isEmpty) _content(),
+        SizedBox(height: 10),
+        _buildDescriptionContent(),
+        SizedBox(height: 10),
+        Expanded(
+          child: _history(),
+        ),
       ],
     );
   }
 
   Widget _history() {
-    List<Widget> arr = [];
-    for (var (index, item) in resetHistory.indexed) {
-      arr.add(
-        Container(
-          margin: EdgeInsets.only(left: index == 0 ? 0 : 10.0),
-          // padding: const EdgeInsets.only(left: 3.0, right: 3.0),
-          // decoration: BoxDecoration(
-          //   border: Border.all(color: Colors.blueAccent),
-          // ),
-          child: Text(
-            item,
-            style: TextStyle(
-              fontSize: 25,
-              color: index % 2 == 0 ? SysColor.primary : null,
-            ),
+    return ListView.builder(
+      itemCount: _resetHistory.length,
+      itemBuilder: (context, index) {
+        final item = _resetHistory[index];
+        final parts = item.split(",");
+        final time = parts.length > 1 ? parts[0] : "";
+        final elapsed = parts.length > 1 ? parts[1] : item;
+
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.2))),
           ),
-        ),
-      );
-    }
-    return Container(
-      // margin: const EdgeInsets.all(15.0),
-      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-      // decoration: BoxDecoration(border: Border.all(color: Colors.blueAccent)),
-      height: 45,
-      child: Row(mainAxisAlignment: MainAxisAlignment.start, children: arr),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("第 ${index + 1} 次", style: TextStyle(fontSize: 18, color: Colors.grey)),
+              Text(time, style: TextStyle(fontSize: 18)),
+              Text(elapsed, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: SysColor.primary)),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -441,82 +427,51 @@ class _StopWatchState extends State<StopWatch> {
     );
   }
 
-  String descript() {
+  String _getDescription() {
+    if (_json == null) return "";
     String s1 = "";
+    final map = _json!;
 
-    if (json is Map) {
-      if (json.containsKey("interval") && json["interval"] > 0) {
-        String unit =
-            json["intervalUnit"] is String && json["intervalUnit"] == "S"
-                ? "秒"
-                : "分";
-        s1 = '間隔 ${json["interval"]} $unit鐘報時';
-      }
-      if (json["itv1"] is num && json["itv1"] > 0) {
-        String unit =
-            json["itv1Unit"] is String && json["itv1Unit"] == "S" ? "秒" : "分";
-        String txt = "${json["itv1Txt"]}";
+    if (map.containsKey("interval") && (map["interval"] as num) > 0) {
+      String unit = map["intervalUnit"] == "S" ? "秒" : "分";
+      s1 = '間隔 ${map["interval"]} $unit鐘報時';
+    }
+
+    void addItv(String key) {
+      if (map[key] is num && map[key] > 0) {
+        String unit = map["${key}Unit"] == "S" ? "秒" : "分";
+        String txt = "${map["${key}Txt"] ?? ''}";
         txt = txt.isEmpty ? "" : "後，$txt";
-
-        s1 += "\n${json["itv1"]} $unit鐘$txt";
-      }
-      if (json["itv2"] is num && json["itv2"] > 0) {
-        String unit =
-            json["itv2Unit"] is String && json["itv2Unit"] == "S" ? "秒" : "分";
-        String txt = "${json["itv2Txt"]}";
-        txt = txt.isEmpty ? "" : "後，$txt";
-
-        s1 += "\n${json["itv2"]} $unit鐘$txt";
+        s1 += "\n${map[key]} $unit鐘$txt";
       }
     }
-    if (s1.indexOf("\n") == 0) {
-      s1 = s1.substring(1);
-    }
-    return s1;
+
+    addItv("itv1");
+    addItv("itv2");
+
+    return s1.startsWith("\n") ? s1.substring(1) : s1;
   }
 
-  Widget _content() {
-    return Expanded(
+  Widget _buildDescriptionContent() {
+    return Container(
       child: Center(
         child: Text(
-          descript(),
+          _getDescription(),
           style: TextStyle(fontSize: 25, color: SysColor.primary),
+          textAlign: TextAlign.center,
         ),
       ),
     );
   }
 
-  Widget _recorders() { // 只是為了測試，實際上不需要顯示這些紀錄
-    return Expanded(
-      child: ListView.builder(
-        itemCount: recoders.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            contentPadding: EdgeInsets.only(left: 10, right: 10),
-            isThreeLine: false,
-            minTileHeight: 10,
-            title: Text(
-              recoders[index],
-              style: TextStyle(
-                // fontSize: 25,
-                color: recoders[index].contains("重新") ? SysColor.red : null,
-              ),
-            ),
-            // contentPadding: EdgeInsets.all(0.0),
-          );
-        },
-      ),
-    );
-  }
-
   String _nextTimeText(String index) {
-    var txt = "${json["itv${index}Txt"]}";
+    var txt = "${_json?["itv${index}Txt"] ?? ''}";
     txt = txt.isEmpty ? "" : "，$txt";
     return "在 ${SecondsToString(_nextTime).toFormat()}$txt";
   }
 
   void _exitSetup() {
-    close();
+    _close();
     Navigator.of(context).pop();
   }
 }
