@@ -43,12 +43,6 @@ class _StopWatchState extends State<StopWatch> {
     // 監聽來自背景服務的 'update' 事件
     _service.on('update').listen((event) {
       if (event != null && event.containsKey("timestamp")) {
-        // int timestamp = event["timestamp"] as int;
-        // var date1 = new DateTime.fromMicrosecondsSinceEpoch(widget.timestamp);
-        // var date2 = new DateTime.fromMicrosecondsSinceEpoch(timestamp);
-        // debugPrint(
-        //   "$TAG widget.timestamp: ${date1.format(pattern: 'mm:ss')}, update.timestamp: ${date2.format(pattern: 'mm:ss')}, ${event["timestamp"] == widget.timestamp}",
-        // );
         if (event["timestamp"] != widget.timestamp) {
           return;
         }
@@ -89,6 +83,7 @@ class _StopWatchState extends State<StopWatch> {
 
       bool isRunning = await _service.isRunning();
       if (isRunning && _finalCountdown == -1) {
+      // if (isRunning && _secondsElapsed > 0) {
         if(result == "STOP") {
           // 如果正在運行，則停止服務
           _toggleService();
@@ -130,16 +125,22 @@ class _StopWatchState extends State<StopWatch> {
   void listenToService(int second) {
     setState(() {
       var now = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+      if(_isRunning == false) {
+        return;
+      }
       if (_finalCountdown > -1) {
-        if (_finalCountdown == 5) { // _finalCountdown == 10 ||
-          speak("倒數 $_finalCountdown 秒");
-        } else if (_finalCountdown == 1) {
+        if (_finalCountdown == 1) {
+          _finalCountdown = -1;
           speak("開始");
           _secondsStart = now;
           times = 0;
-        }
-        _finalCountdown--;
-        return;
+        } else {
+          if (_finalCountdown == 5) { // _finalCountdown == 10 ||
+            speak("倒數 $_finalCountdown 秒");
+          }
+          _finalCountdown--;
+          return;
+        } 
       }
 
       _secondsElapsed = now - _secondsStart;
@@ -192,14 +193,9 @@ class _StopWatchState extends State<StopWatch> {
       _isRunning = isRunning;
       if (isRunning) {
         _service.invoke("stop");
-        _secondsElapsed = 0;
-        // _text = "碼錶執行中... (從背景恢復)";
-        // 如果服務正在運行，可以請求一次當前時間
-        // 注意：這需要你在 onStart 中處理一個 'requestCurrentTime' 之類的事件
       } else {
-        // _text = "";
-        _secondsElapsed = 0;
       }
+      _secondsElapsed = 0;
       setState(() {});
     });
   }
@@ -232,6 +228,7 @@ class _StopWatchState extends State<StopWatch> {
       _service.invoke("stop");
       setState(() {
         var str = SecondsToString(_secondsElapsed).toChinese();
+        resetHistory.add(SecondsToString(_secondsElapsed).toFormat());
         speak("時間 $str；停止碼錶");
         _isRunning = false;
         _secondsElapsed = 0; // 根據需求決定是否重置
@@ -239,14 +236,14 @@ class _StopWatchState extends State<StopWatch> {
         _finalCountdown = -1;
       });
     } else {
-      _finalCountdown = 10;
       await _service.startService();
       _service.invoke("start", {"timestamp": widget.timestamp});
       sendNotification();
       await speak("${json['title']}"); // ，倒數 $_finalCountdown 秒，啟動碼錶
+      _finalCountdown = 10;
       _isRunning = true;
       recoders = [];
-      resetHistory = [];
+      // resetHistory = [];
       resetNextTime();
       setState(() {});
     }
@@ -258,24 +255,36 @@ class _StopWatchState extends State<StopWatch> {
   }
 
   void _reset() async {
-    var sec = 15;
     resetHistory.add(SecondsToString(_secondsElapsed).toFormat());
     var str = SecondsToString(_secondsElapsed).toChinese();
-    await speak("時間 $str；碼錶歸零，倒數 $sec 秒，重新開始");
+    _finalCountdown = -1;
     _secondsElapsed = 0;
-    _nextTime = -1;
-    _finalCountdown = sec;
-    _secondsStart = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
-    resetNextTime();
-    sendNotification();
+    _isRunning = false;
+    showButton = false;
     setState(() {});
+
+      var sec = 15;
+      await speak("時間 $str；碼錶歸零，倒數 $sec 秒，重新開始");
+      _nextTime = -1;
+      _isRunning = true;
+      _finalCountdown = sec;
+      _secondsStart = (DateTime.now().millisecondsSinceEpoch ~/ 1000);
+      resetNextTime();
+      sendNotification();      
+      setState(() {
+        Timer(Duration(seconds: 1), () {
+          setState(() {
+            showButton = !showButton;
+          });
+        });
+      });    
   }
 
   Future<void> speak(String txt) async {
     var result = await tts.speak(txt);
     var s = "${DateTime.now().format(pattern: "HH:mm:ss:ms")} => $txt";
     // debugPrint("stopWatch: $s");
-    if (result == "1" && _finalCountdown == -1) {
+    if (result == "1" && _secondsElapsed > 0) {
       recoders.insert(0, s);
     }
     return;
@@ -331,7 +340,7 @@ class _StopWatchState extends State<StopWatch> {
           // ),
           height: 60,
           child:
-              showButton == false || _finalCountdown > -1 ? null : _btnsRow(),
+            showButton == false || _finalCountdown > -1 ? null : _btnsRow(),
         ),
         if (_isRunning && _nextTime > -1)
           Container(
@@ -477,7 +486,7 @@ class _StopWatchState extends State<StopWatch> {
     );
   }
 
-  Widget _recorders() {
+  Widget _recorders() { // 只是為了測試，實際上不需要顯示這些紀錄
     return Expanded(
       child: ListView.builder(
         itemCount: recoders.length,
