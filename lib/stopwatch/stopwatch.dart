@@ -24,7 +24,7 @@ class _StopWatchState extends State<StopWatch> {
   final FlutterBackgroundService _service = FlutterBackgroundService();
   StreamSubscription? _serviceSubscription;
 
-  int _secondsElapsed = 0,
+  int _secondsElapsed = 0, _minutesElapsed = 0,
       _frequency = 60,
       _nextTime = -1,
       _finalCountdown = -1,
@@ -73,12 +73,12 @@ class _StopWatchState extends State<StopWatch> {
     super.dispose();
   }
 
-  Future<void> sendNotification() async {
+  Future<void> sendNotification({String? msg}) async {
     if (_json == null) return;
     try {
       final result = await _platform.invokeMethod<String>('sendNotification', {
         "title": "${_json!['title']}",
-        "message": _getDescription().replaceAll("\n", "；"),
+        "message": msg ?? _getDescription().replaceAll("\n", "；"),
       });
 
       if (!mounted) return;
@@ -114,6 +114,7 @@ class _StopWatchState extends State<StopWatch> {
     }
     _isRunning = false;
     _secondsElapsed = 0;
+    _minutesElapsed = 0;
     _nextTime = -1;
     _finalCountdown = -1;
   }
@@ -171,6 +172,12 @@ class _StopWatchState extends State<StopWatch> {
           speak("時間 $timeStr$intervalSpeakText");
         }
       }
+      // 太吵了，又無法設定通知，不出聲音；2026-07-31
+      // int minutes = _secondsElapsed ~/ 60;
+      // if(minutes > 0 && _minutesElapsed != minutes) {
+      //   _minutesElapsed = minutes;
+      //   sendNotification(msg: "時間 $minutes 分鐘");
+      // }
     });
   }
 
@@ -183,6 +190,7 @@ class _StopWatchState extends State<StopWatch> {
         _service.invoke("stop");
       }
       _secondsElapsed = 0;
+      _minutesElapsed = 0;
     });
   }
 
@@ -219,6 +227,7 @@ class _StopWatchState extends State<StopWatch> {
         speak("時間 $str；停止碼錶");
         _isRunning = false;
         _secondsElapsed = 0; // 根據需求決定是否重置
+        _minutesElapsed = 0;
         _nextTime = -1;
         _finalCountdown = -1;
       });
@@ -251,6 +260,7 @@ class _StopWatchState extends State<StopWatch> {
     var str = SecondsToString(_secondsElapsed).toChinese();
     _finalCountdown = -1;
     _secondsElapsed = 0;
+    _minutesElapsed = 0;
     _isRunning = false;
     _showButton = false;
     setState(() {});

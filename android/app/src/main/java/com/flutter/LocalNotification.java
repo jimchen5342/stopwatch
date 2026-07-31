@@ -70,6 +70,9 @@ public class LocalNotification {
             .setPriority(NotificationCompat.PRIORITY_HIGH) // 設定高優先級
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC) // 設定在鎖定螢幕上顯示完整內容
             .addAction(actionStop)
+            // 移除聲音與震動設定
+            // .setSound(null) // 沒效
+            // .setVibrate(new long[0])
             .setAutoCancel(true); // 點擊通知主體時自動取消 (可選)
     builder.addAction(new NotificationCompat.Action.Builder(
             android.R.drawable.ic_media_next, // 替換為您的圖示資源

@@ -7,6 +7,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:myapp/system/module.dart';
 import 'dart:async';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:android_intent_plus/android_intent.dart';
+import 'package:android_intent_plus/flag.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -25,6 +27,7 @@ class _HomeState extends State<Home> {
   initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      checkAndRequestBatteryOptimization(context);
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       version = packageInfo.version;
       setState(() {});
@@ -133,5 +136,36 @@ class _HomeState extends State<Home> {
       b = true;
     }
     return b;
+  }
+}
+
+Future<void> checkAndRequestBatteryOptimization(BuildContext context) async {
+
+  // 1. 檢查目前是否已經「忽略電池最佳化」（即不受限制）
+  var status = await Permission.ignoreBatteryOptimizations.status;
+  
+  if (status.isDenied) {
+    // 2. 顯示對話框告知用戶原因（Android 要求必須先向用戶說明）
+    bool? confirm = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('需要關閉電池最佳化'),
+        content: const Text('為了讓語音播報在背景不被中斷，請將此 App 的電池設定改為「不受限制」。'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('取消')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('去設定')),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      // 3. 使用 Android Intent 跳轉至電池最佳化列表
+      // 使用 ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS 導向設定頁面
+      const intent = AndroidIntent(
+        action: 'android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS',
+        flags: [Flag.FLAG_ACTIVITY_NEW_TASK],
+      );
+      await intent.launch();
+    }
   }
 }
